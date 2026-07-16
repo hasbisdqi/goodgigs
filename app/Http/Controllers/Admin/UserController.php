@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -21,6 +22,7 @@ class UserController extends Controller
         $search = $request->query('search');
 
         $users = User::query()
+            ->with('roles')
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
@@ -29,8 +31,11 @@ class UserController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        $roles = Role::all();
+
         return Inertia::render('admin/users', [
             'users' => $users,
+            'roles' => $roles,
             'filters' => [
                 'search' => $search,
             ],
@@ -46,13 +51,19 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['string', 'exists:roles,name'],
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
+
+        if (! empty($validated['roles'])) {
+            $user->syncRoles($validated['roles']);
+        }
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -71,6 +82,8 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'password' => ['nullable', 'string', 'min:8'],
+            'roles' => ['nullable', 'array'],
+            'roles.*' => ['string', 'exists:roles,name'],
         ]);
 
         $user->name = $validated['name'];
@@ -81,6 +94,8 @@ class UserController extends Controller
         }
 
         $user->save();
+
+        $user->syncRoles($validated['roles'] ?? []);
 
         Inertia::flash('toast', [
             'type' => 'success',

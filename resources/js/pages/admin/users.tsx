@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { UserInfo } from '@/components/user-info';
+import { Checkbox } from '@/components/ui/checkbox';
 import InputError from '@/components/input-error';
 import { cn } from '@/lib/utils';
 import {
@@ -20,8 +21,17 @@ import { dashboard } from '@/routes';
 import { index as adminUsers } from '@/routes/admin/users';
 import type { User } from '@/types';
 
+type Role = {
+    id: number;
+    name: string;
+};
+
+type UserWithRoles = User & {
+    roles: Role[];
+};
+
 type UsersPagination = {
-    data: User[];
+    data: UserWithRoles[];
     links: Array<{
         url: string | null;
         label: string;
@@ -34,6 +44,7 @@ type UsersPagination = {
 
 type PageProps = {
     users: UsersPagination;
+    roles: Role[];
     filters: {
         search: string | null;
     };
@@ -42,23 +53,25 @@ type PageProps = {
     };
 };
 
-export default function UsersIndex({ users, filters, auth }: PageProps) {
+export default function UsersIndex({ users, roles, filters, auth }: PageProps) {
     const [searchVal, setSearchVal] = useState(filters.search || '');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedUser, setSelectedUser] = useState<UserWithRoles | null>(null);
 
     const createForm = useForm({
         name: '',
         email: '',
         password: '',
+        roles: [] as string[],
     });
 
     const editForm = useForm({
         name: '',
         email: '',
         password: '',
+        roles: [] as string[],
     });
 
     const handleSearchSubmit = (e: React.FormEvent) => {
@@ -76,12 +89,13 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
         });
     };
 
-    const openEditModal = (user: User) => {
+    const openEditModal = (user: UserWithRoles) => {
         setSelectedUser(user);
         editForm.setData({
             name: user.name,
             email: user.email,
             password: '',
+            roles: user.roles.map(r => r.name),
         });
         setIsEditOpen(true);
     };
@@ -99,7 +113,7 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
         });
     };
 
-    const openDeleteModal = (user: User) => {
+    const openDeleteModal = (user: UserWithRoles) => {
         setSelectedUser(user);
         setIsDeleteOpen(true);
     };
@@ -114,6 +128,22 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
                 setIsDeleteOpen(false);
             },
         });
+    };
+
+    const toggleRoleInCreate = (roleName: string) => {
+        const isChecked = createForm.data.roles.includes(roleName);
+        const updated = isChecked
+            ? createForm.data.roles.filter(r => r !== roleName)
+            : [...createForm.data.roles, roleName];
+        createForm.setData('roles', updated);
+    };
+
+    const toggleRoleInEdit = (roleName: string) => {
+        const isChecked = editForm.data.roles.includes(roleName);
+        const updated = isChecked
+            ? editForm.data.roles.filter(r => r !== roleName)
+            : [...editForm.data.roles, roleName];
+        editForm.setData('roles', updated);
     };
 
     return (
@@ -146,6 +176,7 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
                             <thead>
                                 <tr className="border-b border-border bg-muted/40 font-medium text-muted-foreground text-left">
                                     <th className="p-4">User</th>
+                                    <th className="p-4">Roles</th>
                                     <th className="p-4">Email Status</th>
                                     <th className="p-4">Registered At</th>
                                     <th className="p-4 text-right">Actions</th>
@@ -154,7 +185,7 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
                             <tbody className="divide-y divide-border">
                                 {users.data.length === 0 ? (
                                     <tr>
-                                        <td colSpan={4} className="p-8 text-center text-muted-foreground">
+                                        <td colSpan={5} className="p-8 text-center text-muted-foreground">
                                             No users found.
                                         </td>
                                     </tr>
@@ -164,6 +195,15 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
                                             <td className="p-4">
                                                 <div className="flex items-center gap-3">
                                                     <UserInfo user={user} />
+                                                </div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {user.roles && user.roles.map((role) => (
+                                                        <Badge key={role.id} variant="secondary" className="text-[10px] py-0.5 px-2 font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border-transparent">
+                                                            {role.name}
+                                                        </Badge>
+                                                    ))}
                                                 </div>
                                             </td>
                                             <td className="p-4">
@@ -253,7 +293,7 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
 
             {/* Create User Dialog */}
             <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogContent>
+                <DialogContent className="max-w-md">
                     <DialogHeader>
                         <DialogTitle>Add User</DialogTitle>
                         <DialogDescription>Create a new account by filling out the details below.</DialogDescription>
@@ -295,6 +335,28 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
                             <InputError message={createForm.errors.password} />
                         </div>
 
+                        <div className="grid gap-3 pt-2">
+                            <Label className="text-sm font-semibold">Assign Roles</Label>
+                            <div className="flex flex-wrap gap-4 border border-border rounded-lg p-3">
+                                {roles.map((role) => (
+                                    <div key={role.id} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`create-role-${role.id}`}
+                                            checked={createForm.data.roles.includes(role.name)}
+                                            onCheckedChange={() => toggleRoleInCreate(role.name)}
+                                        />
+                                        <label
+                                            htmlFor={`create-role-${role.id}`}
+                                            className="text-sm font-medium leading-none cursor-pointer"
+                                        >
+                                            {role.name}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                            <InputError message={createForm.errors.roles} />
+                        </div>
+
                         <DialogFooter className="pt-4">
                             <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
                                 Cancel
@@ -309,7 +371,7 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
 
             {/* Edit User Dialog */}
             <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-                <DialogContent>
+                <DialogContent className="max-w-md">
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
                         <DialogDescription>Update account information. Leave the password blank to keep the current password.</DialogDescription>
@@ -349,6 +411,28 @@ export default function UsersIndex({ users, filters, auth }: PageProps) {
                                 placeholder="Leave blank to keep current"
                             />
                             <InputError message={editForm.errors.password} />
+                        </div>
+
+                        <div className="grid gap-3 pt-2">
+                            <Label className="text-sm font-semibold">Roles Matrix</Label>
+                            <div className="flex flex-wrap gap-4 border border-border rounded-lg p-3">
+                                {roles.map((role) => (
+                                    <div key={role.id} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`edit-role-${role.id}`}
+                                            checked={editForm.data.roles.includes(role.name)}
+                                            onCheckedChange={() => toggleRoleInEdit(role.name)}
+                                        />
+                                        <label
+                                            htmlFor={`edit-role-${role.id}`}
+                                            className="text-sm font-medium leading-none cursor-pointer"
+                                        >
+                                            {role.name}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                            <InputError message={editForm.errors.roles} />
                         </div>
 
                         <DialogFooter className="pt-4">

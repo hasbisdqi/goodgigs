@@ -7,8 +7,12 @@ import { index as adminUsers } from '@/routes/admin/users';
 import { edit as profileEdit } from '@/routes/profile';
 import { edit as securityEdit } from '@/routes/security';
 
+import type { Auth } from '@/types';
+import { usePermission } from '@/hooks/use-permission';
+
 export default function Dashboard() {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
+    const { hasPermission } = usePermission();
 
     return (
         <>
@@ -30,32 +34,34 @@ export default function Dashboard() {
                 </div>
 
                 {/* Management Grid */}
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {/* User Management */}
-                    <Card className="flex flex-col justify-between hover:shadow-md transition-shadow">
-                        <CardHeader>
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl">
-                                    <Users className="size-6" />
+                    {hasPermission('manage users') && (
+                        <Card className="flex flex-col justify-between hover:shadow-md transition-shadow">
+                            <CardHeader>
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl">
+                                        <Users className="size-6" />
+                                    </div>
+                                    <div>
+                                        <CardTitle>User Management</CardTitle>
+                                        <CardDescription className="mt-1">Manage database accounts</CardDescription>
+                                    </div>
                                 </div>
-                                <div>
-                                    <CardTitle>User Management</CardTitle>
-                                    <CardDescription className="mt-1">Manage database accounts</CardDescription>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="flex flex-col gap-4 flex-1 justify-between">
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                Create new users, edit existing member accounts, and configure credentials.
-                            </p>
-                            <Button asChild className="w-full mt-4" variant="outline">
-                                <Link href={adminUsers.url()} prefetch className="flex items-center justify-center gap-2">
-                                    Manage Users
-                                    <ArrowRight className="size-4" />
-                                </Link>
-                            </Button>
-                        </CardContent>
-                    </Card>
+                            </CardHeader>
+                            <CardContent className="flex flex-col gap-4 flex-1 justify-between">
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    Create new users, edit existing member accounts, and configure credentials.
+                                </p>
+                                <Button asChild className="w-full mt-4" variant="outline">
+                                    <Link href={adminUsers.url()} prefetch className="flex items-center justify-center gap-2">
+                                        Manage Users
+                                        <ArrowRight className="size-4" />
+                                    </Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     {/* Profile Settings */}
                     <Card className="flex flex-col justify-between hover:shadow-md transition-shadow">
