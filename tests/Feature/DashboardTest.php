@@ -13,4 +13,11 @@ test('authenticated users can visit the dashboard', function () {
 
     $response = $this->get(route('dashboard'));
     $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('dashboard')
+        ->has('stats')
+        ->where('stats.total_gigs', 0)
+        ->where('stats.my_gigs', 0)
+        ->where('stats.urgent_gigs', 0)
+    );
 });

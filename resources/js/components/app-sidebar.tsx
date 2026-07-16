@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Users, Shield } from 'lucide-react';
+import { BookOpen, FolderGit2, LayoutGrid, Users, Shield, Briefcase } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -16,6 +16,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as adminUsers } from '@/routes/admin/users';
 import { index as adminRoles } from '@/routes/admin/roles';
+import { index as jobsIndex } from '@/routes/jobs';
 import { usePermission } from '@/hooks/use-permission';
 import type { NavItem } from '@/types';
 
@@ -40,6 +41,11 @@ export function AppSidebar() {
             title: 'Dashboard',
             href: dashboard(),
             icon: LayoutGrid,
+        },
+        {
+            title: 'Jobs',
+            href: jobsIndex.url(),
+            icon: Briefcase,
         },
     ];
 

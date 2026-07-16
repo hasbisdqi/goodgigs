@@ -519,6 +519,63 @@ Server-side patterns (Inertia::render, props, middleware) are covered in inertia
 - Forgetting to add loading states (skeleton screens) when using deferred props
 - Not handling the `undefined` state of deferred props before data loads
 - Using `<form>` without preventing default submission (use `<Form>` component or `e.preventDefault()`)
-- Forgetting to check if `<Form>` component is available in your Inertia version
 - Using `router.cancel()` instead of `router.cancelAll()` (v3 breaking change)
 - Using `router.on('invalid', ...)` or `router.on('exception', ...)` instead of the renamed `httpException` and `networkError` events
+
+## Responsive Dialog / Drawer Modals
+
+For modal dialogues and forms, follow the responsive modal pattern to ensure a premium user experience across both desktop and mobile viewports:
+1. Use a **Dialog** on desktop (viewport width >= 768px).
+2. Use a bottom-sliding **Drawer** on mobile (viewport width < 768px) to allow natural thumb interaction and better form inputs space.
+3. Extract form components to sub-functions or components to share state and elements between the desktop and mobile modals without code duplication.
+4. Detect mobile view using the `useIsMobile()` hook from `@/hooks/use-mobile`.
+
+### Code Pattern Example
+
+```typescript
+import { useState } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
+
+export function ResponsiveFormModal({ isOpen, setIsOpen }) {
+    const isMobile = useIsMobile();
+    
+    const title = "Edit Profile";
+    const description = "Update your profile information below.";
+    
+    const FormContent = () => (
+        <form className="space-y-4">
+            {/* Input fields */}
+        </form>
+    );
+
+    if (isMobile) {
+        return (
+            <Drawer open={isOpen} onOpenChange={setIsOpen}>
+                <DrawerContent>
+                    <DrawerHeader className="text-left">
+                        <DrawerTitle>{title}</DrawerTitle>
+                        <DrawerDescription>{description}</DrawerDescription>
+                    </DrawerHeader>
+                    <div className="px-4 pb-6">
+                        <FormContent />
+                    </div>
+                </DrawerContent>
+            </Drawer>
+        );
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogContent className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>{description}</DialogDescription>
+                </DialogHeader>
+                <FormContent />
+            </DialogContent>
+        </Dialog>
+    );
+}
+```

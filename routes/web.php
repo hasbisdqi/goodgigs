@@ -2,12 +2,28 @@
 
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\JobPostingController;
+use App\Models\JobPosting;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('dashboard', function () {
+        return Inertia::render('dashboard', [
+            'stats' => [
+                'total_gigs' => JobPosting::count(),
+                'my_gigs' => JobPosting::where('user_id', auth()->id())->count(),
+                'urgent_gigs' => JobPosting::where('type', 'Urgent')->count(),
+            ],
+        ]);
+    })->name('dashboard');
+
+    Route::get('jobs', [JobPostingController::class, 'index'])->name('jobs.index');
+    Route::post('jobs', [JobPostingController::class, 'store'])->name('jobs.store');
+    Route::patch('jobs/{job}', [JobPostingController::class, 'update'])->name('jobs.update');
+    Route::delete('jobs/{job}', [JobPostingController::class, 'destroy'])->name('jobs.destroy');
 
     Route::prefix('admin')->middleware(['can:manage users'])->group(function () {
         Route::get('users', [UserController::class, 'index'])->name('admin.users.index');
