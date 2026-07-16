@@ -30,4 +30,20 @@ class JobPosting extends Model
     {
         return $this->hasMany(JobApplication::class);
     }
+
+    /**
+     * Get the chat messages for this job posting.
+     */
+    public function chatMessages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class);
+    }
+
+    /**
+     * Get the reviews for this job posting.
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
 }

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\JobApplication;
 use App\Models\JobPosting;
+use App\Models\User;
+use App\Notifications\ApplicationStatusUpdated;
+use App\Notifications\JobApplicationReceived;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -36,10 +39,13 @@ class JobApplicationController extends Controller
             return back()->withErrors(['message' => __('Anda sudah melamar ke tugas ini.')]);
         }
 
-        $request->user()->jobApplications()->create([
+        $application = $request->user()->jobApplications()->create([
             'job_posting_id' => $job->id,
             'message' => $validated['message'],
         ]);
+
+        // Notify the job poster about the new application
+        $job->user->notify(new JobApplicationReceived($application, $job, $request->user()));
 
         Inertia::flash('toast', [
             'type' => 'success',
@@ -66,6 +72,12 @@ class JobApplicationController extends Controller
         ]);
 
         $application->update(['status' => $validated['status']]);
+
+        // Notify the applicant about status change
+        $applicant = User::find($application->user_id);
+        if ($applicant) {
+            $applicant->notify(new ApplicationStatusUpdated($application, $job));
+        }
 
         Inertia::flash('toast', [
             'type' => 'success',

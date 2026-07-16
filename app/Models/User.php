@@ -29,7 +29,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'active_mode'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
@@ -64,5 +64,69 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function jobApplications(): HasMany
     {
         return $this->hasMany(JobApplication::class);
+    }
+
+    /**
+     * Get the chat messages sent by this user.
+     */
+    public function sentChatMessages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    /**
+     * Get the chat messages received by this user.
+     */
+    public function receivedChatMessages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'receiver_id');
+    }
+
+    /**
+     * Check if the user is in employer mode.
+     */
+    public function isEmployer(): bool
+    {
+        return $this->active_mode === 'employer';
+    }
+
+    /**
+     * Check if the user is in worker mode.
+     */
+    public function isWorker(): bool
+    {
+        return $this->active_mode === 'worker';
+    }
+
+    /**
+     * Get the reviews given by this user.
+     */
+    public function reviewsGiven(): HasMany
+    {
+        return $this->hasMany(Review::class, 'reviewer_id');
+    }
+
+    /**
+     * Get the reviews received by this user.
+     */
+    public function reviewsReceived(): HasMany
+    {
+        return $this->hasMany(Review::class, 'reviewee_id');
+    }
+
+    /**
+     * Get the endorsements given by this user.
+     */
+    public function endorsementsGiven(): HasMany
+    {
+        return $this->hasMany(Endorsement::class, 'endorser_id');
+    }
+
+    /**
+     * Get the endorsements received by this user.
+     */
+    public function endorsementsReceived(): HasMany
+    {
+        return $this->hasMany(Endorsement::class, 'endorsee_id');
     }
 }

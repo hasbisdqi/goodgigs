@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Head, Link, useForm, router, usePage } from '@inertiajs/react';
-import { Search, Plus, Edit, Trash2, ShieldAlert, Briefcase, MapPin, DollarSign, Calendar, User as UserIcon, Send, CheckCircle, XCircle } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Search, Plus, Edit, Trash2, ShieldAlert, Briefcase, MapPin, DollarSign, Calendar, User as UserIcon, Send, CheckCircle, XCircle, MessageCircle, ArrowLeft, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,8 +28,9 @@ import {
 import { dashboard } from '@/routes';
 import { index as jobsIndex } from '@/routes/jobs';
 import { store as storeApp } from '@/routes/job-applications';
+import { index as chatMessagesIndex, store as chatMessagesStore } from '@/routes/chat-messages';
 import { notice as verificationNotice } from '@/routes/verification';
-import type { User, Auth } from '@/types';
+import type { Auth } from '@/types';
 
 type JobApplication = {
     id: number;
@@ -67,6 +68,18 @@ type Job = {
     jobApplications?: JobApplication[];
 };
 
+type ChatMessage = {
+    id: number;
+    job_posting_id: number;
+    sender_id: number;
+    receiver_id: number;
+    message: string;
+    read_at: string | null;
+    created_at: string;
+    sender?: { id: number; name: string };
+    receiver?: { id: number; name: string };
+};
+
 type JobsPagination = {
     data: Job[];
     links: Array<{
@@ -97,6 +110,11 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
     const [isApplying, setIsApplying] = useState(false);
+    const [activeTab, setActiveTab] = useState<'detail' | 'chat'>('detail');
+    const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+    const [chatReceiverId, setChatReceiverId] = useState<number | null>(null);
+    const [isChatLoading, setIsChatLoading] = useState(false);
+    const [isReviewing, setIsReviewing] = useState(false);
 
     const createForm = useForm({
         title: '',
@@ -119,6 +137,18 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
     const applyForm = useForm({
         job_posting_id: 0,
         message: '',
+    });
+
+    const chatForm = useForm({
+        receiver_id: 0,
+        message: '',
+    });
+
+    const reviewForm = useForm({
+        job_posting_id: 0,
+        reviewee_id: 0,
+        rating: 5,
+        comment: '',
     });
 
     const handleSearchSubmit = (e: React.FormEvent) => {
@@ -184,12 +214,120 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
     const openDetailsModal = (job: Job) => {
         setSelectedJob(job);
         setIsApplying(false);
+        setActiveTab('detail');
+        setChatMessages([]);
         applyForm.setData({
             job_posting_id: job.id,
             message: '',
         });
         applyForm.clearErrors();
+        
+        setIsReviewing(false);
+        reviewForm.reset();
+        reviewForm.clearErrors();
+        
         setIsDetailsOpen(true);
+
+        // Determine chat receiver: if owner, no receiver yet; if worker, receiver is the job owner
+        const apps = job.job_applications || job.jobApplications || [];
+        const myApp = apps.find(app => app.user_id === auth?.user?.id);
+        const isOwner = job.user_id === auth?.user?.id;
+
+        if (!isOwner && myApp) {
+            setChatReceiverId(job.user_id);
+        } else {
+            setChatReceiverId(null);
+        }
+    };
+
+    const loadChatMessages = async (job: Job, receiverId: number) => {
+        setIsChatLoading(true);
+        try {
+            const response = await fetch(chatMessagesIndex.url(job.id));
+            if (response.ok) {
+                const data = await response.json();
+                setChatMessages(data);
+            }
+        } catch {
+            // silently fail
+        } finally {
+            setIsChatLoading(false);
+        }
+    };
+
+    const handleOpenChat = (job: Job, receiverId: number) => {
+        setChatReceiverId(receiverId);
+        chatForm.setData({ receiver_id: receiverId, message: '' });
+        setActiveTab('chat');
+        loadChatMessages(job, receiverId);
+    };
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const openJobId = params.get('open_job_id');
+        const openTab = params.get('open_tab');
+        if (openJobId) {
+            const jobIdNum = parseInt(openJobId);
+            const job = jobs.data.find(j => j.id === jobIdNum);
+            if (job) {
+                openDetailsModal(job);
+                if (openTab === 'chat') {
+                    const receiverId = params.get('chat_receiver_id');
+                    if (receiverId) {
+                        handleOpenChat(job, parseInt(receiverId));
+                    } else {
+                        const apps = job.job_applications || job.jobApplications || [];
+                        const myApp = apps.find(app => app.user_id === auth?.user?.id);
+                        if (job.user_id !== auth?.user?.id && myApp) {
+                            handleOpenChat(job, job.user_id);
+                        }
+                    }
+                }
+            } else {
+                fetch(`/api/jobs/${openJobId}`)
+                    .then(r => r.json())
+                    .then(jobData => {
+                        if (jobData && jobData.id) {
+                            openDetailsModal(jobData);
+                            if (openTab === 'chat') {
+                                const receiverId = params.get('chat_receiver_id');
+                                if (receiverId) {
+                                    handleOpenChat(jobData, parseInt(receiverId));
+                                } else {
+                                    const apps = jobData.job_applications || jobData.jobApplications || [];
+                                    const myApp = apps.find((app: JobApplication) => app.user_id === auth?.user?.id);
+                                    if (jobData.user_id !== auth?.user?.id && myApp) {
+                                        handleOpenChat(jobData, jobData.user_id);
+                                    }
+                                }
+                            }
+                        }
+                    })
+                    .catch(() => {});
+            }
+
+            const newParams = new URLSearchParams(window.location.search);
+            newParams.delete('open_job_id');
+            newParams.delete('open_tab');
+            newParams.delete('chat_receiver_id');
+            const cleanSearch = newParams.toString();
+            const newUrl = window.location.pathname + (cleanSearch ? '?' + cleanSearch : '');
+            window.history.replaceState({}, '', newUrl);
+        }
+    }, [jobs.data]);
+
+    const handleSendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedJob || !chatReceiverId) {
+            return;
+        }
+        chatForm.setData('receiver_id', chatReceiverId);
+        chatForm.post(chatMessagesStore.url(selectedJob.id), {
+            onSuccess: () => {
+                chatForm.setData('message', '');
+                loadChatMessages(selectedJob, chatReceiverId);
+            },
+        });
     };
 
     const handleApplySubmit = (e: React.FormEvent) => {
@@ -198,7 +336,6 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
             onSuccess: () => {
                 applyForm.reset();
                 setIsApplying(false);
-                // Update selected job to show the newly added application
                 const updatedJob = jobs.data.find(j => j.id === selectedJob?.id);
                 if (updatedJob) {
                     setSelectedJob(updatedJob);
@@ -211,12 +348,34 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
     const handleUpdateApplicationStatus = (appId: number, status: 'accepted' | 'rejected') => {
         router.patch(`/job-applications/${appId}`, { status }, {
             onSuccess: () => {
-                // Update selected job state in details modal
                 const updatedJob = jobs.data.find(j => j.id === selectedJob?.id);
                 if (updatedJob) {
                     setSelectedJob(updatedJob);
                 }
             },
+        });
+    };
+
+    const handleCompleteJob = (jobId: number) => {
+        router.patch(`/jobs/${jobId}/complete`, {}, {
+            onSuccess: () => {
+                const updatedJob = jobs.data.find(j => j.id === jobId);
+                if (updatedJob) {
+                    setSelectedJob({ ...updatedJob, status: 'completed' }); // Optimistic update since inertia flash might not refresh data immediately
+                    router.reload({ only: ['jobs'] });
+                }
+            }
+        });
+    };
+
+    const handleReviewSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        reviewForm.post('/reviews', {
+            onSuccess: () => {
+                setIsReviewing(false);
+                reviewForm.reset();
+                router.reload({ only: ['jobs'] });
+            }
         });
     };
 
@@ -265,8 +424,8 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     </form>
 
-                    <Button 
-                        onClick={() => setIsCreateOpen(true)} 
+                    <Button
+                        onClick={() => setIsCreateOpen(true)}
                         disabled={!isEmailVerified}
                         title={!isEmailVerified ? "Verifikasi email Anda untuk memposting tugas" : ""}
                         className="w-full sm:w-auto"
@@ -325,12 +484,17 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                                             )}
                                         </div>
                                         <CardDescription className="flex flex-wrap gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
-                                            <Badge 
-                                                variant="secondary" 
+                                            {job.status === 'completed' && (
+                                                <Badge variant="secondary" className="text-[10px] py-0.5 px-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-transparent">
+                                                    Selesai
+                                                </Badge>
+                                            )}
+                                            <Badge
+                                                variant="secondary"
                                                 className={cn(
                                                     "text-[10px] py-0.5 px-2 border-transparent",
-                                                    job.type === 'Urgent' 
-                                                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' 
+                                                    job.type === 'Urgent'
+                                                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
                                                         : 'bg-primary/10 text-primary'
                                                 )}
                                             >
@@ -341,8 +505,8 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                                                 {job.location}
                                             </Badge>
                                             {myApp && (
-                                                <Badge 
-                                                    variant="secondary" 
+                                                <Badge
+                                                    variant="secondary"
                                                     className={cn(
                                                         "text-[10px] py-0.5 px-2 border-transparent ml-auto",
                                                         myApp.status === 'accepted' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
@@ -501,8 +665,21 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                                 handleApplySubmit={handleApplySubmit}
                                 handleUpdateStatus={handleUpdateApplicationStatus}
                                 isEmailVerified={isEmailVerified}
+                                activeTab={activeTab}
+                                setActiveTab={setActiveTab}
+                                chatMessages={chatMessages}
+                                chatForm={chatForm}
+                                isChatLoading={isChatLoading}
+                                chatReceiverId={chatReceiverId}
+                                onOpenChat={handleOpenChat}
+                                onSendMessage={handleSendMessage}
+                                onCompleteJob={handleCompleteJob}
+                                isReviewing={isReviewing}
+                                setIsReviewing={setIsReviewing}
+                                reviewForm={reviewForm}
+                                handleReviewSubmit={handleReviewSubmit}
                             />
-                            {!isApplying && (
+                            {!isApplying && activeTab === 'detail' && (
                                 <DrawerFooter className="px-0 pt-4">
                                     <Button type="button" onClick={() => setIsDetailsOpen(false)} className="w-full">
                                         Tutup Detail
@@ -530,8 +707,21 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                             handleApplySubmit={handleApplySubmit}
                             handleUpdateStatus={handleUpdateApplicationStatus}
                             isEmailVerified={isEmailVerified}
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            chatMessages={chatMessages}
+                            chatForm={chatForm}
+                            isChatLoading={isChatLoading}
+                            chatReceiverId={chatReceiverId}
+                            onOpenChat={handleOpenChat}
+                            onSendMessage={handleSendMessage}
+                            onCompleteJob={handleCompleteJob}
+                            isReviewing={isReviewing}
+                            setIsReviewing={setIsReviewing}
+                            reviewForm={reviewForm}
+                            handleReviewSubmit={handleReviewSubmit}
                         />
-                        {!isApplying && (
+                        {!isApplying && activeTab === 'detail' && (
                             <DialogFooter className="pt-2">
                                 <Button type="button" onClick={() => setIsDetailsOpen(false)}>
                                     Tutup Detail
@@ -672,6 +862,121 @@ function GigForm({ form, onSubmit, onCancel, submitLabel }: {
     );
 }
 
+function ChatBox({
+    job,
+    currentUserId,
+    chatMessages,
+    chatForm,
+    isChatLoading,
+    chatReceiverId,
+    onSendMessage,
+    onBack,
+}: {
+    job: Job;
+    currentUserId: number;
+    chatMessages: ChatMessage[];
+    chatForm: any;
+    isChatLoading: boolean;
+    chatReceiverId: number;
+    onSendMessage: (e: React.FormEvent) => void;
+    onBack: () => void;
+}) {
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [chatMessages]);
+
+    const otherParty = chatMessages.find(m => m.sender_id !== currentUserId)?.sender
+        ?? chatMessages.find(m => m.receiver_id !== currentUserId)?.receiver;
+
+    return (
+        <div className="flex flex-col h-full min-h-[380px]">
+            {/* Chat header */}
+            <div className="flex items-center gap-3 pb-3 border-b border-border mb-3">
+                <Button variant="ghost" size="icon" className="size-8 shrink-0" onClick={onBack}>
+                    <ArrowLeft className="size-4" />
+                </Button>
+                <div className="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                    {otherParty?.name?.[0]?.toUpperCase() ?? '?'}
+                </div>
+                <div className="min-w-0">
+                    <p className="text-sm font-semibold truncate">{otherParty?.name ?? 'Pesan'}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{job.title}</p>
+                </div>
+            </div>
+
+            {/* Messages area */}
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1 max-h-64">
+                {isChatLoading ? (
+                    <div className="flex flex-col gap-2 animate-pulse">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className={cn("flex", i % 2 === 0 ? "justify-end" : "justify-start")}>
+                                <div className="h-8 w-48 bg-muted rounded-xl" />
+                            </div>
+                        ))}
+                    </div>
+                ) : chatMessages.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center py-8 text-muted-foreground">
+                        <MessageCircle className="size-8 mb-2 opacity-40" />
+                        <p className="text-sm">Belum ada pesan. Mulai percakapan!</p>
+                    </div>
+                ) : (
+                    chatMessages.map((msg) => {
+                        const isMine = msg.sender_id === currentUserId;
+                        return (
+                            <div key={msg.id} className={cn("flex", isMine ? "justify-end" : "justify-start")}>
+                                <div className={cn(
+                                    "max-w-[75%] px-3 py-2 rounded-2xl text-sm leading-relaxed",
+                                    isMine
+                                        ? "bg-primary text-primary-foreground rounded-br-sm"
+                                        : "bg-muted text-foreground rounded-bl-sm"
+                                )}>
+                                    <p className="whitespace-pre-wrap break-words">{msg.message}</p>
+                                    <p className={cn(
+                                        "text-[10px] mt-1",
+                                        isMine ? "text-primary-foreground/70 text-right" : "text-muted-foreground"
+                                    )}>
+                                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        {isMine && msg.read_at && ' · Dibaca'}
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
+                <div ref={messagesEndRef} />
+            </div>
+
+            {/* Message input */}
+            <form onSubmit={onSendMessage} className="flex items-end gap-2 mt-3 pt-3 border-t border-border">
+                <textarea
+                    placeholder="Tulis pesan..."
+                    className="flex-1 min-h-[40px] max-h-24 resize-none rounded-xl border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring placeholder:text-muted-foreground"
+                    value={chatForm.data.message}
+                    onChange={(e) => chatForm.setData('message', e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            onSendMessage(e as any);
+                        }
+                    }}
+                    rows={1}
+                />
+                <Button
+                    type="submit"
+                    size="icon"
+                    className="size-10 rounded-xl shrink-0"
+                    disabled={chatForm.processing || !chatForm.data.message.trim()}
+                >
+                    <Send className="size-4" />
+                </Button>
+            </form>
+            <InputError message={chatForm.errors.message} />
+        </div>
+    );
+}
+
 function GigDetails({
     job,
     currentUserId,
@@ -681,6 +986,14 @@ function GigDetails({
     handleApplySubmit,
     handleUpdateStatus,
     isEmailVerified,
+    activeTab,
+    setActiveTab,
+    chatMessages,
+    chatForm,
+    isChatLoading,
+    chatReceiverId,
+    onOpenChat,
+    onSendMessage,
 }: {
     job: Job | null;
     currentUserId?: number;
@@ -690,14 +1003,43 @@ function GigDetails({
     handleApplySubmit: (e: React.FormEvent) => void;
     handleUpdateStatus: (appId: number, status: 'accepted' | 'rejected') => void;
     isEmailVerified: boolean;
+    activeTab: 'detail' | 'chat';
+    setActiveTab: (tab: 'detail' | 'chat') => void;
+    chatMessages: ChatMessage[];
+    chatForm: any;
+    isChatLoading: boolean;
+    chatReceiverId: number | null;
+    onOpenChat: (job: Job, receiverId: number) => void;
+    onSendMessage: (e: React.FormEvent) => void;
+    onCompleteJob: (jobId: number) => void;
+    isReviewing: boolean;
+    setIsReviewing: (val: boolean) => void;
+    reviewForm: any;
+    handleReviewSubmit: (e: React.FormEvent) => void;
 }) {
-    if (!job) {
+    if (!job || currentUserId === undefined) {
         return null;
     }
 
     const apps = job.job_applications || job.jobApplications || [];
     const myApp = apps.find(app => app.user_id === currentUserId);
     const isOwner = job.user_id === currentUserId;
+
+    // In chat tab
+    if (activeTab === 'chat' && chatReceiverId !== null) {
+        return (
+            <ChatBox
+                job={job}
+                currentUserId={currentUserId}
+                chatMessages={chatMessages}
+                chatForm={chatForm}
+                isChatLoading={isChatLoading}
+                chatReceiverId={chatReceiverId}
+                onSendMessage={onSendMessage}
+                onBack={() => setActiveTab('detail')}
+            />
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -756,6 +1098,28 @@ function GigDetails({
                     {job.description}
                 </p>
             </div>
+            
+            {/* Action for Completing Job (Employer only) */}
+            {isOwner && job.status !== 'completed' && apps.some((app: JobApplication) => app.status === 'accepted') && (
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-center justify-between mt-4">
+                    <div>
+                        <h4 className="font-semibold text-sm">Tugas Sudah Selesai?</h4>
+                        <p className="text-xs text-muted-foreground mt-1">Tandai tugas ini sebagai selesai jika pekerja telah menyelesaikan kewajibannya.</p>
+                    </div>
+                    <Button onClick={() => onCompleteJob(job.id)} className="w-full sm:w-auto shrink-0">
+                        <CheckCircle className="size-4 mr-2" />
+                        Tandai Selesai
+                    </Button>
+                </div>
+            )}
+            
+            {/* Completed Job Status */}
+            {job.status === 'completed' && (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-200 p-4 rounded-xl flex items-center justify-center gap-2 mt-4 font-semibold text-sm">
+                    <CheckCircle className="size-5" />
+                    Tugas ini telah diselesaikan.
+                </div>
+            )}
 
             {/* Applications list for the owner */}
             {isOwner && (
@@ -782,40 +1146,103 @@ function GigDetails({
                                                 <p className="text-[10px] text-muted-foreground">{app.user?.email}</p>
                                             </div>
                                         </div>
-                                        <Badge 
-                                            variant="secondary" 
-                                            className={cn(
-                                                "text-[10px] py-0.5 px-2 border-transparent",
-                                                app.status === 'accepted' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
-                                                app.status === 'rejected' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' :
-                                                'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                        <div className="flex items-center gap-2">
+                                            <Badge
+                                                variant="secondary"
+                                                className={cn(
+                                                    "text-[10px] py-0.5 px-2 border-transparent",
+                                                    app.status === 'accepted' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                                                    app.status === 'rejected' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' :
+                                                    'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                                )}
+                                            >
+                                                {app.status}
+                                            </Badge>
+                                            {/* Chat button for owner to message each applicant */}
+                                            {app.user && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="size-7"
+                                                    title={`Chat dengan ${app.user.name}`}
+                                                    onClick={() => onOpenChat(job, app.user_id)}
+                                                >
+                                                    <MessageCircle className="size-3.5 text-primary" />
+                                                </Button>
                                             )}
-                                        >
-                                            {app.status}
-                                        </Badge>
+                                        </div>
                                     </div>
                                     <p className="text-xs text-muted-foreground bg-background p-2 border border-border rounded mt-1 whitespace-pre-wrap">
                                         {app.message}
                                     </p>
-                                    {app.status === 'pending' && (
+                                    {app.status === 'pending' && job.status !== 'completed' && (
                                         <div className="flex justify-end gap-2 mt-2 pt-1 border-t border-border/40">
-                                            <Button 
-                                                size="sm" 
-                                                variant="outline" 
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
                                                 className="h-7 text-[10px] text-destructive hover:bg-destructive/10"
                                                 onClick={() => handleUpdateStatus(app.id, 'rejected')}
                                             >
                                                 <XCircle className="size-3 mr-1" />
                                                 Tolak
                                             </Button>
-                                            <Button 
-                                                size="sm" 
+                                            <Button
+                                                size="sm"
                                                 className="h-7 text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white"
                                                 onClick={() => handleUpdateStatus(app.id, 'accepted')}
                                             >
                                                 <CheckCircle className="size-3 mr-1" />
                                                 Terima
                                             </Button>
+                                        </div>
+                                    )}
+                                    {app.status === 'accepted' && job.status === 'completed' && (
+                                        <div className="mt-2 pt-2 border-t border-border/40">
+                                            {isReviewing && reviewForm.data.reviewee_id === app.user_id ? (
+                                                <form onSubmit={handleReviewSubmit} className="space-y-3 p-3 bg-background border rounded-lg">
+                                                    <h5 className="text-xs font-semibold">Ulas Pekerja: {app.user?.name}</h5>
+                                                    <div className="flex gap-2">
+                                                        {[1, 2, 3, 4, 5].map((star) => (
+                                                            <button
+                                                                key={star}
+                                                                type="button"
+                                                                onClick={() => reviewForm.setData('rating', star)}
+                                                                className={cn(
+                                                                    "focus:outline-none transition-colors",
+                                                                    (reviewForm.data.rating >= star) ? "text-amber-500" : "text-muted"
+                                                                )}
+                                                            >
+                                                                <Star className="size-6 fill-current" />
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                    <textarea
+                                                        placeholder="Tulis ulasan Anda tentang hasil kerjanya..."
+                                                        className="w-full min-h-[60px] text-xs rounded-md border border-input bg-transparent px-2 py-1.5 focus-visible:outline-none focus-visible:ring-1"
+                                                        value={reviewForm.data.comment}
+                                                        onChange={(e) => reviewForm.setData('comment', e.target.value)}
+                                                    />
+                                                    <InputError message={reviewForm.errors.rating} />
+                                                    <InputError message={reviewForm.errors.comment} />
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button type="button" size="sm" variant="ghost" className="h-7 text-[10px]" onClick={() => setIsReviewing(false)}>Batal</Button>
+                                                        <Button type="submit" size="sm" className="h-7 text-[10px]" disabled={reviewForm.processing}>Kirim Ulasan</Button>
+                                                    </div>
+                                                </form>
+                                            ) : (
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="w-full h-8 text-[11px]"
+                                                    onClick={() => {
+                                                        reviewForm.setData({ job_posting_id: job.id, reviewee_id: app.user_id, rating: 5, comment: '' });
+                                                        setIsReviewing(true);
+                                                    }}
+                                                >
+                                                    <Star className="size-3 mr-1.5" />
+                                                    Beri Ulasan Pekerja
+                                                </Button>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -829,23 +1256,84 @@ function GigDetails({
             {!isOwner && (
                 <div className="border-t border-border pt-4 mt-4">
                     {myApp ? (
-                        <div className={cn(
-                            "p-4 rounded-xl border flex items-start gap-3",
-                            myApp.status === 'accepted' ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-800 dark:text-emerald-200' :
-                            myApp.status === 'rejected' ? 'bg-rose-500/5 border-rose-500/20 text-rose-800 dark:text-rose-200' :
-                            'bg-amber-500/5 border-amber-500/20 text-amber-800 dark:text-amber-200'
-                        )}>
-                            <div className="p-1 rounded-full bg-background border mt-0.5">
-                                {myApp.status === 'accepted' ? <CheckCircle className="size-4 text-emerald-500" /> :
-                                 myApp.status === 'rejected' ? <XCircle className="size-4 text-rose-500" /> :
-                                 <Calendar className="size-4 text-amber-500" />}
+                        <div className="space-y-3">
+                            <div className={cn(
+                                "p-4 rounded-xl border flex items-start gap-3",
+                                myApp.status === 'accepted' ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-800 dark:text-emerald-200' :
+                                myApp.status === 'rejected' ? 'bg-rose-500/5 border-rose-500/20 text-rose-800 dark:text-rose-200' :
+                                'bg-amber-500/5 border-amber-500/20 text-amber-800 dark:text-amber-200'
+                            )}>
+                                <div className="p-1 rounded-full bg-background border mt-0.5">
+                                    {myApp.status === 'accepted' ? <CheckCircle className="size-4 text-emerald-500" /> :
+                                     myApp.status === 'rejected' ? <XCircle className="size-4 text-rose-500" /> :
+                                     <Calendar className="size-4 text-amber-500" />}
+                                </div>
+                                <div>
+                                    <h5 className="font-bold text-sm">Status Lamaran Jasa Anda: <span className="capitalize">{myApp.status}</span></h5>
+                                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                                        Pesan Penawaran Anda: "{myApp.message}"
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h5 className="font-bold text-sm">Status Lamaran Jasa Anda: <span className="capitalize">{myApp.status}</span></h5>
-                                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                                    Pesan Penawaran Anda: "{myApp.message}"
-                                </p>
-                            </div>
+                            
+                            {myApp.status === 'accepted' && job.status === 'completed' && (
+                                <div className="mt-2">
+                                    {isReviewing && reviewForm.data.reviewee_id === job.user_id ? (
+                                        <form onSubmit={handleReviewSubmit} className="space-y-3 p-4 bg-muted/30 border rounded-xl">
+                                            <h5 className="text-sm font-semibold mb-1">Ulas Pemberi Kerja</h5>
+                                            <div className="flex gap-2">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        key={star}
+                                                        type="button"
+                                                        onClick={() => reviewForm.setData('rating', star)}
+                                                        className={cn(
+                                                            "focus:outline-none transition-colors",
+                                                            (reviewForm.data.rating >= star) ? "text-amber-500" : "text-muted"
+                                                        )}
+                                                    >
+                                                        <Star className="size-7 fill-current" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <textarea
+                                                placeholder="Tulis ulasan Anda tentang pengalaman bekerja dengan pemberi kerja ini..."
+                                                className="w-full min-h-[80px] text-sm rounded-md border border-input bg-background px-3 py-2 focus-visible:outline-none focus-visible:ring-1"
+                                                value={reviewForm.data.comment}
+                                                onChange={(e) => reviewForm.setData('comment', e.target.value)}
+                                            />
+                                            <InputError message={reviewForm.errors.rating} />
+                                            <InputError message={reviewForm.errors.comment} />
+                                            <div className="flex justify-end gap-2">
+                                                <Button type="button" size="sm" variant="ghost" onClick={() => setIsReviewing(false)}>Batal</Button>
+                                                <Button type="submit" size="sm" disabled={reviewForm.processing}>Kirim Ulasan</Button>
+                                            </div>
+                                        </form>
+                                    ) : (
+                                        <Button
+                                            variant="secondary"
+                                            className="w-full flex items-center gap-2 mb-2"
+                                            onClick={() => {
+                                                reviewForm.setData({ job_posting_id: job.id, reviewee_id: job.user_id, rating: 5, comment: '' });
+                                                setIsReviewing(true);
+                                            }}
+                                        >
+                                            <Star className="size-4 text-amber-500 fill-amber-500" />
+                                            Beri Ulasan untuk Pemberi Kerja
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Chat button for applicant to message owner */}
+                            <Button
+                                variant="outline"
+                                className="w-full flex items-center gap-2"
+                                onClick={() => onOpenChat(job, job.user_id)}
+                            >
+                                <MessageCircle className="size-4" />
+                                Chat dengan Pemberi Kerja
+                            </Button>
                         </div>
                     ) : (
                         <div>
@@ -861,7 +1349,7 @@ function GigDetails({
                                             onChange={(e) => applyForm.setData('message', e.target.value)}
                                             required
                                         />
-                                        <InputError message={applyForm.errors.message || applyForm.errors.message} />
+                                        <InputError message={applyForm.errors.message} />
                                     </div>
                                     <div className="flex justify-end gap-2">
                                         <Button type="button" size="sm" variant="ghost" onClick={() => setIsApplying(false)}>
