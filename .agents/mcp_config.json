@@ -13,6 +13,13 @@
             "headers": {
                 "X-Goog-Api-Key": "AQ.Ab8RN6INls6fmRN0559uYbpZqOYsMWd1b7VCW_JHEEnmtsbwSA"
             }
+        },
+        "shadcn": {
+            "command": "npx",
+            "args": [
+                "shadcn@latest",
+                "mcp"
+            ]
         }
     }
 }
