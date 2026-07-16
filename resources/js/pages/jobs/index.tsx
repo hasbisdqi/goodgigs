@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Head, Link, useForm, router, usePage } from '@inertiajs/react';
-import { Search, Plus, Edit, Trash2, ShieldAlert, Briefcase, MapPin, DollarSign, Calendar, User as UserIcon } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, ShieldAlert, Briefcase, MapPin, DollarSign, Calendar, User as UserIcon, Send, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,7 +27,23 @@ import {
 } from '@/components/ui/drawer';
 import { dashboard } from '@/routes';
 import { index as jobsIndex } from '@/routes/jobs';
-import type { User } from '@/types';
+import { store as storeApp } from '@/routes/job-applications';
+import type { User, Auth } from '@/types';
+
+type JobApplication = {
+    id: number;
+    job_posting_id: number;
+    user_id: number;
+    message: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+    };
+};
 
 type Job = {
     id: number;
@@ -46,6 +62,8 @@ type Job = {
         name: string;
         email: string;
     };
+    job_applications?: JobApplication[];
+    jobApplications?: JobApplication[];
 };
 
 type JobsPagination = {
@@ -65,9 +83,7 @@ type PageProps = {
     filters: {
         search: string | null;
     };
-    auth: {
-        user: User;
-    };
+    auth: Auth;
 };
 
 export default function JobsIndex({ jobs, filters, auth }: PageProps) {
@@ -78,6 +94,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+    const [isApplying, setIsApplying] = useState(false);
 
     const createForm = useForm({
         title: '',
@@ -95,6 +112,11 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
         type: 'One-time Task',
         salary: '',
         description: '',
+    });
+
+    const applyForm = useForm({
+        job_posting_id: 0,
+        message: '',
     });
 
     const handleSearchSubmit = (e: React.FormEvent) => {
@@ -159,13 +181,51 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
 
     const openDetailsModal = (job: Job) => {
         setSelectedJob(job);
+        setIsApplying(false);
+        applyForm.setData({
+            job_posting_id: job.id,
+            message: '',
+        });
+        applyForm.clearErrors();
         setIsDetailsOpen(true);
     };
 
+    const handleApplySubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        applyForm.post(storeApp.url(), {
+            onSuccess: () => {
+                applyForm.reset();
+                setIsApplying(false);
+                // Update selected job to show the newly added application
+                const updatedJob = jobs.data.find(j => j.id === selectedJob?.id);
+                if (updatedJob) {
+                    setSelectedJob(updatedJob);
+                }
+                setIsDetailsOpen(false);
+            },
+        });
+    };
+
+    const handleUpdateApplicationStatus = (appId: number, status: 'accepted' | 'rejected') => {
+        router.patch(`/job-applications/${appId}`, { status }, {
+            onSuccess: () => {
+                // Update selected job state in details modal
+                const updatedJob = jobs.data.find(j => j.id === selectedJob?.id);
+                if (updatedJob) {
+                    setSelectedJob(updatedJob);
+                }
+            },
+        });
+    };
+
     const canModifyJob = (job: Job) => {
-        const { auth } = usePage<any>().props;
         const roles = auth?.roles || [];
         return job.user_id === auth?.user?.id || roles.includes('Super Admin') || roles.includes('Admin');
+    };
+
+    const getApplicationForJob = (job: Job) => {
+        const apps = job.job_applications || job.jobApplications || [];
+        return apps.find(app => app.user_id === auth?.user?.id);
     };
 
     return (
@@ -207,74 +267,90 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                     </div>
                 ) : (
                     <div className="grid gap-4 md:grid-cols-2">
-                        {jobs.data.map((job) => (
-                            <Card
-                                key={job.id}
-                                className="flex flex-col justify-between hover:shadow-md hover:border-primary/35 transition-all cursor-pointer bg-card"
-                                onClick={() => openDetailsModal(job)}
-                            >
-                                <CardHeader className="pb-3">
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div>
-                                            <span className="text-xs font-semibold text-primary uppercase tracking-wider">{job.company}</span>
-                                            <CardTitle className="text-lg font-bold mt-1 line-clamp-1">{job.title}</CardTitle>
-                                        </div>
-
-                                        {canModifyJob(job) && (
-                                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="size-8"
-                                                    onClick={(e) => openEditModal(job, e)}
-                                                    title="Edit Post"
-                                                >
-                                                    <Edit className="size-4 text-muted-foreground hover:text-foreground" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="size-8"
-                                                    onClick={(e) => openDeleteModal(job, e)}
-                                                    title="Delete Post"
-                                                >
-                                                    <Trash2 className="size-4 text-destructive hover:text-destructive/80" />
-                                                </Button>
+                        {jobs.data.map((job) => {
+                            const myApp = getApplicationForJob(job);
+                            return (
+                                <Card
+                                    key={job.id}
+                                    className="flex flex-col justify-between hover:shadow-md hover:border-primary/35 transition-all cursor-pointer bg-card"
+                                    onClick={() => openDetailsModal(job)}
+                                >
+                                    <CardHeader className="pb-3">
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div>
+                                                <span className="text-xs font-semibold text-primary uppercase tracking-wider">{job.company}</span>
+                                                <CardTitle className="text-lg font-bold mt-1 line-clamp-1">{job.title}</CardTitle>
                                             </div>
-                                        )}
-                                    </div>
-                                    <CardDescription className="flex flex-wrap gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
-                                        <Badge 
-                                            variant="secondary" 
-                                            className={cn(
-                                                "text-[10px] py-0.5 px-2 border-transparent",
-                                                job.type === 'Urgent' 
-                                                    ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' 
-                                                    : 'bg-primary/10 text-primary'
+
+                                            {canModifyJob(job) && (
+                                                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="size-8"
+                                                        onClick={(e) => openEditModal(job, e)}
+                                                        title="Edit Post"
+                                                    >
+                                                        <Edit className="size-4 text-muted-foreground hover:text-foreground" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="size-8"
+                                                        onClick={(e) => openDeleteModal(job, e)}
+                                                        title="Delete Post"
+                                                    >
+                                                        <Trash2 className="size-4 text-destructive hover:text-destructive/80" />
+                                                    </Button>
+                                                </div>
                                             )}
-                                        >
-                                            {job.type}
-                                        </Badge>
-                                        <Badge variant="outline" className="text-[10px] py-0.5 px-2 flex items-center gap-1">
-                                            <MapPin className="size-3" />
-                                            {job.location}
-                                        </Badge>
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="flex flex-col gap-4 flex-1 justify-between">
-                                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-                                        {job.description}
-                                    </p>
-                                    <div className="flex items-center justify-between border-t border-border pt-3 mt-2 text-xs text-muted-foreground">
-                                        <div className="flex items-center gap-1 font-medium text-foreground">
-                                            <DollarSign className="size-3.5 text-emerald-500" />
-                                            <span>{job.salary || 'Negotiable'}</span>
                                         </div>
-                                        <span>Dibuat {new Date(job.created_at).toLocaleDateString()}</span>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
+                                        <CardDescription className="flex flex-wrap gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
+                                            <Badge 
+                                                variant="secondary" 
+                                                className={cn(
+                                                    "text-[10px] py-0.5 px-2 border-transparent",
+                                                    job.type === 'Urgent' 
+                                                        ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' 
+                                                        : 'bg-primary/10 text-primary'
+                                                )}
+                                            >
+                                                {job.type}
+                                            </Badge>
+                                            <Badge variant="outline" className="text-[10px] py-0.5 px-2 flex items-center gap-1">
+                                                <MapPin className="size-3" />
+                                                {job.location}
+                                            </Badge>
+                                            {myApp && (
+                                                <Badge 
+                                                    variant="secondary" 
+                                                    className={cn(
+                                                        "text-[10px] py-0.5 px-2 border-transparent ml-auto",
+                                                        myApp.status === 'accepted' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                                                        myApp.status === 'rejected' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' :
+                                                        'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                                    )}
+                                                >
+                                                    Dilamar ({myApp.status})
+                                                </Badge>
+                                            )}
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="flex flex-col gap-4 flex-1 justify-between">
+                                        <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                                            {job.description}
+                                        </p>
+                                        <div className="flex items-center justify-between border-t border-border pt-3 mt-2 text-xs text-muted-foreground">
+                                            <div className="flex items-center gap-1 font-medium text-foreground">
+                                                <DollarSign className="size-3.5 text-emerald-500" />
+                                                <span>{job.salary || 'Negotiable'}</span>
+                                            </div>
+                                            <span>Dibuat {new Date(job.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
                     </div>
                 )}
 
@@ -389,7 +465,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
             {/* Details Dialog / Drawer */}
             {isMobile ? (
                 <Drawer open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-                    <DrawerContent className="max-h-[85vh]">
+                    <DrawerContent className="max-h-[90vh]">
                         <DrawerHeader className="text-left">
                             <div>
                                 <span className="text-xs font-semibold text-primary uppercase tracking-wider">{selectedJob?.company}</span>
@@ -397,12 +473,22 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                             </div>
                         </DrawerHeader>
                         <div className="px-4 pb-6 overflow-y-auto">
-                            <GigDetails job={selectedJob} />
-                            <DrawerFooter className="px-0 pt-4">
-                                <Button type="button" onClick={() => setIsDetailsOpen(false)} className="w-full">
-                                    Tutup Detail
-                                </Button>
-                            </DrawerFooter>
+                            <GigDetails
+                                job={selectedJob}
+                                currentUserId={auth?.user?.id}
+                                isApplying={isApplying}
+                                setIsApplying={setIsApplying}
+                                applyForm={applyForm}
+                                handleApplySubmit={handleApplySubmit}
+                                handleUpdateStatus={handleUpdateApplicationStatus}
+                            />
+                            {!isApplying && (
+                                <DrawerFooter className="px-0 pt-4">
+                                    <Button type="button" onClick={() => setIsDetailsOpen(false)} className="w-full">
+                                        Tutup Detail
+                                    </Button>
+                                </DrawerFooter>
+                            )}
                         </div>
                     </DrawerContent>
                 </Drawer>
@@ -415,12 +501,22 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                                 <DialogTitle className="text-2xl font-bold mt-1">{selectedJob?.title}</DialogTitle>
                             </div>
                         </DialogHeader>
-                        <GigDetails job={selectedJob} />
-                        <DialogFooter className="pt-2">
-                            <Button type="button" onClick={() => setIsDetailsOpen(false)}>
-                                Tutup Detail
-                            </Button>
-                        </DialogFooter>
+                        <GigDetails
+                            job={selectedJob}
+                            currentUserId={auth?.user?.id}
+                            isApplying={isApplying}
+                            setIsApplying={setIsApplying}
+                            applyForm={applyForm}
+                            handleApplySubmit={handleApplySubmit}
+                            handleUpdateStatus={handleUpdateApplicationStatus}
+                        />
+                        {!isApplying && (
+                            <DialogFooter className="pt-2">
+                                <Button type="button" onClick={() => setIsDetailsOpen(false)}>
+                                    Tutup Detail
+                                </Button>
+                            </DialogFooter>
+                        )}
                     </DialogContent>
                 </Dialog>
             )}
@@ -555,10 +651,31 @@ function GigForm({ form, onSubmit, onCancel, submitLabel }: {
     );
 }
 
-function GigDetails({ job }: { job: Job | null }) {
+function GigDetails({
+    job,
+    currentUserId,
+    isApplying,
+    setIsApplying,
+    applyForm,
+    handleApplySubmit,
+    handleUpdateStatus,
+}: {
+    job: Job | null;
+    currentUserId?: number;
+    isApplying: boolean;
+    setIsApplying: (val: boolean) => void;
+    applyForm: any;
+    handleApplySubmit: (e: React.FormEvent) => void;
+    handleUpdateStatus: (appId: number, status: 'accepted' | 'rejected') => void;
+}) {
     if (!job) {
         return null;
     }
+
+    const apps = job.job_applications || job.jobApplications || [];
+    const myApp = apps.find(app => app.user_id === currentUserId);
+    const isOwner = job.user_id === currentUserId;
+
     return (
         <div className="space-y-6">
             <div className="grid gap-4 py-4 text-sm border-t border-b border-border">
@@ -616,6 +733,133 @@ function GigDetails({ job }: { job: Job | null }) {
                     {job.description}
                 </p>
             </div>
+
+            {/* Applications list for the owner */}
+            {isOwner && (
+                <div className="border-t border-border pt-4 mt-4">
+                    <h4 className="font-bold text-base mb-3 flex items-center gap-2">
+                        <Briefcase className="size-4 text-primary" />
+                        <span>Daftar Pelamar ({apps.length})</span>
+                    </h4>
+                    {apps.length === 0 ? (
+                        <p className="text-sm text-muted-foreground bg-muted/30 p-4 rounded-lg text-center">
+                            Belum ada pelamar untuk tugas ini.
+                        </p>
+                    ) : (
+                        <div className="space-y-3">
+                            {apps.map((app) => (
+                                <div key={app.id} className="border border-border rounded-lg p-4 bg-muted/20 flex flex-col gap-2">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <div className="size-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+                                                {app.user?.name?.[0]?.toUpperCase() || 'P'}
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-semibold text-foreground">{app.user?.name}</p>
+                                                <p className="text-[10px] text-muted-foreground">{app.user?.email}</p>
+                                            </div>
+                                        </div>
+                                        <Badge 
+                                            variant="secondary" 
+                                            className={cn(
+                                                "text-[10px] py-0.5 px-2 border-transparent",
+                                                app.status === 'accepted' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                                                app.status === 'rejected' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400' :
+                                                'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                            )}
+                                        >
+                                            {app.status}
+                                        </Badge>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground bg-background p-2 border border-border rounded mt-1 whitespace-pre-wrap">
+                                        {app.message}
+                                    </p>
+                                    {app.status === 'pending' && (
+                                        <div className="flex justify-end gap-2 mt-2 pt-1 border-t border-border/40">
+                                            <Button 
+                                                size="sm" 
+                                                variant="outline" 
+                                                className="h-7 text-[10px] text-destructive hover:bg-destructive/10"
+                                                onClick={() => handleUpdateStatus(app.id, 'rejected')}
+                                            >
+                                                <XCircle className="size-3 mr-1" />
+                                                Tolak
+                                            </Button>
+                                            <Button 
+                                                size="sm" 
+                                                className="h-7 text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white"
+                                                onClick={() => handleUpdateStatus(app.id, 'accepted')}
+                                            >
+                                                <CheckCircle className="size-3 mr-1" />
+                                                Terima
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Application status / submission for non-owners */}
+            {!isOwner && (
+                <div className="border-t border-border pt-4 mt-4">
+                    {myApp ? (
+                        <div className={cn(
+                            "p-4 rounded-xl border flex items-start gap-3",
+                            myApp.status === 'accepted' ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-800 dark:text-emerald-200' :
+                            myApp.status === 'rejected' ? 'bg-rose-500/5 border-rose-500/20 text-rose-800 dark:text-rose-200' :
+                            'bg-amber-500/5 border-amber-500/20 text-amber-800 dark:text-amber-200'
+                        )}>
+                            <div className="p-1 rounded-full bg-background border mt-0.5">
+                                {myApp.status === 'accepted' ? <CheckCircle className="size-4 text-emerald-500" /> :
+                                 myApp.status === 'rejected' ? <XCircle className="size-4 text-rose-500" /> :
+                                 <Calendar className="size-4 text-amber-500" />}
+                            </div>
+                            <div>
+                                <h5 className="font-bold text-sm">Status Lamaran Jasa Anda: <span className="capitalize">{myApp.status}</span></h5>
+                                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                                    Pesan Penawaran Anda: "{myApp.message}"
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div>
+                            {isApplying ? (
+                                <form onSubmit={handleApplySubmit} className="space-y-3">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="apply-message">Pesan Penawaran / Kontak Anda</Label>
+                                        <textarea
+                                            id="apply-message"
+                                            placeholder="Tulis pesan Anda untuk pemberi kerja. Misal: tarif yang diharapkan, kapan bisa mulai kerja, dan nomor kontak/HP yang bisa dihubungi..."
+                                            className="flex min-h-[90px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800"
+                                            value={applyForm.data.message}
+                                            onChange={(e) => applyForm.setData('message', e.target.value)}
+                                            required
+                                        />
+                                        <InputError message={applyForm.errors.message || applyForm.errors.message} />
+                                    </div>
+                                    <div className="flex justify-end gap-2">
+                                        <Button type="button" size="sm" variant="ghost" onClick={() => setIsApplying(false)}>
+                                            Batal
+                                        </Button>
+                                        <Button type="submit" size="sm" disabled={applyForm.processing} className="bg-primary text-primary-foreground">
+                                            <Send className="size-3 mr-1.5" />
+                                            Kirim Lamaran
+                                        </Button>
+                                    </div>
+                                </form>
+                            ) : (
+                                <Button onClick={() => setIsApplying(true)} className="w-full bg-primary text-primary-foreground hover:bg-primary/95 flex items-center justify-center gap-2">
+                                    <Send className="size-4" />
+                                    Lamar Tugas Ini / Tawarkan Jasa
+                                </Button>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

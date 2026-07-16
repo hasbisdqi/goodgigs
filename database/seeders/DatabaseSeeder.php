@@ -24,6 +24,9 @@ class DatabaseSeeder extends Seeder
 
         $user->assignRole('Super Admin');
 
+        User::factory(5)->create();
+
         $this->call(JobPostingSeeder::class);
+        $this->call(JobApplicationSeeder::class);
     }
 }

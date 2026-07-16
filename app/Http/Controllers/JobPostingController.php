@@ -17,8 +17,25 @@ class JobPostingController extends Controller
     {
         $search = $request->query('search');
 
+        $userId = $request->user()->id;
+        $isAdmin = $request->user()->hasRole('Super Admin') || $request->user()->hasRole('Admin');
+
         $jobs = JobPosting::query()
-            ->with('user')
+            ->with([
+                'user',
+                'jobApplications' => function ($query) use ($userId, $isAdmin) {
+                    $query->with('user')
+                        ->where(function ($q) use ($userId, $isAdmin) {
+                            if ($isAdmin) {
+                                return;
+                            }
+                            $q->where('user_id', $userId)
+                                ->orWhereHas('jobPosting', function ($sub) use ($userId) {
+                                    $sub->where('user_id', $userId);
+                                });
+                        });
+                },
+            ])
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")

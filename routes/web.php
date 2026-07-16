@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobPostingController;
 use App\Models\JobPosting;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('jobs', [JobPostingController::class, 'store'])->name('jobs.store');
     Route::patch('jobs/{job}', [JobPostingController::class, 'update'])->name('jobs.update');
     Route::delete('jobs/{job}', [JobPostingController::class, 'destroy'])->name('jobs.destroy');
+
+    Route::post('job-applications', [JobApplicationController::class, 'store'])->name('job-applications.store');
+    Route::patch('job-applications/{application}', [JobApplicationController::class, 'update'])->name('job-applications.update');
 
     Route::prefix('admin')->middleware(['can:manage users'])->group(function () {
         Route::get('users', [UserController::class, 'index'])->name('admin.users.index');
