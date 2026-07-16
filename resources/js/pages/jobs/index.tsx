@@ -28,6 +28,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as jobsIndex } from '@/routes/jobs';
 import { store as storeApp } from '@/routes/job-applications';
+import { notice as verificationNotice } from '@/routes/verification';
 import type { User, Auth } from '@/types';
 
 type JobApplication = {
@@ -88,6 +89,7 @@ type PageProps = {
 
 export default function JobsIndex({ jobs, filters, auth }: PageProps) {
     const isMobile = useIsMobile();
+    const isEmailVerified = !!auth.user.email_verified_at;
     const [searchVal, setSearchVal] = useState(filters.search || '');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -239,6 +241,18 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                     <p className="text-sm text-muted-foreground">Find local freelance gigs, or post a task to get quick help.</p>
                 </div>
 
+                {!isEmailVerified && (
+                    <div className="bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-200 p-4 rounded-xl text-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <p className="font-semibold">Email Anda belum terverifikasi!</p>
+                            <p className="text-muted-foreground mt-0.5 text-xs">Anda dapat melihat daftar tugas, tetapi harus memverifikasi email untuk membuat postingan tugas baru atau melamar tugas.</p>
+                        </div>
+                        <Button asChild size="sm" variant="outline" className="w-full sm:w-auto border-amber-500/20 hover:bg-amber-500/20">
+                            <Link href={verificationNotice.url()}>Verifikasi Sekarang</Link>
+                        </Button>
+                    </div>
+                )}
+
                 {/* Actions & Filters */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
@@ -251,7 +265,12 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     </form>
 
-                    <Button onClick={() => setIsCreateOpen(true)} className="w-full sm:w-auto">
+                    <Button 
+                        onClick={() => setIsCreateOpen(true)} 
+                        disabled={!isEmailVerified}
+                        title={!isEmailVerified ? "Verifikasi email Anda untuk memposting tugas" : ""}
+                        className="w-full sm:w-auto"
+                    >
                         <Plus className="size-4 mr-2" />
                         Post a Gig / Task
                     </Button>
@@ -481,6 +500,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                                 applyForm={applyForm}
                                 handleApplySubmit={handleApplySubmit}
                                 handleUpdateStatus={handleUpdateApplicationStatus}
+                                isEmailVerified={isEmailVerified}
                             />
                             {!isApplying && (
                                 <DrawerFooter className="px-0 pt-4">
@@ -509,6 +529,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                             applyForm={applyForm}
                             handleApplySubmit={handleApplySubmit}
                             handleUpdateStatus={handleUpdateApplicationStatus}
+                            isEmailVerified={isEmailVerified}
                         />
                         {!isApplying && (
                             <DialogFooter className="pt-2">
@@ -659,6 +680,7 @@ function GigDetails({
     applyForm,
     handleApplySubmit,
     handleUpdateStatus,
+    isEmailVerified,
 }: {
     job: Job | null;
     currentUserId?: number;
@@ -667,6 +689,7 @@ function GigDetails({
     applyForm: any;
     handleApplySubmit: (e: React.FormEvent) => void;
     handleUpdateStatus: (appId: number, status: 'accepted' | 'rejected') => void;
+    isEmailVerified: boolean;
 }) {
     if (!job) {
         return null;
@@ -851,10 +874,20 @@ function GigDetails({
                                     </div>
                                 </form>
                             ) : (
-                                <Button onClick={() => setIsApplying(true)} className="w-full bg-primary text-primary-foreground hover:bg-primary/95 flex items-center justify-center gap-2">
-                                    <Send className="size-4" />
-                                    Lamar Tugas Ini / Tawarkan Jasa
-                                </Button>
+                                isEmailVerified ? (
+                                    <Button onClick={() => setIsApplying(true)} className="w-full bg-primary text-primary-foreground hover:bg-primary/95 flex items-center justify-center gap-2">
+                                        <Send className="size-4" />
+                                        Lamar Tugas Ini / Tawarkan Jasa
+                                    </Button>
+                                ) : (
+                                    <div className="bg-amber-500/10 border border-amber-500/20 text-amber-800 dark:text-amber-200 p-4 rounded-xl text-center text-xs space-y-2">
+                                        <p className="font-semibold">Email Anda belum terverifikasi.</p>
+                                        <p className="text-muted-foreground">Silakan verifikasi email Anda terlebih dahulu untuk menawarkan jasa pada tugas ini.</p>
+                                        <Button asChild size="sm" variant="outline" className="border-amber-500/20 hover:bg-amber-500/20 text-[10px] h-7 mt-1">
+                                            <Link href={verificationNotice.url()}>Verifikasi Sekarang</Link>
+                                        </Button>
+                                    </div>
+                                )
                             )}
                         </div>
                     )}

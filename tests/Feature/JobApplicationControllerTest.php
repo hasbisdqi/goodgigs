@@ -168,3 +168,44 @@ test('system administrators can update any application status', function () {
     $application->refresh();
     expect($application->status)->toBe('accepted');
 });
+
+test('unverified users cannot apply to a gig', function () {
+    $creator = User::factory()->create();
+    $applicant = User::factory()->unverified()->create();
+    $job = JobPosting::factory()->create(['user_id' => $creator->id]);
+
+    $response = $this
+        ->actingAs($applicant)
+        ->post(route('job-applications.store'), [
+            'job_posting_id' => $job->id,
+            'message' => 'Saya tertarik.',
+        ]);
+
+    $response->assertRedirect(route('verification.notice'));
+    $this->assertDatabaseMissing('job_applications', [
+        'job_posting_id' => $job->id,
+        'user_id' => $applicant->id,
+    ]);
+});
+
+test('unverified users cannot update application status', function () {
+    $creator = User::factory()->unverified()->create();
+    $applicant = User::factory()->create();
+    $job = JobPosting::factory()->create(['user_id' => $creator->id]);
+
+    $application = JobApplication::create([
+        'job_posting_id' => $job->id,
+        'user_id' => $applicant->id,
+        'message' => 'Help me',
+    ]);
+
+    $response = $this
+        ->actingAs($creator)
+        ->patch(route('job-applications.update', $application), [
+            'status' => 'accepted',
+        ]);
+
+    $response->assertRedirect(route('verification.notice'));
+    $application->refresh();
+    expect($application->status)->toBe('pending');
+});

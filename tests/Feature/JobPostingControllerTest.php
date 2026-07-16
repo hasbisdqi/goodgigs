@@ -193,3 +193,38 @@ test('system administrators can delete any job posting', function () {
         'id' => $job->id,
     ]);
 });
+
+test('unverified users can view the jobs list', function () {
+    $user = User::factory()->unverified()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->get(route('jobs.index'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('jobs/index')
+        ->has('jobs')
+    );
+});
+
+test('unverified users cannot post a new job vacancy', function () {
+    $user = User::factory()->unverified()->create();
+
+    $response = $this
+        ->actingAs($user)
+        ->post(route('jobs.store'), [
+            'title' => 'Fullstack Dev',
+            'company' => 'Awesome Startup',
+            'description' => 'We need an expert developer.',
+            'location' => 'Jakarta, Indonesia',
+            'salary' => '$3k - $5k',
+            'type' => 'Full-time',
+        ]);
+
+    $response->assertRedirect(route('verification.notice'));
+    $this->assertDatabaseMissing('job_postings', [
+        'title' => 'Fullstack Dev',
+        'company' => 'Awesome Startup',
+    ]);
+});
