@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { Search, Plus, Edit, Trash2, ShieldAlert, Briefcase, MapPin, DollarSign, Calendar, User as UserIcon, Send, CheckCircle, XCircle, MessageCircle, ArrowLeft, Star } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, ShieldAlert, Briefcase, MapPin, DollarSign, Calendar, User as UserIcon, Send, CheckCircle, XCircle, MessageCircle, ArrowLeft, Star, Map, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import JobMap from '@/components/JobMap';
+import ReportModal from '@/components/report-modal';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import InputError from '@/components/input-error';
@@ -94,16 +96,21 @@ type JobsPagination = {
 
 type PageProps = {
     jobs: JobsPagination;
+    recommendedJobs?: Job[];
+    categories?: any[];
     filters: {
         search: string | null;
+        type?: string | null;
     };
     auth: Auth;
 };
 
-export default function JobsIndex({ jobs, filters, auth }: PageProps) {
+export default function JobsIndex({ jobs, recommendedJobs, categories = [], filters, auth }: PageProps) {
     const isMobile = useIsMobile();
     const isEmailVerified = !!auth.user.email_verified_at;
     const [searchVal, setSearchVal] = useState(filters.search || '');
+    const [typeVal, setTypeVal] = useState(filters.type || 'All');
+    const [viewMode, setViewMode] = useState<'list'|'map'>('list');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -123,6 +130,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
         type: 'One-time Task',
         salary: '',
         description: '',
+        job_category_id: '',
     });
 
     const editForm = useForm({
@@ -132,6 +140,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
         type: 'One-time Task',
         salary: '',
         description: '',
+        job_category_id: '',
     });
 
     const applyForm = useForm({
@@ -153,7 +162,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.get(jobsIndex.url(), { search: searchVal }, { preserveState: true, replace: true });
+        router.get(jobsIndex.url(), { search: searchVal, type: typeVal }, { preserveState: true, replace: true });
     };
 
     const handleCreateSubmit = (e: React.FormEvent) => {
@@ -176,6 +185,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
             type: job.type,
             salary: job.salary || '',
             description: job.description,
+            job_category_id: (job as any).job_category_id ? (job as any).job_category_id.toString() : '',
         });
         setIsEditOpen(true);
     };
@@ -413,30 +423,128 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                 )}
 
                 {/* Actions & Filters */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
-                        <Input
-                            placeholder="Cari tugas, pemberi kerja, lokasi..."
-                            value={searchVal}
-                            onChange={(e) => setSearchVal(e.target.value)}
-                            className="pl-9 pr-4"
-                        />
-                        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 flex-1 max-w-xl">
+                        <div className="relative flex-1">
+                            <Input
+                                placeholder="Cari tugas, lokasi, perusahaan..."
+                                value={searchVal}
+                                onChange={(e) => setSearchVal(e.target.value)}
+                                className="pl-9 pr-4 w-full bg-card"
+                            />
+                            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                        </div>
+                        <div className="w-full sm:w-40 shrink-0">
+                            <select 
+                                className="flex h-9 w-full rounded-md border border-input bg-card px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                value={typeVal}
+                                onChange={(e) => setTypeVal(e.target.value)}
+                            >
+                                <option value="All">Semua Jenis</option>
+                                <option value="Full-time">Full-time</option>
+                                <option value="Part-time">Part-time</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Remote">Remote</option>
+                                <option value="Urgent">Urgent</option>
+                                <option value="One-time Task">One-time Task</option>
+                                <option value="Short-term">Short-term</option>
+                            </select>
+                        </div>
+                        <Button type="submit" className="w-full sm:w-auto">Cari</Button>
                     </form>
 
-                    <Button
-                        onClick={() => setIsCreateOpen(true)}
-                        disabled={!isEmailVerified}
-                        title={!isEmailVerified ? "Verifikasi email Anda untuk memposting tugas" : ""}
-                        className="w-full sm:w-auto"
-                    >
-                        <Plus className="size-4 mr-2" />
-                        Post a Gig / Task
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <div className="bg-muted/50 p-1 rounded-lg flex items-center border">
+                            <Button 
+                                variant={viewMode === 'list' ? 'default' : 'ghost'} 
+                                size="sm" 
+                                className="h-8 px-3 text-xs"
+                                onClick={() => setViewMode('list')}
+                            >
+                                <List className="size-3.5 mr-1.5" />
+                                Daftar
+                            </Button>
+                            <Button 
+                                variant={viewMode === 'map' ? 'default' : 'ghost'} 
+                                size="sm" 
+                                className="h-8 px-3 text-xs"
+                                onClick={() => setViewMode('map')}
+                            >
+                                <Map className="size-3.5 mr-1.5" />
+                                Peta
+                            </Button>
+                        </div>
+                        <Button
+                            onClick={() => setIsCreateOpen(true)}
+                            disabled={!isEmailVerified}
+                            title={!isEmailVerified ? "Verifikasi email Anda untuk memposting tugas" : ""}
+                            className="w-full sm:w-auto"
+                        >
+                            <Plus className="size-4 mr-2" />
+                            Post a Gig / Task
+                        </Button>
+                    </div>
                 </div>
 
-                {/* Jobs Grid */}
-                {jobs.data.length === 0 ? (
+                {/* Recommended Jobs Section */}
+                {recommendedJobs && recommendedJobs.length > 0 && viewMode === 'list' && (
+                    <div className="mb-4">
+                        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                            <Star className="size-5 fill-amber-500" />
+                            Rekomendasi Terbaik Untuk Anda
+                        </h2>
+                        <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory hide-scrollbar">
+                            {recommendedJobs.map((job) => {
+                                const myApp = getApplicationForJob(job);
+                                return (
+                                    <Card
+                                        key={job.id}
+                                        className="flex flex-col justify-between min-w-[280px] md:min-w-[320px] max-w-[320px] snap-center hover:shadow-md hover:border-amber-500/50 transition-all cursor-pointer bg-amber-50/30 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900"
+                                        onClick={() => openDetailsModal(job)}
+                                    >
+                                        <CardHeader className="pb-3">
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div>
+                                                    <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">{job.company}</span>
+                                                    <CardTitle className="text-lg font-bold mt-1 line-clamp-1">{job.title}</CardTitle>
+                                                </div>
+                                            </div>
+                                            <CardDescription className="flex flex-wrap gap-2 mt-2">
+                                                <Badge variant="outline" className="text-[10px] py-0.5 px-2 flex items-center gap-1 bg-background">
+                                                    <MapPin className="size-3" />
+                                                    {job.location}
+                                                </Badge>
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="text-[10px] py-0.5 px-2 bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300 border-transparent"
+                                                >
+                                                    Cocok {((job as any).match_score || 0)} Poin
+                                                </Badge>
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="flex flex-col gap-2 pt-0">
+                                            <div className="flex items-center gap-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                                                <DollarSign className="size-4" />
+                                                <span>{job.salary || 'Negotiable'}</span>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* View Container */}
+                {viewMode === 'map' ? (
+                    <div className="h-[600px] w-full rounded-xl overflow-hidden border bg-card">
+                        <JobMap 
+                            jobs={jobs.data} 
+                            onJobSelect={(job) => openDetailsModal(job)} 
+                            className="w-full h-full"
+                        />
+                    </div>
+                ) : jobs.data.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-xl bg-card">
                         <Briefcase className="size-12 text-muted-foreground/50 mb-3" />
                         <h3 className="text-lg font-semibold">Belum ada tugas aktif</h3>
@@ -589,6 +697,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                                 onSubmit={handleCreateSubmit}
                                 onCancel={() => setIsCreateOpen(false)}
                                 submitLabel="Posting Tugas"
+                                categories={categories}
                             />
                         </div>
                     </DrawerContent>
@@ -605,6 +714,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                             onSubmit={handleCreateSubmit}
                             onCancel={() => setIsCreateOpen(false)}
                             submitLabel="Posting Tugas"
+                            categories={categories}
                         />
                     </DialogContent>
                 </Dialog>
@@ -624,6 +734,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                                 onSubmit={handleEditSubmit}
                                 onCancel={() => setIsEditOpen(false)}
                                 submitLabel="Simpan Perubahan"
+                                categories={categories}
                             />
                         </div>
                     </DrawerContent>
@@ -640,6 +751,7 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                             onSubmit={handleEditSubmit}
                             onCancel={() => setIsEditOpen(false)}
                             submitLabel="Simpan Perubahan"
+                            categories={categories}
                         />
                     </DialogContent>
                 </Dialog>
@@ -680,8 +792,11 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                                 handleReviewSubmit={handleReviewSubmit}
                             />
                             {!isApplying && activeTab === 'detail' && (
-                                <DrawerFooter className="px-0 pt-4">
-                                    <Button type="button" onClick={() => setIsDetailsOpen(false)} className="w-full">
+                                <DrawerFooter className="px-0 pt-4 flex flex-row items-center justify-between">
+                                    {selectedJob?.user_id !== auth?.user?.id && selectedJob && (
+                                        <ReportModal reportableId={selectedJob.id} reportableType="App\Models\JobPosting" />
+                                    )}
+                                    <Button type="button" onClick={() => setIsDetailsOpen(false)} className={selectedJob?.user_id !== auth?.user?.id ? "flex-1 ml-4" : "w-full"}>
                                         Tutup Detail
                                     </Button>
                                 </DrawerFooter>
@@ -722,7 +837,10 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
                             handleReviewSubmit={handleReviewSubmit}
                         />
                         {!isApplying && activeTab === 'detail' && (
-                            <DialogFooter className="pt-2">
+                            <DialogFooter className="pt-2 flex flex-row items-center justify-between sm:justify-between w-full">
+                                {selectedJob?.user_id !== auth?.user?.id && selectedJob && (
+                                    <ReportModal reportableId={selectedJob.id} reportableType="App\Models\JobPosting" />
+                                )}
                                 <Button type="button" onClick={() => setIsDetailsOpen(false)}>
                                     Tutup Detail
                                 </Button>
@@ -761,104 +879,297 @@ export default function JobsIndex({ jobs, filters, auth }: PageProps) {
     );
 }
 
-function GigForm({ form, onSubmit, onCancel, submitLabel }: {
+function GigForm({ form, onSubmit, onCancel, submitLabel, categories = [] }: {
     form: any;
     onSubmit: (e: React.FormEvent) => void;
     onCancel: () => void;
     submitLabel: string;
+    categories?: any[];
 }) {
+    const [step, setStep] = useState(1);
+    const [recommendedWage, setRecommendedWage] = useState<number | null>(null);
+    const [isFetchingWage, setIsFetchingWage] = useState(false);
+
+    const fetchWageRecommendation = async () => {
+        setIsFetchingWage(true);
+        try {
+            const response = await fetch(`/api/wage-recommendation?type=${encodeURIComponent(form.data.type)}`);
+            const data = await response.json();
+            if (data.wage) {
+                setRecommendedWage(data.wage);
+                form.setData('salary', `Rp ${data.wage.toLocaleString('id-ID')}`);
+            } else {
+                setRecommendedWage(null);
+                alert('Belum ada data historis yang cukup untuk merekomendasikan upah jenis ini.');
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsFetchingWage(false);
+        }
+    };
+
+    const nextStep = () => {
+        // Simple step validation
+        if (step === 1) {
+            if (!form.data.title || !form.data.company) {
+                alert('Silakan isi Nama Pekerjaan dan Nama Pemesan.');
+                return;
+            }
+        }
+        if (step === 2) {
+            if (!form.data.location) {
+                alert('Silakan isi Lokasi / Alamat.');
+                return;
+            }
+        }
+        setStep(prev => Math.min(prev + 1, 4));
+    };
+
+    const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+
     return (
-        <form onSubmit={onSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                    <Label htmlFor="title">Nama Pekerjaan / Tugas</Label>
-                    <Input
-                        id="title"
-                        placeholder="e.g. Jahit Celana Robek, Perbaiki Pipa Bocor"
-                        value={form.data.title}
-                        onChange={(e) => form.setData('title', e.target.value)}
-                        required
-                    />
-                    <InputError message={form.errors.title} />
+        <div className="space-y-4">
+            {/* Step Indicators */}
+            <div className="flex items-center justify-between border-b pb-4 mb-4">
+                {[1, 2, 3, 4].map((s) => (
+                    <div key={s} className="flex items-center gap-2">
+                        <div className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm",
+                            step === s ? "bg-primary text-primary-foreground" : 
+                            step > s ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"
+                        )}>
+                            {s}
+                        </div>
+                        <span className={cn(
+                            "text-xs hidden sm:inline-block",
+                            step === s ? "font-semibold text-foreground" : "text-muted-foreground"
+                        )}>
+                            {s === 1 ? 'Detail' : s === 2 ? 'Lokasi' : s === 3 ? 'Upah' : 'Tinjauan'}
+                        </span>
+                        {s < 4 && <div className="h-px w-8 sm:w-12 bg-muted" />}
+                    </div>
+                ))}
+            </div>
+
+            <form onSubmit={onSubmit} className="space-y-4">
+                {step === 1 && (
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="title">Nama Pekerjaan / Tugas</Label>
+                                <Input
+                                    id="title"
+                                    placeholder="e.g. Jahit Celana Robek, Perbaiki Pipa Bocor"
+                                    value={form.data.title}
+                                    onChange={(e) => form.setData('title', e.target.value)}
+                                    required
+                                />
+                                <InputError message={form.errors.title} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="company">Nama Pemesan / Penyelenggara</Label>
+                                <Input
+                                    id="company"
+                                    placeholder="e.g. Pribadi (Ibu Rina), Warung Sejahtera"
+                                    value={form.data.company}
+                                    onChange={(e) => form.setData('company', e.target.value)}
+                                    required
+                                />
+                                <InputError message={form.errors.company} />
+                            </div>
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="job_category_id">Kategori Pekerjaan (Opsional)</Label>
+                            <select
+                                id="job_category_id"
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800"
+                                value={form.data.job_category_id}
+                                onChange={(e) => form.setData('job_category_id', e.target.value)}
+                            >
+                                <option value="">-- Pilih Kategori --</option>
+                                {categories.map((c: any) => (
+                                    <option key={c.id} value={c.id}>
+                                        {c.parent ? `${c.parent.name} > ` : ''}{c.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={form.errors.job_category_id} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="description">Deskripsi Tugas / Detail Pekerjaan</Label>
+                            <textarea
+                                id="description"
+                                placeholder="Jelaskan apa saja yang perlu dikerjakan, alat yang disediakan/perlu dibawa, dan kebutuhan lainnya..."
+                                className="flex min-h-[120px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800"
+                                value={form.data.description}
+                                onChange={(e) => form.setData('description', e.target.value)}
+                                required
+                            />
+                            <InputError message={form.errors.description} />
+                        </div>
+                    </div>
+                )}
+
+                {step === 2 && (
+                    <div className="space-y-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="location">Lokasi / Alamat</Label>
+                            <Input
+                                id="location"
+                                placeholder="e.g. Jakarta Selatan, Remote"
+                                value={form.data.location}
+                                onChange={(e) => form.setData('location', e.target.value)}
+                                required
+                            />
+                            <InputError message={form.errors.location} />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="latitude">Latitude (Koordinat Lintang)</Label>
+                                <Input
+                                    id="latitude"
+                                    type="number"
+                                    step="any"
+                                    placeholder="e.g. -6.2088"
+                                    value={form.data.latitude || ''}
+                                    onChange={(e) => form.setData('latitude', e.target.value)}
+                                />
+                                <InputError message={form.errors.latitude} />
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label htmlFor="longitude">Longitude (Koordinat Bujur)</Label>
+                                <Input
+                                    id="longitude"
+                                    type="number"
+                                    step="any"
+                                    placeholder="e.g. 106.8456"
+                                    value={form.data.longitude || ''}
+                                    onChange={(e) => form.setData('longitude', e.target.value)}
+                                />
+                                <InputError message={form.errors.longitude} />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {step === 3 && (
+                    <div className="space-y-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="type">Jenis Tugas</Label>
+                            <select
+                                id="type"
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800"
+                                value={form.data.type}
+                                onChange={(e) => form.setData('type', e.target.value)}
+                                required
+                            >
+                                <option value="One-time Task">One-time Task (Tugas Sekali Selesai)</option>
+                                <option value="Hourly Freelance">Hourly Freelance (Jasa Per Jam)</option>
+                                <option value="Urgent">Urgent (Mendesak / Cepat)</option>
+                                <option value="Short-term">Short-term (Jangka Pendek)</option>
+                            </select>
+                            <InputError message={form.errors.type} />
+                        </div>
+
+                        <div className="grid gap-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="salary">Imbalan / Upah (Optional)</Label>
+                                <Button 
+                                    type="button" 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="h-6 text-[10px] text-emerald-600 px-2"
+                                    onClick={fetchWageRecommendation}
+                                    disabled={isFetchingWage}
+                                >
+                                    {isFetchingWage ? 'Menghitung...' : 'Rekomendasi Upah Adil'}
+                                </Button>
+                            </div>
+                            <Input
+                                id="salary"
+                                placeholder="e.g. Rp 150.000 / Rp 50.000 per jam"
+                                value={form.data.salary}
+                                onChange={(e) => form.setData('salary', e.target.value)}
+                            />
+                            <InputError message={form.errors.salary} />
+                            {recommendedWage !== null && (
+                                <p className="text-[10px] text-emerald-600 mt-1">
+                                    Sistem merekomendasikan upah sebesar Rp {recommendedWage.toLocaleString('id-ID')} berdasarkan rata-rata historis.
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {step === 4 && (
+                    <div className="space-y-4">
+                        <div className="rounded-md border p-4 space-y-2 bg-muted/50 text-sm">
+                            <h3 className="font-semibold text-base border-b pb-2 mb-2">Tinjau Detail Tugas</h3>
+                            <div className="grid grid-cols-3 gap-2">
+                                <span className="font-medium text-muted-foreground">Tugas:</span>
+                                <span className="col-span-2 font-semibold">{form.data.title}</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                <span className="font-medium text-muted-foreground">Pemesan:</span>
+                                <span className="col-span-2">{form.data.company}</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                <span className="font-medium text-muted-foreground">Kategori:</span>
+                                <span className="col-span-2">
+                                    {categories.find((c: any) => c.id.toString() === form.data.job_category_id?.toString())?.name || '-'}
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                <span className="font-medium text-muted-foreground">Lokasi:</span>
+                                <span className="col-span-2">{form.data.location}</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                <span className="font-medium text-muted-foreground">Jenis:</span>
+                                <span className="col-span-2">{form.data.type}</span>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2">
+                                <span className="font-medium text-muted-foreground">Upah:</span>
+                                <span className="col-span-2 text-emerald-600 font-semibold">{form.data.salary || 'Sukarela'}</span>
+                            </div>
+                            <div className="mt-2 border-t pt-2">
+                                <span className="font-medium text-muted-foreground block mb-1">Deskripsi:</span>
+                                <p className="text-xs whitespace-pre-line text-muted-foreground">{form.data.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div className="flex justify-between gap-2 pt-2 border-t mt-4">
+                    <div className="flex gap-2">
+                        {step > 1 && (
+                            <Button type="button" variant="outline" onClick={prevStep}>
+                                Kembali
+                            </Button>
+                        )}
+                        <Button type="button" variant="outline" onClick={onCancel}>
+                            Batal
+                        </Button>
+                    </div>
+                    <div>
+                        {step < 4 ? (
+                            <Button type="button" onClick={nextStep}>
+                                Lanjut
+                            </Button>
+                        ) : (
+                            <Button type="submit" disabled={form.processing}>
+                                {submitLabel}
+                            </Button>
+                        )}
+                    </div>
                 </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="company">Nama Pemesan / Penyelenggara</Label>
-                    <Input
-                        id="company"
-                        placeholder="e.g. Pribadi (Ibu Rina), Warung Sejahtera"
-                        value={form.data.company}
-                        onChange={(e) => form.setData('company', e.target.value)}
-                        required
-                    />
-                    <InputError message={form.errors.company} />
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                    <Label htmlFor="location">Lokasi / Alamat</Label>
-                    <Input
-                        id="location"
-                        placeholder="e.g. Jakarta Selatan, Remote"
-                        value={form.data.location}
-                        onChange={(e) => form.setData('location', e.target.value)}
-                        required
-                    />
-                    <InputError message={form.errors.location} />
-                </div>
-
-                <div className="grid gap-2">
-                    <Label htmlFor="type">Jenis Tugas</Label>
-                    <select
-                        id="type"
-                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800"
-                        value={form.data.type}
-                        onChange={(e) => form.setData('type', e.target.value)}
-                        required
-                    >
-                        <option value="One-time Task">One-time Task (Tugas Sekali Selesai)</option>
-                        <option value="Hourly Freelance">Hourly Freelance (Jasa Per Jam)</option>
-                        <option value="Urgent">Urgent (Mendesak / Cepat)</option>
-                        <option value="Short-term">Short-term (Jangka Pendek)</option>
-                    </select>
-                    <InputError message={form.errors.type} />
-                </div>
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="salary">Imbalan / Upah (Optional)</Label>
-                <Input
-                    id="salary"
-                    placeholder="e.g. Rp 150.000 / Rp 50.000 per jam"
-                    value={form.data.salary}
-                    onChange={(e) => form.setData('salary', e.target.value)}
-                />
-                <InputError message={form.errors.salary} />
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="description">Deskripsi Tugas / Detail Pekerjaan</Label>
-                <textarea
-                    id="description"
-                    placeholder="Jelaskan apa saja yang perlu dikerjakan, alat yang disediakan/perlu dibawa, dan kebutuhan lainnya..."
-                    className="flex min-h-[120px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-800"
-                    value={form.data.description}
-                    onChange={(e) => form.setData('description', e.target.value)}
-                    required
-                />
-                <InputError message={form.errors.description} />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={onCancel}>
-                    Batal
-                </Button>
-                <Button type="submit" disabled={form.processing}>
-                    {submitLabel}
-                </Button>
-            </div>
-        </form>
+            </form>
+        </div>
     );
 }
 
@@ -994,6 +1305,11 @@ function GigDetails({
     chatReceiverId,
     onOpenChat,
     onSendMessage,
+    onCompleteJob,
+    isReviewing,
+    setIsReviewing,
+    reviewForm,
+    handleReviewSubmit,
 }: {
     job: Job | null;
     currentUserId?: number;
@@ -1098,6 +1414,63 @@ function GigDetails({
                     {job.description}
                 </p>
             </div>
+
+            {/* Progress Updates Section */}
+            {apps.some(app => app.status === 'accepted') && (
+                <div className="border-t border-border pt-4 mt-4 space-y-4">
+                    <h4 className="font-bold text-base flex items-center gap-2">
+                        <List className="size-4 text-primary" />
+                        <span>Pembaruan Progres</span>
+                    </h4>
+                    
+                    {job.progressUpdates && job.progressUpdates.length > 0 ? (
+                        <div className="space-y-3">
+                            {job.progressUpdates.map((update: any) => (
+                                <div key={update.id} className="bg-muted/20 border rounded-lg p-3 text-sm">
+                                    <p className="font-medium text-xs text-muted-foreground mb-1">
+                                        {new Date(update.created_at).toLocaleString()}
+                                    </p>
+                                    <p className="whitespace-pre-wrap">{update.message}</p>
+                                    {update.image_path && (
+                                        <img src={`/storage/${update.image_path}`} alt="Progres" className="mt-2 rounded-md max-h-32 object-cover" />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-muted-foreground italic">Belum ada pembaruan progres.</p>
+                    )}
+
+                    {/* Progress Update Form for Worker */}
+                    {!isOwner && myApp?.status === 'accepted' && job.status !== 'completed' && (
+                        <form 
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                const form = e.target as HTMLFormElement;
+                                const formData = new FormData(form);
+                                router.post(`/jobs/${job.id}/progress`, formData, {
+                                    preserveScroll: true,
+                                    onSuccess: () => form.reset()
+                                });
+                            }}
+                            className="bg-primary/5 p-3 rounded-lg border border-primary/10 mt-3"
+                        >
+                            <h5 className="text-xs font-semibold mb-2">Beri Laporan Progres</h5>
+                            <textarea 
+                                name="message" 
+                                required 
+                                className="w-full text-sm rounded-md border-input bg-background px-3 py-2 focus-visible:outline-none focus-visible:ring-1" 
+                                placeholder="Apa yang sudah dikerjakan?" 
+                                rows={2}
+                            />
+                            <div className="flex items-center gap-2 mt-2">
+                                <Input type="file" name="image" accept="image/*" className="text-xs h-8 flex-1" />
+                                <Button type="submit" size="sm" className="h-8 text-xs shrink-0">Kirim Progres</Button>
+                            </div>
+                        </form>
+                    )}
+                </div>
+            )}
             
             {/* Action for Completing Job (Employer only) */}
             {isOwner && job.status !== 'completed' && apps.some((app: JobApplication) => app.status === 'accepted') && (

@@ -12,9 +12,14 @@ import type { User } from '@/types';
 import { usePermission } from '@/hooks/use-permission';
 
 type DashboardStats = {
-    total_gigs: number;
-    my_gigs: number;
-    urgent_gigs: number;
+    // Employer
+    total_gigs?: number;
+    my_gigs?: number;
+    urgent_gigs?: number;
+    // Worker
+    total_applications?: number;
+    accepted_applications?: number;
+    completed_jobs?: number;
 };
 
 type PageProps = {
@@ -52,41 +57,79 @@ export default function Dashboard({ stats }: PageProps) {
 
                 {/* Stats Widgets */}
                 <div className="grid gap-4 sm:grid-cols-3">
-                    {/* Total Active Gigs */}
-                    <Card className="hover:shadow-sm transition-all bg-card/60 backdrop-blur-xs">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Tugas Aktif</CardTitle>
-                            <Briefcase className="size-4 text-primary" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stats.total_gigs}</div>
-                            <p className="text-[10px] text-muted-foreground mt-1">Pekerjaan tersedia untuk diambil</p>
-                        </CardContent>
-                    </Card>
+                    {auth.user.active_mode === 'employer' ? (
+                        <>
+                            {/* Employer Stats */}
+                            <Card className="hover:shadow-sm transition-all bg-card/60 backdrop-blur-xs">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                                    <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Tugas Aktif</CardTitle>
+                                    <Briefcase className="size-4 text-primary" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{stats.total_gigs ?? 0}</div>
+                                    <p className="text-[10px] text-muted-foreground mt-1">Pekerjaan tersedia di platform</p>
+                                </CardContent>
+                            </Card>
 
-                    {/* My Posted Gigs */}
-                    <Card className="hover:shadow-sm transition-all bg-card/60 backdrop-blur-xs">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Tugas Saya</CardTitle>
-                            <PlusCircle className="size-4 text-emerald-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{stats.my_gigs}</div>
-                            <p className="text-[10px] text-muted-foreground mt-1">Tugas yang Anda posting</p>
-                        </CardContent>
-                    </Card>
+                            <Card className="hover:shadow-sm transition-all bg-card/60 backdrop-blur-xs">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                                    <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Tugas Saya</CardTitle>
+                                    <PlusCircle className="size-4 text-emerald-500" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{stats.my_gigs ?? 0}</div>
+                                    <p className="text-[10px] text-muted-foreground mt-1">Tugas yang Anda posting</p>
+                                </CardContent>
+                            </Card>
 
-                    {/* Urgent Gigs */}
-                    <Card className="hover:shadow-sm transition-all bg-card/60 backdrop-blur-xs">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Tugas Mendesak</CardTitle>
-                            <AlertTriangle className="size-4 text-rose-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-rose-600 dark:text-rose-400">{stats.urgent_gigs}</div>
-                            <p className="text-[10px] text-muted-foreground mt-1">Membutuhkan penanganan cepat</p>
-                        </CardContent>
-                    </Card>
+                            <Card className="hover:shadow-sm transition-all bg-card/60 backdrop-blur-xs">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                                    <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Tugas Mendesak</CardTitle>
+                                    <AlertTriangle className="size-4 text-rose-500" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold text-rose-600 dark:text-rose-400">{stats.urgent_gigs ?? 0}</div>
+                                    <p className="text-[10px] text-muted-foreground mt-1">Tugas Anda yang butuh cepat</p>
+                                </CardContent>
+                            </Card>
+                        </>
+                    ) : (
+                        <>
+                            {/* Worker Stats */}
+                            <Card className="hover:shadow-sm transition-all bg-card/60 backdrop-blur-xs">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                                    <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Total Lamaran</CardTitle>
+                                    <Briefcase className="size-4 text-primary" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{stats.total_applications ?? 0}</div>
+                                    <p className="text-[10px] text-muted-foreground mt-1">Lamaran yang telah Anda kirim</p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="hover:shadow-sm transition-all bg-card/60 backdrop-blur-xs">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                                    <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Lamaran Diterima</CardTitle>
+                                    <ShieldCheck className="size-4 text-emerald-500" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.accepted_applications ?? 0}</div>
+                                    <p className="text-[10px] text-muted-foreground mt-1">Tugas yang sedang/akan dikerjakan</p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="hover:shadow-sm transition-all bg-card/60 backdrop-blur-xs">
+                                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                                    <CardTitle className="text-xs font-semibold text-muted-foreground uppercase">Tugas Selesai</CardTitle>
+                                    <Sparkles className="size-4 text-purple-500" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.completed_jobs ?? 0}</div>
+                                    <p className="text-[10px] text-muted-foreground mt-1">Tugas yang berhasil Anda selesaikan</p>
+                                </CardContent>
+                            </Card>
+                        </>
+                    )}
                 </div>
 
                 {/* Management Grid */}

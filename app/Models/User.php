@@ -29,7 +29,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'active_mode'])]
+#[Fillable(['name', 'email', 'password', 'active_mode', 'bio', 'address', 'skills', 'latitude', 'longitude', 'is_identity_verified', 'verified_skills'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
@@ -47,6 +47,9 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'skills' => 'array',
+            'is_identity_verified' => 'boolean',
+            'verified_skills' => 'array',
         ];
     }
 
@@ -128,5 +131,29 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function endorsementsReceived(): HasMany
     {
         return $this->hasMany(Endorsement::class, 'endorsee_id');
+    }
+
+    /**
+     * Get the portfolios created by this user.
+     */
+    public function portfolios(): HasMany
+    {
+        return $this->hasMany(Portfolio::class);
+    }
+
+    /**
+     * Get the verification requests submitted by this user.
+     */
+    public function verificationRequests(): HasMany
+    {
+        return $this->hasMany(VerificationRequest::class);
+    }
+
+    /**
+     * Get the reports submitted by this user.
+     */
+    public function reportsSubmitted(): HasMany
+    {
+        return $this->hasMany(Report::class, 'reporter_id');
     }
 }

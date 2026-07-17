@@ -47,38 +47,38 @@ Berikut adalah daftar tugas pengembangan GoodGigs beserta status pengerjaannya u
 
 ---
 
-## Fase 5: Visualisasi Peta & Pencarian Tugas (Belum Dikerjakan)
-- [ ] Search Jobs: Fitur pencarian lanjutan dan filter (lokasi, kategori, harga) untuk pekerja.
-- [ ] Tambahkan kolom koordinat (`latitude`, `longitude`) di tabel `job_postings`.
-- [ ] Integrasikan peta Leaflet.js di halaman utama pencarian tugas.
-- [ ] Tampilkan pin penanda lokasi gig/tugas secara visual di peta.
+## Fase 5: Visualisasi Peta & Pencarian Tugas (Selesai)
+- [x] Search Jobs: Fitur pencarian lanjutan dan filter (lokasi, kategori, harga) untuk pekerja.
+- [x] Tambahkan kolom koordinat (`latitude`, `longitude`) di tabel `job_postings`.
+- [x] Integrasikan peta Leaflet.js di halaman utama pencarian tugas.
+- [x] Tampilkan pin penanda lokasi gig/tugas secara visual di peta.
 
 ---
 
-## Fase 6: Manajemen Profil, Dashboard, & Eksekusi Tugas (Belum Dikerjakan)
-- [ ] Employer Dashboard & Worker Dashboard: Tampilan ringkasan aktivitas sesuai peran.
-- [ ] Manage Employer Profile & Manage Worker Profile: Halaman khusus untuk memperbarui info terkait peran (alamat usaha vs keterampilan).
-- [ ] Portfolio Management: Fitur unggah dokumen/foto portofolio untuk pekerja.
-- [ ] Job Status Management: Alur manajemen status tugas yang lebih rinci (Dalam Pengerjaan, Pending, Selesai).
-- [ ] Job Progress Update: Pekerja dapat memberikan update harian/progres dari tugas yang sedang dikerjakan.
-- [ ] Search Workers: Fitur pencarian direktori pekerja bagi pemberi kerja.
+## Fase 6: Manajemen Profil, Dashboard, & Eksekusi Tugas (Selesai)
+- [x] Employer Dashboard & Worker Dashboard: Tampilan ringkasan aktivitas sesuai peran.
+- [x] Manage Employer Profile & Manage Worker Profile: Halaman khusus untuk memperbarui info terkait peran (alamat usaha vs keterampilan).
+- [x] Portfolio Management: Fitur unggah dokumen/foto portofolio untuk pekerja.
+- [x] Job Status Management: Alur manajemen status tugas yang lebih rinci (Dalam Pengerjaan, Pending, Selesai).
+- [x] Job Progress Update: Pekerja dapat memberikan update harian/progres dari tugas yang sedang dikerjakan.
+- [x] Search Workers: Fitur pencarian direktori pekerja bagi pemberi kerja.
 
 ---
 
-## Fase 7: Fitur Pintar & Rekomendasi (Belum Dikerjakan)
-- [ ] Smart Job Matching: Algoritma pencocokan pekerja dengan lowongan terdekat dan relevan dengan keahliannya.
-- [ ] Fair Wage Recommendation: Sistem saran upah minimal otomatis berdasarkan jenis tugas dan tren lokasi agar gaji adil.
+## Fase 7: Fitur Pintar & Rekomendasi (Selesai)
+- [x] Smart Job Matching: Algoritma pencocokan pekerja dengan lowongan terdekat dan relevan dengan keahliannya.
+- [x] Fair Wage Recommendation: Sistem saran upah minimal otomatis berdasarkan jenis tugas dan tren lokasi agar gaji adil.
 
 ---
 
-## Fase 8: Trust & Safety (Kepercayaan & Verifikasi) (Belum Dikerjakan)
-- [ ] Identity Verification: Modul unggah kartu identitas (KTP) / swafoto untuk validasi pengguna.
-- [ ] Skill Verification: Pengajuan verifikasi keahlian khusus (misal: sertifikat teknisi kelistrikan).
-- [ ] Verification Management: Halaman admin (backend) untuk meninjau (Review) dan menyetujui dokumen identitas.
-- [ ] Report Management: Sistem pelaporan postingan pekerjaan palsu, spam, atau akun bermasalah.
+## Fase 8: Trust & Safety (Kepercayaan & Verifikasi) (Selesai)
+- [x] Identity Verification: Modul unggah kartu identitas (KTP) / swafoto untuk validasi pengguna.
+- [x] Skill Verification: Pengajuan verifikasi keahlian khusus (misal: sertifikat teknisi kelistrikan).
+- [x] Verification Management: Halaman admin (backend) untuk meninjau (Review) dan menyetujui dokumen identitas.
+- [x] Report Management: Sistem pelaporan postingan pekerjaan palsu, spam, atau akun bermasalah.
 
 ---
 
-## Fase 9: Administrasi & Analitik (Belum Dikerjakan)
-- [ ] Analytics Dashboard: Panel Super Admin untuk melihat jumlah transaksi, pertumbuhan pengguna, dan rasio sukses pekerjaan.
-- [ ] Job Category Management: Modul CRUD untuk menambah/mengedit kategori dan sub-kategori pekerjaan secara dinamis.
+## Fase 9: Administrasi & Analitik (Selesai)
+- [x] Analytics Dashboard: Panel Super Admin untuk melihat jumlah transaksi, pertumbuhan pengguna, dan rasio sukses pekerjaan.
+- [x] Job Category Management: Modul CRUD untuk menambah/mengedit kategori dan sub-kategori pekerjaan secara dinamis.

@@ -88,6 +88,8 @@ class JobPostingFactory extends Factory
             'salary' => $selected['salary'],
             'type' => $selected['type'],
             'status' => 'published',
+            'latitude' => $this->faker->latitude(-6.3, -6.1), // Around Jakarta
+            'longitude' => $this->faker->longitude(106.7, 106.9),
         ];
     }
 }

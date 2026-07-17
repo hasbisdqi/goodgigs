@@ -17,6 +17,23 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        return $this->profileRules($this->user()->id);
+        return array_merge($this->profileRules($this->user()->id), [
+            'bio' => ['nullable', 'string', 'max:1000'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'skills' => ['nullable', 'array'],
+            'skills.*' => ['string', 'max:50'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+        ]);
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('skills') && is_string($this->skills)) {
+            $skills = array_filter(array_map('trim', explode(',', $this->skills)));
+            $this->merge([
+                'skills' => empty($skills) ? null : array_values($skills),
+            ]);
+        }
     }
 }

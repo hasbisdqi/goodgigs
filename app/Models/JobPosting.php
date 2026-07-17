@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'title', 'company', 'description', 'location', 'salary', 'type', 'status'])]
+#[Fillable(['user_id', 'title', 'company', 'description', 'location', 'salary', 'type', 'status', 'latitude', 'longitude', 'job_category_id'])]
 class JobPosting extends Model
 {
     /** @use HasFactory<JobPostingFactory> */
@@ -21,6 +21,14 @@ class JobPosting extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the category of this job posting.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(JobCategory::class, 'job_category_id');
     }
 
     /**
@@ -45,5 +53,13 @@ class JobPosting extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get the progress updates for this job posting.
+     */
+    public function progressUpdates(): HasMany
+    {
+        return $this->hasMany(JobProgressUpdate::class);
     }
 }

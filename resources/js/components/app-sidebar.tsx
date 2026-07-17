@@ -1,5 +1,5 @@
 import { Link, usePage, router } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Users, Shield, Briefcase, HardHat, Building2 } from 'lucide-react';
+import { BookOpen, FolderGit2, LayoutGrid, Users, Shield, Briefcase, HardHat, Building2, FileBadge, ShieldAlert, BarChart3, ListTree } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -36,6 +36,8 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
+
+
 export function AppSidebar() {
     const { hasPermission } = usePermission();
     const { auth } = usePage<{ auth: Auth }>().props;
@@ -64,7 +66,20 @@ export function AppSidebar() {
         },
     ];
 
+    if (isEmployer) {
+        mainNavItems.push({
+            title: 'Cari Pekerja',
+            href: '/workers', // using string as wayfinder might not have it yet, or better use wayfinder index from workers route if available, but for now '/workers'
+            icon: Users,
+        });
+    }
+
     if (hasPermission('manage users')) {
+        mainNavItems.push({
+            title: 'Analytics',
+            href: '/admin/analytics',
+            icon: BarChart3,
+        });
         mainNavItems.push({
             title: 'Users',
             href: adminUsers.url(),
@@ -74,6 +89,21 @@ export function AppSidebar() {
             title: 'Roles',
             href: adminRoles.url(),
             icon: Shield,
+        });
+        mainNavItems.push({
+            title: 'Categories',
+            href: '/admin/categories',
+            icon: ListTree,
+        });
+        mainNavItems.push({
+            title: 'Verifications',
+            href: '/admin/verifications',
+            icon: FileBadge,
+        });
+        mainNavItems.push({
+            title: 'Reports',
+            href: '/admin/reports',
+            icon: ShieldAlert,
         });
     }
 

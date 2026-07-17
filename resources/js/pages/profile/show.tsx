@@ -3,6 +3,7 @@ import { Star, Shield, Award, Calendar, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import ReportModal from '@/components/report-modal';
 import { dashboard } from '@/routes';
 import { cn } from '@/lib/utils';
 import type { Auth } from '@/types';
@@ -74,15 +75,18 @@ export default function PublicProfile({ profileUser, stats, reviews, has_endorse
                             </div>
                             
                             {!isSelf && auth.user && (
-                                <Button 
-                                    onClick={handleEndorse} 
-                                    disabled={has_endorsed}
-                                    variant={has_endorsed ? "secondary" : "default"}
-                                    className="w-full sm:w-auto"
-                                >
-                                    <Award className="size-4 mr-2" />
-                                    {has_endorsed ? 'Telah Di-Endorse' : 'Endorse Pengguna Ini'}
-                                </Button>
+                                <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+                                    <Button 
+                                        onClick={handleEndorse} 
+                                        disabled={has_endorsed}
+                                        variant={has_endorsed ? "secondary" : "default"}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        <Award className="size-4 mr-2" />
+                                        {has_endorsed ? 'Telah Di-Endorse' : 'Endorse Pengguna Ini'}
+                                    </Button>
+                                    <ReportModal reportableId={profileUser.id} reportableType="App\Models\User" />
+                                </div>
                             )}
                         </div>
                     </CardHeader>

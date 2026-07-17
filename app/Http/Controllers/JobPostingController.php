@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\JobCategory;
 use App\Models\JobPosting;
+use App\Services\RecommendationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +19,7 @@ class JobPostingController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->query('search');
+        $type = $request->query('type');
 
         $userId = $request->user()->id;
         $isAdmin = $request->user()->hasRole('Super Admin') || $request->user()->hasRole('Admin');
@@ -36,6 +39,7 @@ class JobPostingController extends Controller
                                 });
                         });
                 },
+                'progressUpdates.user',
             ])
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
@@ -44,14 +48,30 @@ class JobPostingController extends Controller
                         ->orWhere('location', 'like', "%{$search}%");
                 });
             })
+            ->when($type, function ($query, $type) {
+                if ($type !== 'All') {
+                    $query->where('type', $type);
+                }
+            })
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
+        $recommendedJobs = collect();
+        if ($request->user()->active_mode === 'worker') {
+            $recommendationService = app(RecommendationService::class);
+            $recommendedJobs = $recommendationService->getRecommendedJobs($request->user(), 5);
+        }
+
+        $categories = JobCategory::with('parent')->latest()->get();
+
         return Inertia::render('jobs/index', [
             'jobs' => $jobs,
+            'recommendedJobs' => $recommendedJobs,
+            'categories' => $categories,
             'filters' => [
                 'search' => $search,
+                'type' => $type,
             ],
         ]);
     }
@@ -68,6 +88,9 @@ class JobPostingController extends Controller
             'location' => ['required', 'string', 'max:255'],
             'salary' => ['nullable', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
+            'job_category_id' => ['nullable', 'exists:job_categories,id'],
         ]);
 
         $request->user()->jobPostings()->create($validated);
@@ -96,6 +119,9 @@ class JobPostingController extends Controller
             'location' => ['required', 'string', 'max:255'],
             'salary' => ['nullable', 'string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
+            'latitude' => ['nullable', 'numeric'],
+            'longitude' => ['nullable', 'numeric'],
+            'job_category_id' => ['nullable', 'exists:job_categories,id'],
         ]);
 
         $job->update($validated);
@@ -149,6 +175,7 @@ class JobPostingController extends Controller
                             });
                     });
             },
+            'progressUpdates.user',
         ]);
 
         return response()->json($job);
@@ -171,5 +198,21 @@ class JobPostingController extends Controller
         ]);
 
         return redirect()->back();
+    }
+
+    /**
+     * Get a fair wage recommendation based on job type.
+     */
+    public function wageRecommendation(Request $request, RecommendationService $recommendationService): JsonResponse
+    {
+        $type = $request->query('type');
+
+        if (! $type) {
+            return response()->json(['wage' => null]);
+        }
+
+        $wage = $recommendationService->getFairWageRecommendation($type);
+
+        return response()->json(['wage' => $wage]);
     }
 }
