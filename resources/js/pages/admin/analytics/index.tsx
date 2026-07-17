@@ -12,7 +12,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function AnalyticsIndex({ stats }: { stats: any }) {
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Analytics Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-6 max-w-6xl mx-auto w-full">
                 <Heading title="Analytics Dashboard" description="Ringkasan metrik platform dan performa pengguna." />
@@ -97,6 +97,10 @@ export default function AnalyticsIndex({ stats }: { stats: any }) {
                     </Card>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+AnalyticsIndex.layout = {
+    breadcrumbs: breadcrumbs,
+};

@@ -22,7 +22,7 @@ export default function VerificationsIndex({ verifications }: { verifications: a
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Manage Verifications" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <Heading title="Verification Requests" description="Kelola pengajuan verifikasi identitas dan keahlian pengguna." />
@@ -92,6 +92,10 @@ export default function VerificationsIndex({ verifications }: { verifications: a
                     </Table>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
+}
+
+VerificationsIndex.layout = {
+    breadcrumbs: breadcrumbs,
 }

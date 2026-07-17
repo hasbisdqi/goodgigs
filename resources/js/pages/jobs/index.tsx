@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import InputError from '@/components/input-error';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Map as Mapcn, useMap, MapControls, MapMarker, MarkerContent, MarkerLabel } from '@/components/ui/map';
 import {
     Dialog,
     DialogContent,
@@ -424,66 +425,73 @@ export default function JobsIndex({ jobs, recommendedJobs, categories = [], filt
 
                 {/* Actions & Filters */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 flex-1 max-w-xl">
-                        <div className="relative flex-1">
-                            <Input
-                                placeholder="Cari tugas, lokasi, perusahaan..."
-                                value={searchVal}
-                                onChange={(e) => setSearchVal(e.target.value)}
-                                className="pl-9 pr-4 w-full bg-card"
-                            />
-                            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        </div>
-                        <div className="w-full sm:w-40 shrink-0">
-                            <select 
-                                className="flex h-9 w-full rounded-md border border-input bg-card px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                value={typeVal}
-                                onChange={(e) => setTypeVal(e.target.value)}
-                            >
-                                <option value="All">Semua Jenis</option>
-                                <option value="Full-time">Full-time</option>
-                                <option value="Part-time">Part-time</option>
-                                <option value="Contract">Contract</option>
-                                <option value="Remote">Remote</option>
-                                <option value="Urgent">Urgent</option>
-                                <option value="One-time Task">One-time Task</option>
-                                <option value="Short-term">Short-term</option>
-                            </select>
-                        </div>
-                        <Button type="submit" className="w-full sm:w-auto">Cari</Button>
-                    </form>
+                    {auth.user.active_mode === 'worker' ? (
+                        <>
+                            <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 flex-1 max-w-xl">
+                                <div className="relative flex-1">
+                                    <Input
+                                        placeholder="Cari tugas, lokasi, perusahaan..."
+                                        value={searchVal}
+                                        onChange={(e) => setSearchVal(e.target.value)}
+                                        className="pl-9 pr-4 w-full bg-card"
+                                    />
+                                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                </div>
+                                <div className="w-full sm:w-40 shrink-0">
+                                    <select 
+                                        className="flex h-9 w-full rounded-md border border-input bg-card px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                        value={typeVal}
+                                        onChange={(e) => setTypeVal(e.target.value)}
+                                    >
+                                        <option value="All">Semua Jenis</option>
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Contract">Contract</option>
+                                        <option value="Remote">Remote</option>
+                                        <option value="Urgent">Urgent</option>
+                                        <option value="One-time Task">One-time Task</option>
+                                        <option value="Short-term">Short-term</option>
+                                    </select>
+                                </div>
+                                <Button type="submit" className="w-full sm:w-auto">Cari</Button>
+                            </form>
 
-                    <div className="flex items-center gap-2">
-                        <div className="bg-muted/50 p-1 rounded-lg flex items-center border">
-                            <Button 
-                                variant={viewMode === 'list' ? 'default' : 'ghost'} 
-                                size="sm" 
-                                className="h-8 px-3 text-xs"
-                                onClick={() => setViewMode('list')}
+                            <div className="flex items-center gap-2">
+                                <div className="bg-muted/50 p-1 rounded-lg flex items-center border">
+                                    <Button 
+                                        variant={viewMode === 'list' ? 'default' : 'ghost'} 
+                                        size="sm" 
+                                        className="h-8 px-3 text-xs"
+                                        onClick={() => setViewMode('list')}
+                                    >
+                                        <List className="size-3.5 mr-1.5" />
+                                        Daftar
+                                    </Button>
+                                    <Button 
+                                        variant={viewMode === 'map' ? 'default' : 'ghost'} 
+                                        size="sm" 
+                                        className="h-8 px-3 text-xs"
+                                        onClick={() => setViewMode('map')}
+                                    >
+                                        <Map className="size-3.5 mr-1.5" />
+                                        Peta
+                                    </Button>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex items-center justify-end w-full">
+                            <Button
+                                onClick={() => setIsCreateOpen(true)}
+                                disabled={!isEmailVerified}
+                                title={!isEmailVerified ? "Verifikasi email Anda untuk memposting tugas" : ""}
+                                className="w-full sm:w-auto"
                             >
-                                <List className="size-3.5 mr-1.5" />
-                                Daftar
-                            </Button>
-                            <Button 
-                                variant={viewMode === 'map' ? 'default' : 'ghost'} 
-                                size="sm" 
-                                className="h-8 px-3 text-xs"
-                                onClick={() => setViewMode('map')}
-                            >
-                                <Map className="size-3.5 mr-1.5" />
-                                Peta
+                                <Plus className="size-4 mr-2" />
+                                Post a Gig / Task
                             </Button>
                         </div>
-                        <Button
-                            onClick={() => setIsCreateOpen(true)}
-                            disabled={!isEmailVerified}
-                            title={!isEmailVerified ? "Verifikasi email Anda untuk memposting tugas" : ""}
-                            className="w-full sm:w-auto"
-                        >
-                            <Plus className="size-4 mr-2" />
-                            Post a Gig / Task
-                        </Button>
-                    </div>
+                    )}
                 </div>
 
                 {/* Recommended Jobs Section */}
@@ -537,12 +545,36 @@ export default function JobsIndex({ jobs, recommendedJobs, categories = [], filt
 
                 {/* View Container */}
                 {viewMode === 'map' ? (
-                    <div className="h-[600px] w-full rounded-xl overflow-hidden border bg-card">
-                        <JobMap 
-                            jobs={jobs.data} 
-                            onJobSelect={(job) => openDetailsModal(job)} 
-                            className="w-full h-full"
-                        />
+                    <div className="h-[600px] w-full rounded-xl overflow-hidden border bg-card relative">
+                        <Mapcn
+                            initialViewState={{
+                                longitude: 106.8456,
+                                latitude: -6.2088,
+                                zoom: 10,
+                            }}
+                        >
+                            <MapControls
+                                showZoom
+                                showFullscreen
+                                showLocate
+                                position="top-right"
+                            />
+                            {jobs.data.filter(j => (j as any).latitude && (j as any).longitude).map((job) => (
+                                <MapMarker
+                                    key={job.id}
+                                    latitude={parseFloat(String((job as any).latitude))}
+                                    longitude={parseFloat(String((job as any).longitude))}
+                                    onClick={() => openDetailsModal(job)}
+                                >
+                                    <MarkerContent />
+                                    <MarkerLabel position="top">
+                                        <div className="bg-popover text-popover-foreground border px-2 py-1 rounded-sm shadow-xs text-[10px] font-semibold">
+                                            {job.title}
+                                        </div>
+                                    </MarkerLabel>
+                                </MapMarker>
+                            ))}
+                        </Mapcn>
                     </div>
                 ) : jobs.data.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-xl bg-card">
@@ -790,6 +822,7 @@ export default function JobsIndex({ jobs, recommendedJobs, categories = [], filt
                                 setIsReviewing={setIsReviewing}
                                 reviewForm={reviewForm}
                                 handleReviewSubmit={handleReviewSubmit}
+                                activeMode={auth?.user?.active_mode}
                             />
                             {!isApplying && activeTab === 'detail' && (
                                 <DrawerFooter className="px-0 pt-4 flex flex-row items-center justify-between">
@@ -835,6 +868,7 @@ export default function JobsIndex({ jobs, recommendedJobs, categories = [], filt
                             setIsReviewing={setIsReviewing}
                             reviewForm={reviewForm}
                             handleReviewSubmit={handleReviewSubmit}
+                            activeMode={auth?.user?.active_mode}
                         />
                         {!isApplying && activeTab === 'detail' && (
                             <DialogFooter className="pt-2 flex flex-row items-center justify-between sm:justify-between w-full">
@@ -877,6 +911,21 @@ export default function JobsIndex({ jobs, recommendedJobs, categories = [], filt
             </Dialog>
         </>
     );
+}
+
+function MapPickerHelper({ onPick }: { onPick: (lat: number, lng: number) => void }) {
+    const { map } = useMap();
+    useEffect(() => {
+        if (!map) return;
+        const clickHandler = (e: any) => {
+            onPick(e.lngLat.lat, e.lngLat.lng);
+        };
+        map.on('click', clickHandler);
+        return () => {
+            map.off('click', clickHandler);
+        };
+    }, [map, onPick]);
+    return null;
 }
 
 function GigForm({ form, onSubmit, onCancel, submitLabel, categories = [] }: {
@@ -1055,6 +1104,38 @@ function GigForm({ form, onSubmit, onCancel, submitLabel, categories = [] }: {
                                 <InputError message={form.errors.longitude} />
                             </div>
                         </div>
+
+                        <div className="h-[250px] w-full overflow-hidden rounded-xl border mt-2">
+                            <Mapcn
+                                initialViewState={{
+                                    longitude: parseFloat(form.data.longitude) || 106.8456,
+                                    latitude: parseFloat(form.data.latitude) || -6.2088,
+                                    zoom: 11,
+                                }}
+                            >
+                                <MapControls
+                                    showZoom
+                                    showLocate
+                                    position="top-right"
+                                />
+                                <MapPickerHelper onPick={(lat, lng) => {
+                                    form.setData({
+                                        ...form.data,
+                                        latitude: lat.toString(),
+                                        longitude: lng.toString(),
+                                    });
+                                }} />
+                                {form.data.latitude && form.data.longitude && (
+                                    <MapMarker
+                                        latitude={parseFloat(form.data.latitude)}
+                                        longitude={parseFloat(form.data.longitude)}
+                                    >
+                                        <MarkerContent />
+                                    </MapMarker>
+                                )}
+                            </Mapcn>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground italic">Klik pada peta di atas untuk memilih koordinat lokasi secara otomatis.</p>
                     </div>
                 )}
 
@@ -1310,6 +1391,7 @@ function GigDetails({
     setIsReviewing,
     reviewForm,
     handleReviewSubmit,
+    activeMode,
 }: {
     job: Job | null;
     currentUserId?: number;
@@ -1332,6 +1414,7 @@ function GigDetails({
     setIsReviewing: (val: boolean) => void;
     reviewForm: any;
     handleReviewSubmit: (e: React.FormEvent) => void;
+    activeMode?: string;
 }) {
     if (!job || currentUserId === undefined) {
         return null;
@@ -1626,7 +1709,7 @@ function GigDetails({
             )}
 
             {/* Application status / submission for non-owners */}
-            {!isOwner && (
+            {!isOwner && activeMode === 'worker' && (
                 <div className="border-t border-border pt-4 mt-4">
                     {myApp ? (
                         <div className="space-y-3">

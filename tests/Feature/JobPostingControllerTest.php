@@ -60,8 +60,8 @@ test('authenticated users can search jobs by title, company, or location', funct
     );
 });
 
-test('authenticated users can post a new job vacancy', function () {
-    $user = User::factory()->create();
+test('authenticated employers can post a new job vacancy', function () {
+    $user = User::factory()->create(['active_mode' => 'employer']);
 
     $response = $this
         ->actingAs($user)
@@ -80,6 +80,23 @@ test('authenticated users can post a new job vacancy', function () {
         'company' => 'Awesome Startup',
         'user_id' => $user->id,
     ]);
+});
+
+test('workers cannot post a new job vacancy', function () {
+    $user = User::factory()->create(['active_mode' => 'worker']);
+
+    $response = $this
+        ->actingAs($user)
+        ->post(route('jobs.store'), [
+            'title' => 'Fullstack Dev',
+            'company' => 'Awesome Startup',
+            'description' => 'We need an expert developer.',
+            'location' => 'Jakarta, Indonesia',
+            'salary' => '$3k - $5k',
+            'type' => 'Full-time',
+        ]);
+
+    $response->assertStatus(403);
 });
 
 test('creator of a job posting can update it', function () {
@@ -209,7 +226,7 @@ test('unverified users can view the jobs list', function () {
 });
 
 test('unverified users cannot post a new job vacancy', function () {
-    $user = User::factory()->unverified()->create();
+    $user = User::factory()->unverified()->create(['active_mode' => 'employer']);
 
     $response = $this
         ->actingAs($user)

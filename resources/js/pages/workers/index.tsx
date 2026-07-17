@@ -9,6 +9,7 @@ import { router } from '@inertiajs/react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { profile } from '@/routes';
+import { BreadcrumbItem } from '@/types';
 
 type Worker = {
     id: number;
@@ -19,6 +20,11 @@ type Worker = {
     reviews_received_count: number;
     reviews_received_avg_rating?: number;
 };
+
+const breadcrumbs: BreadcrumbItem[] = [
+    { title: 'Dashboard', href: '#' },
+    { title: 'Cari Pekerja', href: '/workers' },
+];
 
 export default function WorkersIndex({ workers, filters }: { workers: any; filters: any }) {
     const [search, setSearch] = useState(filters.search || '');
@@ -33,7 +39,7 @@ export default function WorkersIndex({ workers, filters }: { workers: any; filte
     };
 
     return (
-        <AppLayout breadcrumbs={[{ title: 'Cari Pekerja', href: '/workers' }]}>
+        <>
             <Head title="Cari Pekerja" />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex flex-col gap-2">
@@ -164,6 +170,10 @@ export default function WorkersIndex({ workers, filters }: { workers: any; filte
                     </div>
                 )}
             </div>
-        </AppLayout>
+        </>
     );
 }
+
+WorkersIndex.layout = {
+    breadcrumbs: breadcrumbs,
+};

@@ -22,7 +22,7 @@ export default function ReportsIndex({ reports }: { reports: any }) {
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Manage Reports" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <Heading title="Laporan & Keamanan" description="Tinjau laporan pekerjaan atau akun dari komunitas." />
@@ -102,6 +102,10 @@ export default function ReportsIndex({ reports }: { reports: any }) {
                     </Table>
                 </div>
             </div>
-        </AppLayout>
+        </>
     );
+}
+
+ReportsIndex.layout = {
+    breadcrumbs: breadcrumbs,
 }

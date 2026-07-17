@@ -93,7 +93,7 @@ export default function CategoriesIndex({ categories, parentCategories, errors }
     };
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <>
             <Head title="Manage Job Categories" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex items-center justify-between">
@@ -266,6 +266,10 @@ export default function CategoriesIndex({ categories, parentCategories, errors }
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </AppLayout>
+        </>
     );
+}
+
+CategoriesIndex.layout = {
+    breadcrumbs: breadcrumbs,
 }

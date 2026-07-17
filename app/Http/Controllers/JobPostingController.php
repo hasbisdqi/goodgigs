@@ -41,6 +41,12 @@ class JobPostingController extends Controller
                 },
                 'progressUpdates.user',
             ])
+            ->when(! $isAdmin && $request->user()->active_mode === 'employer', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->when(! $isAdmin && $request->user()->active_mode === 'worker', function ($query) {
+                $query->where('status', 'published');
+            })
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
@@ -81,6 +87,10 @@ class JobPostingController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        if ($request->user()->active_mode !== 'employer' && ! $request->user()->hasRole('Super Admin') && ! $request->user()->hasRole('Admin')) {
+            abort(403, 'Penyedia Jasa tidak diizinkan membuat lowongan tugas.');
+        }
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'company' => ['required', 'string', 'max:255'],
