@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['job_posting_id', 'user_id', 'message', 'status'])]
+#[Fillable(['job_posting_id', 'user_id', 'message', 'status', 'hourly_rate', 'duration', 'availability', 'attachment_path'])]
 class JobApplication extends Model
 {
     /** @use HasFactory<JobApplicationFactory> */

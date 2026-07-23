@@ -36,6 +36,13 @@ class PublicProfileController extends Controller
                 'name' => $user->name,
                 'active_mode' => $user->active_mode,
                 'created_at' => $user->created_at,
+                'address' => $user->address,
+                'latitude' => $user->latitude,
+                'longitude' => $user->longitude,
+                'bio' => $user->bio,
+                'skills' => $user->skills ?? [],
+                'is_worker_active' => $user->is_worker_active ?? true,
+                'is_employer_active' => $user->is_employer_active ?? false,
             ],
             'stats' => [
                 'average_rating' => $averageRating ? round($averageRating, 1) : 0,

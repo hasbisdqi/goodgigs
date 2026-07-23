@@ -1,14 +1,26 @@
-export type User = {
+export interface User {
     id: number;
     name: string;
+    username: string | null;
     email: string;
     avatar?: string;
     email_verified_at: string | null;
-    active_mode: 'employer' | 'worker';
-    two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown;
+    two_factor_enabled: boolean;
+    has_password?: boolean;
+    active_mode: 'worker' | 'employer';
+    is_worker_active: boolean;
+    is_employer_active: boolean;
+    bio?: string;
+    address?: string;
+    latitude?: string | number | null;
+    longitude?: string | number | null;
+    skills?: string[] | string | null;
+    is_identity_verified?: boolean;
+    verified_skills?: string[];
+    roles?: Role[];
+    permissions?: Permission[];
 };
 
 export type Auth = {

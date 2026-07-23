@@ -33,6 +33,10 @@ class UserFactory extends Factory
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            'username' => fake()->unique()->userName(),
+            'active_mode' => 'worker',
+            'is_worker_active' => true,
+            'is_employer_active' => true,
         ];
     }
 

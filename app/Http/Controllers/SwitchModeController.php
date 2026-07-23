@@ -17,7 +17,17 @@ class SwitchModeController extends Controller
             'mode' => ['required', 'string', 'in:employer,worker'],
         ]);
 
-        $request->user()->update([
+        $user = $request->user();
+        
+        if ($validated['mode'] === 'worker' && !$user->is_worker_active) {
+            return back()->withErrors(['mode' => 'Profil Penyedia Jasa Anda sedang dinonaktifkan.']);
+        }
+        
+        if ($validated['mode'] === 'employer' && !$user->is_employer_active) {
+            return back()->withErrors(['mode' => 'Profil Pemberi Kerja Anda sedang dinonaktifkan.']);
+        }
+
+        $user->update([
             'active_mode' => $validated['mode'],
         ]);
 

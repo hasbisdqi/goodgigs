@@ -1,0 +1,336 @@
+<!DOCTYPE html><html class="light" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#d9d8ff",
+                    "tertiary-container": "#4b4dd8",
+                    "surface-tint": "#4d44e3",
+                    "outline-variant": "#c7c4d8",
+                    "on-primary": "#ffffff",
+                    "inverse-surface": "#2d3133",
+                    "surface-container-high": "#e6e8ea",
+                    "tertiary": "#3130c0",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#f7f9fb",
+                    "on-surface": "#191c1e",
+                    "surface-variant": "#e0e3e5",
+                    "inverse-primary": "#c3c0ff",
+                    "on-secondary-fixed-variant": "#005236",
+                    "on-background": "#191c1e",
+                    "error": "#ba1a1a",
+                    "surface-container": "#eceef0",
+                    "surface": "#f7f9fb",
+                    "on-tertiary-fixed": "#07006c",
+                    "error-container": "#ffdad6",
+                    "surface-container-highest": "#e0e3e5",
+                    "secondary": "#006c49",
+                    "on-secondary-fixed": "#002113",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f2f4f6",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#0f0069",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "on-secondary-container": "#00714d",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-error": "#ffffff",
+                    "secondary-container": "#6cf8bb",
+                    "surface-dim": "#d8dadc",
+                    "on-primary-container": "#dad7ff",
+                    "tertiary-fixed": "#e1e0ff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-surface-variant": "#464555",
+                    "primary-fixed": "#e2dfff",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "secondary-fixed": "#6ffbbe",
+                    "primary-container": "#4f46e5",
+                    "primary": "#3525cd",
+                    "tertiary-fixed-dim": "#c0c1ff",
+                    "secondary-fixed-dim": "#4edea3",
+                    "outline": "#777587",
+                    "background": "#f7f9fb",
+                    "on-tertiary-fixed-variant": "#2f2ebe"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-padding-mobile": "1rem",
+                    "stack-md": "1rem",
+                    "gutter": "1.5rem",
+                    "stack-lg": "2rem",
+                    "base": "8px",
+                    "stack-sm": "0.5rem",
+                    "container-padding-desktop": "2rem"
+            },
+            "fontFamily": {
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.25", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script></head><body class="font-body-md text-body-md bg-background">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 z-50 bg-surface dark:bg-inverse-surface shadow-sm flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop w-full h-16 fixed top-0 left-0">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img class="w-full h-full object-cover" data-alt="A professional high-resolution corporate headshot of a female executive with a confident smile, wearing a modern navy blue blazer. The background is a blurred high-end office interior with soft natural light streaming through large windows, creating a bright and trustworthy professional atmosphere. The lighting is crisp and the overall aesthetic is clean and institutional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6y4e4430TxP-HS8Mdh8pnwuIRrh3t7oOgYvenAHaDAQ1Wod-4rS4vPoHCZnhWNo_y4PKkuBIg6I-10L6IvhswSBdnyczlq_62Hw1EfCGKptRTsODGLbTcqZFRyxv20eRkEWoYqL5XHLVhWLISYulTZQdToW-VRCu6RFfOWQM3jnridGKE7l7VVvtJUdWe1HdH8FHAtl5chCyyDiJWokwXZpln7LTG_vMTdLyVA7kWxb7qVB4nVipN8w">
+</div>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">GigConnect</span>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed p-2 rounded-full hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" data-icon="search">search</button>
+<div class="hidden md:flex bg-surface-container-low p-1 rounded-full border border-outline-variant">
+<button class="px-4 py-1.5 rounded-full text-label-md font-label-md bg-primary text-on-primary shadow-sm">Employer</button>
+<button class="px-4 py-1.5 rounded-full text-label-md font-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors">Freelancer</button>
+</div>
+</div>
+</header>
+<main class="mt-16 mb-24 min-h-screen px-container-padding-mobile md:px-container-padding-desktop max-w-[1200px] mx-auto py-stack-lg">
+<!-- Welcome Hero Section -->
+<section class="mb-stack-lg flex flex-col md:flex-row md:items-end justify-between gap-stack-md">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-1">Halo, Employer!</h1>
+<p class="text-on-surface-variant font-body-md text-body-md">Your project pipeline is looking strong today.</p>
+</div>
+<button class="flex items-center justify-center gap-stack-sm bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md text-label-md shadow-lg hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="add_circle" data-original-icon="add_circle">add_circle</span>
+                Post a New Gig
+            </button>
+</section>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-stack-lg">
+<div class="bento-card bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant col-span-1">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-primary" data-icon="rocket_launch" data-original-icon="rocket_launch">rocket_launch</span>
+<span class="text-secondary font-label-sm text-label-sm bg-secondary-container px-2 py-0.5 rounded-full">+12%</span>
+</div>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Active Projects</p>
+<p class="text-headline-md font-headline-md text-on-surface">08</p>
+</div>
+<div class="bento-card bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant col-span-1">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-tertiary" data-icon="groups">groups</span>
+</div>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Total Applicants</p>
+<p class="text-headline-md font-headline-md text-on-surface">42</p>
+</div>
+<div class="bento-card bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant col-span-1">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-secondary" data-icon="payments" data-original-icon="payments">payments</span>
+</div>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Escrow Budget</p>
+<p class="text-headline-md font-headline-md text-on-surface">$3,240</p>
+</div>
+<div class="bento-card bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant col-span-1">
+<div class="flex items-center justify-between mb-2">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="schedule">schedule</span>
+</div>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Avg. Hire Time</p>
+<p class="text-headline-md font-headline-md text-on-surface">1.4d</p>
+</div>
+</div>
+<!-- Main Content Section: Active Gigs -->
+<section>
+<div class="flex items-center justify-between mb-stack-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Your Active Gigs</h2>
+<button class="text-primary font-label-md text-label-md flex items-center hover:underline">
+                    View Archive
+                    <span class="material-symbols-outlined ml-1" data-icon="arrow_forward" data-original-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<!-- Gig Listing Stack -->
+<div class="space-y-stack-md">
+<!-- Gig Item 1 -->
+<div class="bento-card bg-surface-container-lowest p-stack-md md:p-6 rounded-xl border border-outline-variant flex flex-col md:flex-row md:items-center gap-stack-md">
+<div class="w-14 h-14 bg-primary-fixed rounded-lg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="terminal">terminal</span>
+</div>
+<div class="grow">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-label-md text-headline-md text-on-surface">Senior React Developer - Fintech App</h3>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full text-label-sm font-label-sm flex items-center gap-1">
+<span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+                                Searching for talent
+                            </span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md mb-3">Project duration: 3 months • Fixed Price: $8,000</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-label-sm font-label-sm text-on-surface-variant">React.js</span>
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-label-sm font-label-sm text-on-surface-variant">TypeScript</span>
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-label-sm font-label-sm text-on-surface-variant">Financial APIs</span>
+</div>
+</div>
+<div class="md:text-right shrink-0 border-t md:border-t-0 md:border-l border-outline-variant pt-stack-md md:pt-0 md:pl-stack-md">
+<p class="text-primary font-headline-md text-headline-md">12</p>
+<p class="text-on-surface-variant text-label-sm font-label-sm mb-3">New Applicants</p>
+<button class="w-full md:w-auto bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md active:scale-95 transition-transform">Review Candidates</button>
+</div>
+</div>
+<!-- Gig Item 2 -->
+<div class="bento-card bg-surface-container-lowest p-stack-md md:p-6 rounded-xl border border-outline-variant flex flex-col md:flex-row md:items-center gap-stack-md">
+<div class="w-14 h-14 bg-tertiary-fixed rounded-lg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary text-3xl" data-icon="brush">brush</span>
+</div>
+<div class="grow">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-label-md text-headline-md text-on-surface">Brand Identity for Sustainable Start-up</h3>
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-label-sm font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="person_search" data-original-icon="person_search">person_search</span>
+                                3 applicants
+                            </span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md mb-3">Project duration: 2 weeks • Fixed Price: $1,500</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-label-sm font-label-sm text-on-surface-variant">Logo Design</span>
+<span class="px-3 py-1 bg-surface-container-high rounded-full text-label-sm font-label-sm text-on-surface-variant">Guidelines</span>
+</div>
+</div>
+<div class="md:text-right shrink-0 border-t md:border-t-0 md:border-l border-outline-variant pt-stack-md md:pt-0 md:pl-stack-md">
+<p class="text-tertiary font-headline-md text-headline-md">3</p>
+<p class="text-on-surface-variant text-label-sm font-label-sm mb-3">New Applicants</p>
+<button class="w-full md:w-auto bg-tertiary text-on-tertiary px-4 py-2 rounded-lg font-label-md text-label-md active:scale-95 transition-transform">Review Candidates</button>
+</div>
+</div>
+<!-- Gig Item 3 (In Progress State) -->
+<div class="bento-card bg-surface-container p-stack-md md:p-6 rounded-xl border border-outline-variant flex flex-col md:flex-row md:items-center gap-stack-md opacity-90">
+<div class="w-14 h-14 bg-surface-container-highest rounded-lg flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl" data-icon="video_camera_front" data-original-icon="video_camera_front">video_camera_front</span>
+</div>
+<div class="grow">
+<div class="flex items-start justify-between mb-1">
+<h3 class="font-label-md text-headline-md text-on-surface">Short Social Media Video Editor</h3>
+<span class="px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full text-label-sm font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="sync">sync</span>
+                                In Progress
+                            </span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md mb-3">Assigned to: Alex Rivera • Due in 2 days</p>
+<div class="w-full bg-surface-container-high rounded-full h-1.5 mb-1">
+<div class="bg-secondary h-1.5 rounded-full" style="width: 65%"></div>
+</div>
+<p class="text-on-surface-variant text-[10px] uppercase font-bold tracking-wider">65% Milestones Completed</p>
+</div>
+<div class="md:text-right shrink-0 border-t md:border-t-0 md:border-l border-outline-variant pt-stack-md md:pt-0 md:pl-stack-md flex md:flex-col gap-2">
+<button class="grow bg-surface-container-highest text-on-surface px-4 py-2 rounded-lg font-label-md text-label-md border border-outline-variant hover:bg-surface-bright transition-colors">Manage</button>
+<button class="shrink-0 p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg"><span class="material-symbols-outlined" data-icon="more_vert" data-original-icon="more_vert">more_vert</span></button>
+</div>
+</div>
+</div>
+</section>
+<!-- Suggested Talent Placeholder -->
+<section class="mt-stack-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-md">Recommended for You</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="bento-card bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant">
+<div class="flex items-center gap-stack-md mb-stack-md">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A close-up high-quality portrait of a young creative professional man with glasses, smiling warmly. He is in a brightly lit co-working space with indoor plants and warm wood textures in the background. The style is modern corporate photography with a focus on approachability and skill. Colors are soft pastels and professional neutrals." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAp28dFrnebY78TTtgEP6w28ftFMc-9X62ZIM6jDACWotjfDQZvk0gLQfGOaUvO9XjyWHFEhKXNXSbDLHg7m8Arz0joDQWGpjG38Wu6Oj2NebqfFCk9Ieq1BzBCu7DCm4C0OD3ccINgCtwhbxa_FPYY-wlXRbUVnV2FfA2zqkUeTsvR6W_LoVqTgVBeuiw9PSqHlsAshUxChbJURfTj8KVKo7SYUYoUiEZwHoiYPwVqlfNuaUXPMJe7A">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Marcus Chen</h4>
+<p class="text-on-surface-variant text-label-sm font-label-sm">UI/UX Designer</p>
+</div>
+</div>
+<div class="flex items-center gap-1 text-secondary mb-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm">4.9 (120 reviews)</span>
+</div>
+<p class="text-on-surface-variant text-body-md line-clamp-2 mb-stack-md">Specializes in building complex dashboard systems for SaaS startups.</p>
+<button class="w-full py-2 border border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-primary-fixed transition-colors">Invite to Gig</button>
+</div>
+<!-- Repeat cards for layout visual -->
+<div class="hidden md:block bento-card bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant">
+<div class="flex items-center gap-stack-md mb-stack-md">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A portrait of a diverse female software engineer with a friendly expression. She is working at a clean, white desk with high-end tech accessories and dual monitors in the background. The lighting is soft and professional, emphasizing a modern tech-optimist vibe. Color palette is clean whites and professional blues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBU0CngwaCp-xIaaP5SvyMNDAAkJvf4qvEVCOiVpy9kfqrz_QDCSnJFkAzbANdZI1S6cYk4zb0_vajK-M2w9v8vz_17p66zaAiZRnxSjhz7RZ7Ut6cjcDs83smAvVe9EajbG21ZBgsE28kl7Q79QvQYVdPGlsb_cjX4JCVVdNHcgka8ZWHYHpjo3wrWF5Kt_OZPs87SBKOLdyHXaIrls6SRE-9KCAyZA9csv3dMrWCk1bZQL2hB_KDisw">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Sarah J.</h4>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Fullstack Dev</p>
+</div>
+</div>
+<div class="flex items-center gap-1 text-secondary mb-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm">5.0 (88 reviews)</span>
+</div>
+<p class="text-on-surface-variant text-body-md line-clamp-2 mb-stack-md">Expert in Node.js and AWS infrastructure scaling.</p>
+<button class="w-full py-2 border border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-primary-fixed transition-colors">Invite to Gig</button>
+</div>
+<div class="hidden md:block bento-card bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant">
+<div class="flex items-center gap-stack-md mb-stack-md">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A profile photo of a mature creative director with graying hair and a sharp, stylish look. He is in a professional design studio with high-end lighting and architectural elements. The mood is sophisticated and experienced. The lighting is dramatic yet soft, highlighting professionalism and creative leadership." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8mVWxVtpXx4WGE5EUqxdYotUwGHXmMeEVX6vFk8ktUlEP98_X1OMqm4dBlRP7Ig7cRV_NYFIvh9-1Z1AHCbXQEKqk5B7SK4ooXoWXKKniMpFsw8kIjXIO5WPoRv_fCn6QxnbE0-OBTBayFyqYMUyJ_jbfBPLvfsV8wTjrD7Tbe1c8VQtkmAxotLcUBqpr7NujzHPcFO1ZrWz4TzKCtTpMW7kKOU0BwCRH2Umrc2eb975LFaKh62g52w">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Elena Rodriguez</h4>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Brand Strategist</p>
+</div>
+</div>
+<div class="flex items-center gap-1 text-secondary mb-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-sm text-label-sm">4.8 (215 reviews)</span>
+</div>
+<p class="text-on-surface-variant text-body-md line-clamp-2 mb-stack-md">Award-winning brand designer with a focus on tech ethics companies.</p>
+<button class="w-full py-2 border border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-primary-fixed transition-colors">Invite to Gig</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Visible on Mobile) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface dark:bg-inverse-surface shadow-[0_-2px_10px_rgba(0,0,0,0.05)] md:hidden flex justify-around items-center px-4 py-2">
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-fixed-dim text-on-secondary-container dark:text-on-secondary-fixed rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="work">work</span>
+<span class="font-label-sm text-label-sm">My Gigs</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<!-- Desktop Navigation Elements (TopAppBar extension) -->
+<script>
+        // Micro-interactions for active state logic
+        document.querySelectorAll('nav a, header button').forEach(el => {
+            el.addEventListener('click', (e) => {
+                // Example interaction: Scale effect handled by Tailwind classes 'active:scale-90'
+            });
+        });
+
+        // Simulating some dynamic status changes or loading
+        window.addEventListener('DOMContentLoaded', () => {
+            const applicantsCount = document.querySelector('.main-applicant-count');
+            if(applicantsCount) {
+                let count = 0;
+                const interval = setInterval(() => {
+                    count++;
+                    applicantsCount.textContent = count;
+                    if(count >= 12) clearInterval(interval);
+                }, 100);
+            }
+        });
+    </script>
+</body></html>

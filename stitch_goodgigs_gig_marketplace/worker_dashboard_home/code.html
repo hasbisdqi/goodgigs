@@ -1,0 +1,315 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><meta charset="utf-8"><script id="tailwind-config">try{
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-container": "#4f46e5",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "secondary-fixed": "#6ffbbe",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "tertiary": "#3130c0",
+                    "secondary-container": "#6cf8bb",
+                    "surface-container": "#eceef0",
+                    "on-background": "#191c1e",
+                    "inverse-primary": "#c3c0ff",
+                    "on-surface-variant": "#464555",
+                    "tertiary-container": "#4b4dd8",
+                    "surface-bright": "#f7f9fb",
+                    "background": "#f7f9fb",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed-variant": "#2f2ebe",
+                    "on-primary-container": "#dad7ff",
+                    "on-secondary-container": "#00714d",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2d3133",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#005236",
+                    "tertiary-fixed": "#e1e0ff",
+                    "surface": "#f7f9fb",
+                    "on-primary": "#ffffff",
+                    "inverse-on-surface": "#eff1f3",
+                    "error": "#ba1a1a",
+                    "surface-container-low": "#f2f4f6",
+                    "secondary": "#006c49",
+                    "outline": "#777587",
+                    "on-tertiary-container": "#d9d8ff",
+                    "on-surface": "#191c1e",
+                    "surface-variant": "#e0e3e5",
+                    "on-tertiary-fixed": "#07006c",
+                    "on-secondary-fixed": "#002113",
+                    "surface-container-high": "#e6e8ea",
+                    "primary": "#3525cd",
+                    "on-primary-fixed": "#0f0069",
+                    "surface-tint": "#4d44e3",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "tertiary-fixed-dim": "#c0c1ff",
+                    "primary-fixed": "#e2dfff",
+                    "outline-variant": "#c7c4d8",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "0.5rem",
+                    "stack-md": "1rem",
+                    "container-padding-mobile": "1rem",
+                    "base": "8px",
+                    "stack-lg": "2rem",
+                    "gutter": "1.5rem",
+                    "container-padding-desktop": "2rem"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "label-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.25", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    }catch(_e){}</script></head><body class="bg-surface font-body-md text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-inverse-surface shadow-sm fixed top-0 w-full z-50 docked full-width flex justify-between items-center px-container-padding-mobile w-full h-16">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a creative freelancer named Sarah, featuring a friendly smile and modern glasses, set against a soft blurred studio background with warm, professional lighting. The aesthetic is clean and corporate modern, emphasizing reliability and approachability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUBlN7eQLCumSAFGtQnNWCHMRVtWta2h9HcOcHFhFQBgkOzcB-KauN6Sgd36t_AYRE8KaI9keOhxy9VTUvocv_szdBQMm99Io4SpzetsXEBCAPz02ivde20GnSNDGq0HibSS7Er1i9EbflROBAIjSBoI_w6xkIuVkNkb803Wg5Ij3CopNDVbzF-RyLJ6VnNXR_D2cniA0ir43WBCtqcUcBZhDJUD3SQyeeABm0pPpunQdV5o5z3XkyiA">
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">GigConnect</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-container transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary">search</span>
+</button>
+</div>
+</header>
+<main class="pt-20 px-container-padding-mobile md:px-container-padding-desktop max-w-[1200px] mx-auto">
+<!-- Hero Section -->
+<section class="mt-6 mb-8">
+<div class="flex flex-col gap-1">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Halo, Sarah!</h2>
+<p class="text-on-surface-variant font-body-md">You have 3 pending offers and 2 upcoming deadlines this week. Time to shine!</p>
+</div>
+</section>
+<!-- Stats Grid (Bento Style) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-stack-md mb-stack-lg">
+<!-- Total Earnings -->
+<div class="bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between">
+<div>
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Total Earnings</span>
+<h3 class="text-headline-md font-bold text-primary mt-1">$12,450.00</h3>
+</div>
+<div class="mt-4 h-12 flex items-end gap-1">
+<div class="flex-1 bg-secondary-container/30 h-1/2 rounded-sm transition-all hover:h-full"></div>
+<div class="flex-1 bg-secondary-container/50 h-2/3 rounded-sm transition-all hover:h-full"></div>
+<div class="flex-1 bg-secondary-container/40 h-1/2 rounded-sm transition-all hover:h-full"></div>
+<div class="flex-1 bg-secondary-container/70 h-3/4 rounded-sm transition-all hover:h-full"></div>
+<div class="flex-1 bg-secondary-container h-full rounded-sm"></div>
+</div>
+</div>
+<!-- Active Gigs -->
+<div class="bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div>
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Active Gigs</span>
+<h3 class="text-headline-md font-bold text-on-surface mt-1">04</h3>
+</div>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">work</span>
+</div>
+</div>
+<div class="mt-4 flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden">
+<img class="w-full h-full" data-alt="Corporate logo for a high-tech startup, minimalist vector design with indigo and white colors, representing innovation and speed. Professional and sleek aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCSUhJ5Dn1tg-ojX_KbCd1WqWEIxr14gcDWzBs084dbsneheskbfiMmatvBYy5zI5UqfY2vXuAvnsX-WR_W_oZXVOHsmqoyvo4VJzQ_cxHNS69Y4AfwyHmwul0Heyrai3D1PZS6o1UmqCTUCzb8T7Ei5KH-H1V73m1BH0fxj2LGC2M2uawR2haiSq9t_HHLfqiI1_WMlsBRi7trHhg4D5LqpS1JMkr3gK9JzY2EaiYk7dEQkVDpwntrg">
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-200 overflow-hidden">
+<img class="w-full h-full" data-alt="Abstract circular brand mark for a creative agency, using vibrant gradients of mint and teal. Clean lines and professional modern tech-optimist vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsk5NdgJl7Gj04un23RoBJ2-F6yZd7CT38qoRZI83Hq3Uc8vXkynGYYgf_MsvYubwodJJmuQWGF7Ce0fatjfZUqYxIKL3fr3Xivk2B5JScOJ6VfNdiLhWHNMKLJO8N2JEb2ILgH026tWr7nOe7dy4pyH88EGN64bVkXgfLz7q66BEK8QIIRoNzx6EtRNvOfS8nRM27utJ9aExdPEXOQty-xfZoasa7kWggqy4XOdeAvi3QnYsmKRKXJQ">
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-white bg-slate-300 flex items-center justify-center text-[10px] font-bold text-on-surface-variant">+2</div>
+</div>
+</div>
+<!-- Client Rating -->
+<div class="bg-surface-container-lowest p-stack-md rounded-xl border border-outline-variant shadow-sm flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<div>
+<span class="text-label-sm text-on-surface-variant uppercase tracking-wider">Client Rating</span>
+<h3 class="text-headline-md font-bold text-on-surface mt-1">4.9<span class="text-body-md font-normal text-on-surface-variant">/5.0</span></h3>
+</div>
+<div class="bg-secondary-container/30 p-2 rounded-lg">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="text-label-sm font-medium text-secondary">Top Rated Plus</span>
+<div class="h-1 flex-1 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[98%]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recommended Gigs Section -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Recommended for You</h2>
+<p class="text-on-surface-variant font-body-md">Based on your skills in UI/UX &amp; React</p>
+</div>
+<a class="text-primary font-label-md hover:underline flex items-center gap-1 active:scale-95 transition-transform" href="#">
+                    Find More Gigs
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="flex flex-col gap-stack-md">
+<!-- Gig Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant shadow-sm hover:border-primary hover:shadow-md transition-all group cursor-pointer">
+<div class="flex flex-col md:flex-row gap-6">
+<div class="w-16 h-16 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Minimalist technology company logo, bold sans-serif 'N' inside a rounded indigo square. High-contrast, professional tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKaPqVb2UUu_ln-1Vtj4C9551_VG1rgh4yacys8P6ZBbapX_c-BLNQgu1pmLG5W8hJxaCoy2k0kp8I_8LAXFjtgUYLkc8x1Yw6WN7mxsMboaapr3TKSh_ezoUjc2hItCLQvEmbgV1MHVW5OnCpNcnn5uFRD0cnQIsHDR4Kx-NUPkJM-2_a-KEqs16WYv8-pMUsOzKSMwFuir7Xx2Gz4U1AhTBYyWaiAAf9R26JuQzcviby8dsMX-uhvA">
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-headline-md text-on-surface group-hover:text-primary transition-colors">Senior Graphic Designer</h4>
+<p class="text-on-surface-variant font-body-md flex items-center gap-2">
+                                        Nebula Systems • Remote 
+                                        <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+                                        Posted 2h ago
+                                    </p>
+</div>
+
+</div>
+<div class="flex flex-wrap gap-2 my-4">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container font-label-sm rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                    Matched Skill
+                                </span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant font-label-sm rounded-full">Figma</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant font-label-sm rounded-full">Prototyping</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant font-label-sm rounded-full">Brand Identity</span>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-surface-container">
+<span class="font-headline-md text-on-surface">$85<span class="text-body-md text-on-surface-variant font-normal">/hr</span></span>
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-md hover:bg-primary-container active:scale-95 transition-all shadow-sm">
+                                    Apply Now
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Gig Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant shadow-sm hover:border-primary hover:shadow-md transition-all group cursor-pointer">
+<div class="flex flex-col md:flex-row gap-6">
+<div class="w-16 h-16 rounded-xl bg-surface-container flex items-center justify-center shrink-0 overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Eco-friendly brand logo, featuring an abstract green leaf integrated with a sleek geometric circle. Mint and charcoal color palette, organic yet professional modern design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWBMo6wSpj3upIelibnDCV70BV7BDODxozQE55bSX1Cb87wQBMialKONFXnrQLDo8G6hJS9SeDXQEyf8jvVACEzNWlybayh50VJuNbec4KW0UFD-ZWVet8RWUMtNlqd5fK3hrlMhvoth1uaxHk8HPG0cgyASzieRwpG7p-anRS4D508oyK5MbBCGxc--bVjE7YBkr30RYgNZ0l1uiv6QSr1LXmONTYKWCKJqVKf_wGaiezr4ggQNvkkw">
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h4 class="font-headline-md text-on-surface group-hover:text-primary transition-colors">UI/UX Consultant (FinTech)</h4>
+<p class="text-on-surface-variant font-body-md flex items-center gap-2">
+                                        EcoPay Solutions • New York, NY
+                                        <span class="w-1 h-1 bg-outline-variant rounded-full"></span>
+                                        Posted 5h ago
+                                    </p>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-primary active:scale-90 transition-transform">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+<div class="flex flex-wrap gap-2 my-4">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container font-label-sm rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                    Matched Skill
+                                </span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant font-label-sm rounded-full">React Native</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant font-label-sm rounded-full">Financial Systems</span>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-surface-container">
+<span class="font-headline-md text-on-surface">$110<span class="text-body-md text-on-surface-variant font-normal">/hr</span></span>
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-md hover:bg-primary-container active:scale-95 transition-all shadow-sm">
+                                    Apply Now
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-secondary-container text-on-secondary-container rounded-2xl shadow-lg flex items-center justify-center hover:shadow-xl active:scale-90 transition-all z-40 group overflow-hidden">
+<span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform">add</span>
+<!-- Optional Tooltip or Label that could expand on hover -->
+</button>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-inverse-surface shadow-[0_-2px_10px_rgba(0,0,0,0.05)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-fixed-dim text-on-secondary-container dark:text-on-secondary-fixed rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<!-- My Gigs -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="font-label-sm text-label-sm">My Gigs</span>
+</a>
+<!-- Messages -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform duration-200 relative" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+<span class="absolute top-0 right-1 w-2 h-2 bg-error rounded-full"></span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for Stats Cards hover
+        document.querySelectorAll('section > div > div').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-4px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0px)';
+            });
+            card.style.transition = 'transform 0.3s ease';
+        });
+
+        // Add small scroll listener for header elevation
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md');
+                header.classList.remove('shadow-sm');
+            } else {
+                header.classList.add('shadow-sm');
+                header.classList.remove('shadow-md');
+            }
+        });
+    </script>
+
+</body></html>

@@ -14,6 +14,24 @@ use Inertia\Inertia;
 class JobApplicationController extends Controller
 {
     /**
+     * Display a listing of candidates for a specific job posting.
+     */
+    public function index(Request $request, JobPosting $jobPosting): \Inertia\Response
+    {
+        // Ensure current user is the owner of the gig
+        if ($jobPosting->user_id !== $request->user()->id && ! $request->user()->hasRole('Super Admin') && ! $request->user()->hasRole('Admin')) {
+            abort(403);
+        }
+
+        $applications = $jobPosting->applications()->with(['user.reviewsReceived'])->latest()->get();
+
+        return Inertia::render('jobs/manage-candidates', [
+            'job' => $jobPosting,
+            'applications' => $applications,
+        ]);
+    }
+
+    /**
      * Store a newly created job application in storage.
      */
     public function store(Request $request): RedirectResponse
@@ -21,6 +39,10 @@ class JobApplicationController extends Controller
         $validated = $request->validate([
             'job_posting_id' => ['required', 'exists:job_postings,id'],
             'message' => ['required', 'string', 'max:1000'],
+            'hourly_rate' => ['nullable', 'numeric', 'min:0'],
+            'duration' => ['nullable', 'string', 'max:255'],
+            'availability' => ['nullable', 'string', 'max:255'],
+            'attachment' => ['nullable', 'file', 'max:10240'], // 10MB max
         ]);
 
         $job = JobPosting::findOrFail($validated['job_posting_id']);
@@ -39,9 +61,19 @@ class JobApplicationController extends Controller
             return back()->withErrors(['message' => __('Anda sudah melamar ke tugas ini.')]);
         }
 
-        $application = $request->user()->jobApplications()->create([
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('job-applications', 'public');
+        }
+
+        $application = JobApplication::create([
             'job_posting_id' => $job->id,
+            'user_id' => $request->user()->id,
             'message' => $validated['message'],
+            'hourly_rate' => $validated['hourly_rate'] ?? null,
+            'duration' => $validated['duration'] ?? null,
+            'availability' => $validated['availability'] ?? null,
+            'attachment_path' => $attachmentPath,
         ]);
 
         // Notify the job poster about the new application

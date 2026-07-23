@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GigConnect - Freelancer Directory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-header {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        .freelancer-card:active {
+            transform: scale(0.98);
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#00714d",
+                        "on-tertiary-fixed-variant": "#2f2ebe",
+                        "on-surface-variant": "#464555",
+                        "surface-tint": "#4d44e3",
+                        "secondary-fixed": "#6ffbbe",
+                        "tertiary-container": "#4b4dd8",
+                        "primary-container": "#4f46e5",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed": "#07006c",
+                        "tertiary-fixed": "#e1e0ff",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "inverse-primary": "#c3c0ff",
+                        "primary-fixed": "#e2dfff",
+                        "primary": "#3525cd",
+                        "on-primary-fixed": "#0f0069",
+                        "surface-container-low": "#f2f4f6",
+                        "on-surface": "#191c1e",
+                        "inverse-on-surface": "#eff1f3",
+                        "error": "#ba1a1a",
+                        "surface-container": "#eceef0",
+                        "surface-variant": "#e0e3e5",
+                        "background": "#f7f9fb",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#002113",
+                        "outline-variant": "#c7c4d8",
+                        "on-background": "#191c1e",
+                        "on-tertiary-container": "#d9d8ff",
+                        "surface-bright": "#f7f9fb",
+                        "outline": "#777587",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#c0c1ff",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "surface": "#f7f9fb",
+                        "surface-dim": "#d8dadc",
+                        "on-primary-container": "#dad7ff",
+                        "tertiary": "#3130c0",
+                        "secondary-container": "#6cf8bb",
+                        "secondary": "#006c49",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e0e3e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding-mobile": "1rem",
+                        "stack-sm": "0.5rem",
+                        "stack-lg": "2rem",
+                        "gutter": "1.5rem",
+                        "container-padding-desktop": "2rem",
+                        "stack-md": "1rem",
+                        "base": "8px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.25", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen pb-20">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 glass-header shadow-sm h-16 flex justify-between items-center px-container-padding-mobile">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A professional high-definition portrait of a corporate executive employer with a friendly smile, set against a blurred modern office background with neutral gray and white tones. The lighting is soft and professional, reflecting a clean light-mode aesthetic with high clarity and detail." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsjkBQeR0EfkD1FaHcMog7PNuQj51Bvq07jUAJpz9g9Fw0jtQg17vFq4qzrfk14vKP3K-L_JA4IE64jks0jOltG7fGvRXyWOJJuq7MYIjTniWvoNIfOVshyp-zoI0mIP_0RBMpri7LAlysJOcvKiM8_34fWqd_ZFXNUb5v7GNfaPa9ld4J0uQkT265GaIhxAvk1mE7CDmzB44sk4I5m30NTfzx_juRtRSRwwdSZZYIZUx0RBTImrU9pg"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">GigConnect</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-primary">search</span>
+</button>
+</header>
+<main class="pt-20 px-container-padding-mobile space-y-stack-lg">
+<!-- Search & Filter Section -->
+<section class="space-y-stack-md">
+<div class="relative">
+<input class="w-full h-12 pl-12 pr-4 rounded-xl border border-outline-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder:text-outline outline-none" placeholder="Search freelancers, skills..." type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md shadow-md active:scale-95 transition-transform">
+                    All Talent
+                </button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">
+                    Designers
+                </button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">
+                    Developers
+                </button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant border border-outline-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">
+                    Marketing
+                </button>
+</div>
+</section>
+<!-- Recommended Section -->
+<section class="space-y-stack-md">
+<div class="flex justify-between items-end">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Top Matches</h2>
+<button class="text-primary font-label-md text-label-md hover:underline">View all</button>
+</div>
+<!-- Freelancer Cards - Asymmetric/Bento Pattern -->
+<div class="space-y-stack-md">
+<!-- Main Featured Card -->
+<div class="freelancer-card group bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant shadow-sm transition-all hover:shadow-lg hover:border-primary active:scale-[0.98]">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-4">
+<div class="w-16 h-16 rounded-2xl bg-secondary-fixed-dim overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A detailed professional headshot of a female Senior UX Designer with a confident expression. She is wearing modern glasses and professional attire. The background is a clean, bright studio setting with soft indigo lighting accents. The overall image has a sharp, high-end corporate tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDigWz3S7cj-2nKQdoQ05Ri0OgCvvd7vOFpa3KxNczS098uMq6AcLbV2dr89qDsCbD0PUIGFUOSzsyTx7m2_VId8zmmYPG055DeelDAEWnhwL6WgJ5pfePEf-y6JETErRZPdXE-rwEHBqKEgZONx5j_IjRJJ5ZKmtOgMLjuizx2m2W16YbBuW05XJnVYlazxQpLoLTQsf66YoXvGWBT8DJUpoiSAcJ0OVTjNrKvI6pw1kV34E40A_301Q"/>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md font-bold text-on-surface">Elena Rodriguez</h3>
+<p class="text-on-surface-variant font-body-md text-body-md">Senior Product Designer</p>
+</div>
+</div>
+<div class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-label-sm text-label-sm">98% Match</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-3 py-1 rounded-full bg-surface-container text-outline font-label-sm text-label-sm">Figma</span>
+<span class="px-3 py-1 rounded-full bg-surface-container text-outline font-label-sm text-label-sm">System Design</span>
+<span class="px-3 py-1 rounded-full bg-secondary-fixed-dim text-on-secondary-fixed-variant font-label-sm text-label-sm">UX Research</span>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-surface-variant">
+<div class="text-on-surface-variant font-label-md text-label-md">
+<span class="font-bold text-on-surface">$85</span> / hr
+                        </div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-xl font-label-md text-label-md shadow-md hover:bg-surface-tint transition-colors">
+                            View Profile
+                        </button>
+</div>
+</div>
+<!-- Bento Row -->
+<div class="grid grid-cols-2 gap-4">
+<!-- Smaller Card 1 -->
+<div class="freelancer-card bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant shadow-sm flex flex-col items-center text-center space-y-3 hover:border-primary transition-all">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="A portrait of a male full-stack developer with a modern, approachable look, wearing a sleek black polo shirt. The background features a clean, minimalist workspace with soft daylight and hints of technology. The style is sharp, professional, and follows a light-mode color palette with indigo highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCI0HiAWcMyT9V9l2kNN0CbhNtHKOvobc0yfbCq1aGEP28BvOIRikguxOLI-TQXdunDj1mZqLDa6QdN-yi-CJHvL27qOwFbZQsjUnSbzbznLMQpGb1sfiG0XDt114I32XCORSndIDoox-QXUd2K3EC7LDo8sFNOK0Y1RJVTLHofo7XvyP7tNrS_bOnwUE3z6OvExHZMwEoRoDIcqHxnzNp0kDjxdVpyOW2jMVXkVufpl8hD73KNeb4YuQ"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-secondary-container rounded-full flex items-center justify-center border-2 border-white">
+<span class="material-symbols-outlined text-[12px] text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface">James Chen</h4>
+<p class="text-on-surface-variant text-[12px]">Full-Stack Eng.</p>
+</div>
+<div class="font-label-sm text-label-sm text-primary bg-primary-fixed/30 px-2 py-0.5 rounded-full">
+                            $70/hr
+                        </div>
+</div>
+<!-- Smaller Card 2 -->
+<div class="freelancer-card bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant shadow-sm flex flex-col items-center text-center space-y-3 hover:border-primary transition-all">
+<div class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female marketing strategist with an energetic and friendly demeanor, set in a bright, modern studio with vibrant corporate mint and indigo lighting. The image is crisp, high-quality, and conveys competence and reliability in a light-mode UI context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzjLaz4zVGNfrelVrM0PHgsbHWW2OWFyfbRnZyLK57FsCB_CEFBqJDKQkWAJEqRl3NWhT9_cAT_-bgpOphEuDhcZv26Wz9DESnv-7S43m41Ih88w5tJjTG4BePChy77pKjQWyqa89bIRgl6ZZlaVrKOwe1q3gy9SJAvJdrLe0Cs2blsUNx2JXjCqU78gUkz4d8HxpH6Tpl3ouzujpow8UfYlcAyRhO5JzzRBCPIfTC5JTREQ4hqjFRcA"/>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface">Sarah Miller</h4>
+<p class="text-on-surface-variant text-[12px]">Growth Hacker</p>
+</div>
+<div class="font-label-sm text-label-sm text-primary bg-primary-fixed/30 px-2 py-0.5 rounded-full">
+                            $95/hr
+                        </div>
+</div>
+</div>
+<!-- Wide Info Card -->
+<div class="freelancer-card bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant shadow-sm flex items-center justify-between hover:border-primary transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed-dim overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a creative director in a stylish, modern workspace with bright lighting and professional tech aesthetics. The subject has an artistic yet professional appearance, dressed in business-casual attire. The image is rendered with high clarity, emphasizing a clean and efficient workspace feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXaH95iKri5XfxWukNqTdxoVn_3A0SwWwheuSCaNqnRCFgUuQqxejg5jThxz7CxG20LGpgW33xEMv9WTh5SGiTUWTt4mMJI5e60ab2B9NUmYSjgma4MpYw1qHpLD5FRd6u-J1wAt2ybFs2lDQPq3k0Ryrfq76K1He4Qj7jO7hZhb7AmMsFxbyukMiF3f4uxpzVSallC1pWYu8JktNZ8PlCKZ9q9zqUsYa9oIud2VpYSmvNNkvwIACQlw"/>
+</div>
+<div>
+<h4 class="font-label-md text-label-md font-bold text-on-surface">Marcus Thorne</h4>
+<p class="text-on-surface-variant text-[12px]">Motion Graphics</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="text-on-secondary-container font-label-sm text-label-sm font-bold bg-secondary-container px-2 py-1 rounded-lg">92%</span>
+<button class="text-primary material-symbols-outlined">chevron_right</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Hiring Tips / Atmospheric Section -->
+<section class="relative overflow-hidden rounded-3xl p-6 bg-primary text-on-primary shadow-xl">
+<div class="relative z-10 space-y-stack-sm">
+<h3 class="font-headline-md text-headline-md font-bold">Employer Insights</h3>
+<p class="font-body-md text-body-md opacity-90">Talent with 95%+ match score are 3x more likely to complete projects ahead of schedule.</p>
+<button class="mt-4 px-5 py-2 bg-on-primary text-primary rounded-xl font-label-md text-label-md font-bold active:scale-95 transition-transform">
+                    Update Preferences
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface shadow-[0_-2px_10px_rgba(0,0,0,0.05)] h-20">
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">work</span>
+<span class="font-label-sm text-label-sm">My Gigs</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-sm text-label-sm mt-1">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm mt-1">Profile</span>
+</a>
+</nav>
+<!-- Floating Action Button - Search Contextual -->
+<button class="fixed bottom-40 right-6 w-14 h-14 bg-secondary-container text-on-secondary-container rounded-2xl shadow-lg flex flex-col items-center justify-center active:scale-90 transition-all hover:shadow-xl z-40 border border-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Map</span>
+</button><button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-lg flex items-center justify-center active:scale-90 transition-all hover:bg-surface-tint z-40">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">filter_list</span>
+</button>
+<script>
+        // Simple Interaction Logic
+        document.querySelectorAll('.freelancer-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Mimic navigation splash or feedback
+                card.style.borderColor = '#3525cd';
+                setTimeout(() => {
+                    card.style.borderColor = '';
+                }, 200);
+            });
+        });
+
+        // Toggle Active State logic for demo purposes
+        const navItems = document.querySelectorAll('nav a');
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                navItems.forEach(i => {
+                    i.className = 'flex flex-col items-center justify-center text-on-surface-variant active:scale-90 transition-transform duration-200';
+                    const icon = i.querySelector('.material-symbols-outlined');
+                    if(icon) icon.style.fontVariationSettings = "'FILL' 0";
+                });
+                item.className = 'flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-200';
+                const activeIcon = item.querySelector('.material-symbols-outlined');
+                if(activeIcon) activeIcon.style.fontVariationSettings = "'FILL' 1";
+            });
+        });
+    </script>
+</body></html>

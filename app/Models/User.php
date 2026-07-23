@@ -29,12 +29,45 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'active_mode', 'bio', 'address', 'skills', 'latitude', 'longitude', 'is_identity_verified', 'verified_skills'])]
+#[Fillable(['name', 'username', 'email', 'password', 'active_mode', 'bio', 'address', 'skills', 'latitude', 'longitude', 'is_identity_verified', 'verified_skills', 'is_worker_active', 'is_employer_active'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+
+    /**
+     * Get the value of the model's route key.
+     */
+    public function getRouteKey()
+    {
+        return $this->username ?: 'u-' . $this->id;
+    }
+
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @param  string|null  $field
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        if (preg_match('/^u-(\d+)$/', $value, $matches)) {
+            return $this->where('id', $matches[1])->firstOrFail();
+        }
+
+        $user = $this->where('username', $value)->first();
+        if ($user) {
+            return $user;
+        }
+
+        if (is_numeric($value)) {
+            return $this->where('id', $value)->firstOrFail();
+        }
+
+        abort(404);
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -50,6 +83,8 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'skills' => 'array',
             'is_identity_verified' => 'boolean',
             'verified_skills' => 'array',
+            'is_worker_active' => 'boolean',
+            'is_employer_active' => 'boolean',
         ];
     }
 
@@ -90,7 +125,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
      */
     public function isEmployer(): bool
     {
-        return $this->active_mode === 'employer';
+        return $this->active_mode === 'employer' && $this->is_employer_active;
     }
 
     /**
@@ -98,7 +133,23 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
      */
     public function isWorker(): bool
     {
-        return $this->active_mode === 'worker';
+        return $this->active_mode === 'worker' && $this->is_worker_active;
+    }
+
+    /**
+     * Check if the user has activated their employer profile.
+     */
+    public function hasEmployerProfile(): bool
+    {
+        return $this->is_employer_active;
+    }
+
+    /**
+     * Check if the user has activated their worker profile.
+     */
+    public function hasWorkerProfile(): bool
+    {
+        return $this->is_worker_active;
     }
 
     /**

@@ -14,6 +14,108 @@
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
+    /* Custom Colors from GoodGigs template */
+    --color-primary-container: #4f46e5;
+    --color-on-tertiary: #ffffff;
+    --color-surface-dim: #d8dadc;
+    --color-secondary-fixed: #6ffbbe;
+    --color-secondary-fixed-dim: #4edea3;
+    --color-on-error-container: #93000a;
+    --color-surface-container-highest: #e0e3e5;
+    --color-on-primary-fixed-variant: #3323cc;
+    --color-tertiary: #3130c0;
+    --color-secondary-container: #6cf8bb;
+    --color-surface-container: #eceef0;
+    --color-on-background: #191c1e;
+    --color-inverse-primary: #c3c0ff;
+    --color-on-surface-variant: #464555;
+    --color-tertiary-container: #4b4dd8;
+    --color-surface-bright: #f7f9fb;
+    --color-surface-container-lowest: #ffffff;
+    --color-on-tertiary-fixed-variant: #2f2ebe;
+    --color-on-primary-container: #dad7ff;
+    --color-on-secondary-container: #00714d;
+    --color-on-secondary: #ffffff;
+    --color-inverse-surface: #2d3133;
+    --color-error-container: #ffdad6;
+    --color-on-secondary-fixed-variant: #005236;
+    --color-tertiary-fixed: #e1e0ff;
+    --color-surface: #f7f9fb;
+    --color-on-primary: #ffffff;
+    --color-inverse-on-surface: #eff1f3;
+    --color-error: #ba1a1a;
+    --color-surface-container-low: #f2f4f6;
+    --color-secondary: #006c49;
+    --color-outline: #777587;
+    --color-on-tertiary-container: #d9d8ff;
+    --color-on-surface: #191c1e;
+    --color-surface-variant: #e0e3e5;
+    --color-on-tertiary-fixed: #07006c;
+    --color-on-secondary-fixed: #002113;
+    --color-surface-container-high: #e6e8ea;
+    --color-primary: #3525cd;
+    --color-on-primary-fixed: #0f0069;
+    --color-surface-tint: #4d44e3;
+    --color-primary-fixed-dim: #c3c0ff;
+    --color-tertiary-fixed-dim: #c0c1ff;
+    --color-primary-fixed: #e2dfff;
+    --color-outline-variant: #c7c4d8;
+    --color-on-error: #ffffff;
+
+    /* Spacing */
+    --spacing-stack-sm: 0.5rem;
+    --spacing-stack-md: 1rem;
+    --spacing-container-padding-mobile: 1rem;
+    --spacing-base: 8px;
+    --spacing-stack-lg: 2rem;
+    --spacing-gutter: 1.5rem;
+    --spacing-container-padding-desktop: 2rem;
+
+    /* Fonts */
+    --font-body-md: 'Inter', sans-serif;
+    --font-body-lg: 'Inter', sans-serif;
+    --font-headline-md: 'Plus Jakarta Sans', sans-serif;
+    --font-headline-lg-mobile: 'Plus Jakarta Sans', sans-serif;
+    --font-label-md: 'Inter', sans-serif;
+    --font-label-sm: 'Inter', sans-serif;
+    --font-headline-lg: 'Plus Jakarta Sans', sans-serif;
+    --font-display-lg: 'Plus Jakarta Sans', sans-serif;
+
+    /* Font sizes */
+    --text-body-md: 16px;
+    --text-body-md--line-height: 1.5;
+    --text-body-md--font-weight: 400;
+    
+    --text-body-lg: 18px;
+    --text-body-lg--line-height: 1.6;
+    --text-body-lg--font-weight: 400;
+
+    --text-headline-md: 24px;
+    --text-headline-md--line-height: 1.4;
+    --text-headline-md--font-weight: 600;
+
+    --text-headline-lg-mobile: 24px;
+    --text-headline-lg-mobile--line-height: 1.3;
+    --text-headline-lg-mobile--font-weight: 700;
+
+    --text-label-md: 14px;
+    --text-label-md--line-height: 1.2;
+    --text-label-md--letter-spacing: 0.01em;
+    --text-label-md--font-weight: 600;
+
+    --text-label-sm: 12px;
+    --text-label-sm--line-height: 1.2;
+    --text-label-sm--font-weight: 500;
+
+    --text-headline-lg: 32px;
+    --text-headline-lg--line-height: 1.25;
+    --text-headline-lg--font-weight: 700;
+
+    --text-display-lg: 48px;
+    --text-display-lg--line-height: 1.2;
+    --text-display-lg--letter-spacing: -0.02em;
+    --text-display-lg--font-weight: 700;
+
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);

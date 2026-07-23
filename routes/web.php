@@ -11,6 +11,8 @@ use App\Http\Controllers\EndorsementController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\JobProgressUpdateController;
+use App\Http\Controllers\JobTrackingController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\PublicProfileController;
@@ -35,13 +37,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('dashboard', function () {
             $user = auth()->user();
             $stats = [];
-
+            $recent_gigs = [];
             if ($user->isEmployer()) {
                 $stats = [
                     'total_gigs' => JobPosting::count(),
                     'my_gigs' => JobPosting::where('user_id', $user->id)->count(),
                     'urgent_gigs' => JobPosting::where('type', 'Urgent')->count(),
                 ];
+                $recent_gigs = JobPosting::where('user_id', $user->id)
+                    ->withCount('jobApplications')
+                    ->latest()
+                    ->take(3)
+                    ->get();
             } else {
                 $stats = [
                     'total_applications' => JobApplication::where('user_id', $user->id)->count(),
@@ -49,10 +56,18 @@ Route::middleware(['auth'])->group(function () {
                     'completed_jobs' => JobApplication::where('user_id', $user->id)
                         ->whereHas('jobPosting', fn ($q) => $q->where('status', 'completed'))->count(),
                 ];
+                $recent_gigs = JobApplication::where('user_id', $user->id)
+                    ->where('status', 'accepted')
+                    ->with('jobPosting')
+                    ->latest()
+                    ->take(3)
+                    ->get()
+                    ->pluck('jobPosting');
             }
 
             return Inertia::render('dashboard', [
                 'stats' => $stats,
+                'recent_gigs' => $recent_gigs,
             ]);
         })->name('dashboard');
 
@@ -65,12 +80,19 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('job-applications', [JobApplicationController::class, 'store'])->name('job-applications.store');
         Route::patch('job-applications/{application}', [JobApplicationController::class, 'update'])->name('job-applications.update');
+        Route::get('jobs/{jobPosting}/candidates', [JobApplicationController::class, 'index'])->name('jobs.candidates');
+        Route::delete('job-applications/{application}', [JobApplicationController::class, 'destroy'])->name('job-applications.destroy');
+
+        Route::get('jobs/{jobPosting}/tracking', [JobTrackingController::class, 'show'])->name('jobs.tracking');
 
         Route::post('portfolios', [PortfolioController::class, 'store'])->name('portfolios.store');
         Route::delete('portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolios.destroy');
 
         Route::get('jobs/{jobPosting}/messages', [ChatMessageController::class, 'index'])->name('chat-messages.index');
         Route::post('jobs/{jobPosting}/messages', [ChatMessageController::class, 'store'])->name('chat-messages.store');
+
+        Route::get('messages', [MessageController::class, 'index'])->name('messages.index');
+        Route::get('messages/{jobPosting}/{user}', [MessageController::class, 'show'])->name('messages.show');
 
         Route::post('jobs/{jobPosting}/progress', [JobProgressUpdateController::class, 'store'])->name('job-progress-updates.store');
 

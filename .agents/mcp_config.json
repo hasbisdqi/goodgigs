@@ -20,6 +20,9 @@
                 "shadcn@latest",
                 "mcp"
             ]
+        },
+        "Figma": {
+            "url": "https://mcp.figma.com/mcp"
         }
     }
 }

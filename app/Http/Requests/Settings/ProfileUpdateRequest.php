@@ -24,7 +24,24 @@ class ProfileUpdateRequest extends FormRequest
             'skills.*' => ['string', 'max:50'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
+            'is_worker_active' => ['boolean'],
+            'is_employer_active' => ['boolean'],
         ]);
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $isWorkerActive = $this->has('is_worker_active') ? $this->boolean('is_worker_active') : $this->user()->is_worker_active;
+            $isEmployerActive = $this->has('is_employer_active') ? $this->boolean('is_employer_active') : $this->user()->is_employer_active;
+
+            if (! $isWorkerActive && ! $isEmployerActive) {
+                $validator->errors()->add(
+                    'is_worker_active',
+                    'Anda harus mengaktifkan setidaknya satu profil (Penyedia Jasa atau Pemberi Kerja).'
+                );
+            }
+        });
     }
 
     protected function prepareForValidation(): void

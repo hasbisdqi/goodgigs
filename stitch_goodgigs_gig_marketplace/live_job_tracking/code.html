@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Live Job Tracking | GigConnect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .slider-knob {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-effect {
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.85);
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.33); opacity: 1; }
+      80%, 100% { transform: scale(1.5); opacity: 0; }
+    }
+    .pulse-animation::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: inherit;
+      border-radius: inherit;
+      animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-bright": "#f7f9fb",
+            "on-primary": "#ffffff",
+            "secondary": "#006c49",
+            "on-secondary-fixed-variant": "#005236",
+            "surface-tint": "#4d44e3",
+            "surface-variant": "#e0e3e5",
+            "outline-variant": "#c7c4d8",
+            "on-tertiary-container": "#d9d8ff",
+            "background": "#f7f9fb",
+            "secondary-fixed-dim": "#4edea3",
+            "error-container": "#ffdad6",
+            "surface-container-highest": "#e0e3e5",
+            "on-secondary-fixed": "#002113",
+            "surface-container-high": "#e6e8ea",
+            "primary-fixed-dim": "#c3c0ff",
+            "surface-container": "#eceef0",
+            "surface-dim": "#d8dadc",
+            "tertiary-fixed-dim": "#c0c1ff",
+            "on-secondary-container": "#00714d",
+            "primary-container": "#4f46e5",
+            "inverse-primary": "#c3c0ff",
+            "surface-container-low": "#f2f4f6",
+            "surface": "#f7f9fb",
+            "tertiary": "#3130c0",
+            "on-primary-fixed": "#0f0069",
+            "surface-variant": "#e0e3e5",
+            "on-surface": "#191c1e",
+            "tertiary-fixed": "#e1e0ff",
+            "on-error-container": "#93000a",
+            "on-background": "#191c1e",
+            "on-secondary": "#ffffff",
+            "on-tertiary": "#ffffff",
+            "secondary-container": "#6cf8bb",
+            "on-primary-fixed-variant": "#3323cc",
+            "inverse-surface": "#2d3133",
+            "outline": "#777587",
+            "on-tertiary-fixed": "#07006c",
+            "on-error": "#ffffff",
+            "primary-fixed": "#e2dfff",
+            "error": "#ba1a1a",
+            "on-primary-container": "#dad7ff",
+            "tertiary-container": "#4b4dd8",
+            "secondary-fixed": "#6ffbbe",
+            "on-tertiary-fixed-variant": "#2f2ebe"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "container-padding-desktop": "2rem",
+            "stack-sm": "0.5rem",
+            "stack-md": "1rem",
+            "gutter": "1.5rem",
+            "base": "8px",
+            "container-padding-mobile": "1rem",
+            "stack-lg": "2rem"
+          },
+          "fontFamily": {
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Inter"],
+            "body-lg": ["Inter"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Inter"],
+            "label-md": ["Inter"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "headline-lg": ["32px", { "lineHeight": "1.25", "fontWeight": "700" }],
+            "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "500" }],
+            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+            "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+            "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+            "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+            "headline-lg-mobile": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-surface-bright text-on-surface font-body-md selection:bg-primary-fixed-dim overflow-hidden h-screen flex flex-col">
+<!-- Header Section (TopAppBar Guidance Applied) -->
+<header class="bg-surface dark:bg-inverse-surface shadow-sm docked full-width top-0 z-50 flex justify-between items-center px-container-padding-mobile w-full h-16">
+<div class="flex items-center gap-stack-md">
+<button class="active:scale-95 transition-transform p-2">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Mrs. Diana</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+          Pipe Repair <span class="w-1 h-1 bg-outline rounded-full"></span> Job #4421
+        </p>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full border-2 border-primary overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a friendly female client in her 50s with a warm smile, set against a blurred indoor home background. The image has a clean, high-clarity corporate modern aesthetic with soft lighting and professional color grading in a light-mode UI style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDn_802G4RA7qHI7C_PvUgd9ZUyALOEvNfFa-TmJAOpKkmealxKT3JFDZhhX3h_ss2QNWzVyp-aRNi6eABwjE3igZsuRbA276znEscrc4-uSaGgJTU4x_5rhr3jmxn_p7SRx6n9j2_f8Ii4sMggxFA1XgSDezGkp6Ju1ffAjlH_9ag4EH0bfiplR-qQg0RGuWxh1AEisRda2ilo43IPB9MvABD8cVFxQts0d5eoYO7AJeTHwjO9di24SA"/>
+</div>
+</div>
+</header>
+<!-- Main Tracking Canvas -->
+<main class="flex-grow relative bg-surface-dim">
+<!-- Map Placeholder (Simulated via high-res background) -->
+<div class="absolute inset-0 z-0" data-alt="A detailed aerial view of a clean modern city map with a professional indigo route line highlighted. The map shows soft gray streets, green parks, and a glowing blue marker for the worker and a red destination pin. The visual style is sleek, minimalist, and data-focused with high contrast and smooth lines." data-location="London" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACZr95Vn4r83n3mcWhxuU3QMmsTUwJGKLYdzuZ8tA328tQeDNMO8sihKZRfJWtjQmWt5XKF9MIMJt0JbkWg_eBROY6XHI3bTX5kyUIeVrZY9fNF3YJgDAzuQXpeqBo0koRYr3WgXFBqF2RDHvff5Ybr_XMVil3_hn9DhyVZCRVOVKYwV2yUmNoJ8IRVcU0adNHszRUtgzWVLArjQfZ94xePz1fZftGCygZDxoheM0_gH50MhsWmfRa-g')">
+<!-- Live Worker Marker Overlay -->
+<div class="absolute top-1/2 left-1/3 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+<div class="w-8 h-8 bg-primary rounded-full border-4 border-on-primary shadow-lg flex items-center justify-center pulse-animation">
+<span class="material-symbols-outlined text-white text-[18px]">navigation</span>
+</div>
+<div class="mt-2 bg-primary px-3 py-1 rounded-full shadow-sm">
+<span class="text-on-primary font-label-md text-[11px] whitespace-nowrap">You</span>
+</div>
+</div>
+<!-- Destination Marker Overlay -->
+<div class="absolute top-1/4 right-1/4 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+<div class="w-10 h-10 bg-error rounded-full border-4 border-on-primary shadow-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[20px]">location_on</span>
+</div>
+<div class="mt-2 bg-on-surface px-3 py-1 rounded-full shadow-sm">
+<span class="text-on-primary font-label-md text-[11px] whitespace-nowrap">Mrs. Diana's Home</span>
+</div>
+</div>
+</div>
+<!-- Floating ETA Badge -->
+<div class="absolute top-4 left-1/2 -translate-x-1/2 z-20">
+<div class="glass-effect px-6 py-3 rounded-full shadow-lg border border-white/50 flex items-center gap-3">
+<div class="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
+<div class="flex flex-col">
+<span class="font-headline-md text-[18px] text-on-surface leading-tight">Arriving in 12 mins</span>
+<span class="font-label-sm text-[12px] text-on-surface-variant">Estimated arrival: 2:45 PM</span>
+</div>
+</div>
+</div>
+<!-- Floating Traffic Info (Asymmetric Element) -->
+<div class="absolute right-4 bottom-32 z-20 md:right-8">
+<div class="bg-surface-container-lowest p-3 rounded-xl shadow-md border border-outline-variant flex flex-col gap-1 items-end">
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-[18px]">speed</span>
+<span class="font-label-md">Normal Traffic</span>
+</div>
+<span class="font-label-sm text-on-surface-variant">2.4 miles remaining</span>
+</div>
+</div>
+</main>
+<!-- Interaction & Status Layer -->
+<footer class="bg-surface-container-lowest shadow-[0_-8px_24px_rgba(0,0,0,0.06)] z-30 px-container-padding-mobile py-6 rounded-t-[32px] flex flex-col gap-6">
+<!-- Quick Actions Row -->
+<div class="flex items-center justify-between gap-4">
+<div class="flex gap-4 flex-1">
+<button class="flex-1 bg-surface-container-high py-4 rounded-2xl flex flex-col items-center gap-1 active:scale-95 transition-all hover:bg-surface-dim">
+<span class="material-symbols-outlined text-primary">chat</span>
+<span class="font-label-md text-on-surface">Message</span>
+</button>
+<button class="flex-1 bg-surface-container-high py-4 rounded-2xl flex flex-col items-center gap-1 active:scale-95 transition-all hover:bg-surface-dim">
+<span class="material-symbols-outlined text-secondary">call</span>
+<span class="font-label-md text-on-surface">Call</span>
+</button>
+</div>
+<button class="w-16 h-16 bg-surface-container-high rounded-2xl flex items-center justify-center active:scale-95 transition-all hover:bg-surface-dim">
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+</button>
+</div>
+<!-- Kinetic Slider "Slide to Start Job" -->
+<div class="relative w-full h-[72px] bg-secondary-container/30 rounded-full p-2 flex items-center border-2 border-secondary/10 group overflow-hidden" id="slider-container">
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<span class="font-label-md text-on-secondary-container/60 uppercase tracking-widest text-[13px] group-hover:animate-pulse">Slide to start job</span>
+</div>
+<div class="slider-knob h-[56px] w-[56px] bg-secondary text-on-primary rounded-full flex items-center justify-center shadow-lg cursor-grab active:cursor-grabbing z-10" id="slider-knob" onmousedown="startSlide(event)" ontouchstart="startSlide(event)">
+<span class="material-symbols-outlined text-[28px]">play_arrow</span>
+</div>
+<!-- Fill background -->
+<div class="absolute left-0 top-0 bottom-0 bg-secondary/10 rounded-full transition-all duration-75 pointer-events-none" id="slider-fill"></div>
+</div>
+</footer>
+<script>
+    // Slider Logic
+    const sliderKnob = document.getElementById('slider-knob');
+    const sliderContainer = document.getElementById('slider-container');
+    const sliderFill = document.getElementById('slider-fill');
+    
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    const maxSlide = sliderContainer.offsetWidth - sliderKnob.offsetWidth - 16; // 16 for padding
+
+    function startSlide(e) {
+      isDragging = true;
+      startX = (e.type === 'touchstart') ? e.touches[0].clientX : e.clientX;
+      document.addEventListener('mousemove', moveSlide);
+      document.addEventListener('mouseup', endSlide);
+      document.addEventListener('touchmove', moveSlide);
+      document.addEventListener('touchend', endSlide);
+    }
+
+    function moveSlide(e) {
+      if (!isDragging) return;
+      const x = (e.type === 'touchmove') ? e.touches[0].clientX : e.clientX;
+      currentX = Math.max(0, Math.min(x - startX, maxSlide));
+      
+      sliderKnob.style.transform = `translateX(${currentX}px)`;
+      sliderFill.style.width = `${currentX + 56}px`;
+
+      // Visual feedback on completion
+      if (currentX >= maxSlide * 0.95) {
+        sliderKnob.classList.add('bg-primary');
+        sliderKnob.classList.remove('bg-secondary');
+      } else {
+        sliderKnob.classList.add('bg-secondary');
+        sliderKnob.classList.remove('bg-primary');
+      }
+    }
+
+    function endSlide() {
+      if (!isDragging) return;
+      isDragging = false;
+      
+      if (currentX >= maxSlide * 0.9) {
+        // Successful slide
+        sliderKnob.style.transform = `translateX(${maxSlide}px)`;
+        sliderFill.style.width = '100%';
+        completeAction();
+      } else {
+        // Reset
+        sliderKnob.style.transform = `translateX(0px)`;
+        sliderFill.style.width = '0px';
+      }
+      
+      document.removeEventListener('mousemove', moveSlide);
+      document.removeEventListener('mouseup', endSlide);
+      document.removeEventListener('touchmove', moveSlide);
+      document.removeEventListener('touchend', endSlide);
+    }
+
+    function completeAction() {
+      sliderKnob.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span>';
+      setTimeout(() => {
+        sliderKnob.innerHTML = '<span class="material-symbols-outlined">check</span>';
+        alert('Job Started Successfully!');
+        // Transition to active job state logic here
+      }, 1000);
+    }
+
+    // Dynamic Time Update simulation
+    setInterval(() => {
+      const etaElements = document.querySelectorAll('.animate-pulse');
+      // Just some visual liveliness
+    }, 3000);
+  </script>
+</body></html>

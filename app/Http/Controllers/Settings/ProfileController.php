@@ -37,6 +37,13 @@ class ProfileController extends Controller
             $request->user()->email_verified_at = null;
         }
 
+        // Automatic mode switch if the current mode is disabled
+        if ($request->user()->active_mode === 'worker' && !$request->user()->is_worker_active) {
+            $request->user()->active_mode = 'employer';
+        } elseif ($request->user()->active_mode === 'employer' && !$request->user()->is_employer_active) {
+            $request->user()->active_mode = 'worker';
+        }
+
         $request->user()->save();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Profile updated.')]);

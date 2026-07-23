@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daftar Gigs - GigConnect</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#191c1e",
+                    "surface-bright": "#f7f9fb",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#6ffbbe",
+                    "tertiary-container": "#4b4dd8",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-secondary-fixed": "#002113",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#dad7ff",
+                    "tertiary-fixed-dim": "#c0c1ff",
+                    "tertiary": "#3130c0",
+                    "on-primary-fixed": "#0f0069",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#c3c0ff",
+                    "surface-container-high": "#e6e8ea",
+                    "on-secondary-fixed-variant": "#005236",
+                    "surface-dim": "#d8dadc",
+                    "surface-container-highest": "#e0e3e5",
+                    "on-tertiary-container": "#d9d8ff",
+                    "on-error": "#ffffff",
+                    "on-surface-variant": "#464555",
+                    "outline-variant": "#c7c4d8",
+                    "on-error-container": "#93000a",
+                    "primary": "#3525cd",
+                    "surface-tint": "#4d44e3",
+                    "surface-container-low": "#f2f4f6",
+                    "surface": "#f7f9fb",
+                    "on-secondary": "#ffffff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-tertiary-fixed-variant": "#2f2ebe",
+                    "primary-container": "#4f46e5",
+                    "inverse-surface": "#2d3133",
+                    "tertiary-fixed": "#e1e0ff",
+                    "surface-variant": "#e0e3e5",
+                    "on-background": "#191c1e",
+                    "on-secondary-container": "#00714d",
+                    "primary-fixed": "#e2dfff",
+                    "error": "#ba1a1a",
+                    "secondary": "#006c49",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "secondary-container": "#6cf8bb",
+                    "on-tertiary-fixed": "#07006c",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#eceef0",
+                    "outline": "#777587",
+                    "background": "#f7f9fb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "gutter": "1.5rem",
+                    "container-padding-mobile": "1rem",
+                    "stack-sm": "0.5rem",
+                    "stack-md": "1rem",
+                    "stack-lg": "2rem",
+                    "container-padding-desktop": "2rem"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "120%", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "150%", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "130%", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "120%", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "120%", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "125%", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "140%", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "160%", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f7f9fb;
+            color: #191c1e;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(224, 227, 229, 0.5);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-20">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-inverse-surface shadow-sm docked full-width top-0 z-40 sticky">
+<div class="flex justify-between items-center px-container-padding-mobile w-full h-16 max-w-[1200px] mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-container flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a young Southeast Asian freelancer with a friendly smile, set against a clean minimalist studio background with soft mint and indigo lighting. The style is modern, high-definition, and corporate tech-optimist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZArvObd5xWKTgpytQZR4Tu1TUK2IHFi44wzquuHGiq0FW96qUxelzzHs5lr0mh8WcvQcM3bn0lV9yobup9OBMyTsSv16ozBf1OYc5FtyKWGYmenMn6QUSLAb_zu1-G3iFC3bWSbdaONgja-YijPi8ofGmNFi-apal1-uvt_kI4XV5BAOcluLsNWWma7f8kKOs-C3Tg9H0cgbDgEBpB01JN_cozx1UBhKK3TWWP_g2S4Vy2s7X0gaMmw"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">GigConnect</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 mr-2" title="Map View">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">map</span>
+</button><button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">search</span>
+</button>
+</div>
+</header>
+<main class="max-w-[1200px] mx-auto px-container-padding-mobile md:px-container-padding-desktop mt-stack-md">
+<!-- Search & Filter Area -->
+<section class="mb-stack-lg">
+<div class="relative group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-white border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl py-4 pl-12 pr-4 font-body-md text-on-surface shadow-sm transition-all duration-300" placeholder="Cari posisi atau keahlian..." type="text"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-all">
+                    Cari
+                </button>
+</div>
+</section>
+<!-- Categories -->
+<section class="mb-stack-lg overflow-hidden">
+<div class="flex gap-stack-sm overflow-x-auto no-scrollbar pb-2">
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-primary text-on-primary font-label-md shadow-md transition-transform active:scale-95">Semua Gigs</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-white text-on-surface-variant border border-outline-variant font-label-md hover:bg-surface-container transition-colors">Desain</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-white text-on-surface-variant border border-outline-variant font-label-md hover:bg-surface-container transition-colors">Developer</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-white text-on-surface-variant border border-outline-variant font-label-md hover:bg-surface-container transition-colors">Penulisan</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-white text-on-surface-variant border border-outline-variant font-label-md hover:bg-surface-container transition-colors">Pemasaran</button>
+<button class="whitespace-nowrap px-6 py-2.5 rounded-full bg-white text-on-surface-variant border border-outline-variant font-label-md hover:bg-surface-container transition-colors">Data Science</button>
+</div>
+</section>
+<!-- Hot Opportunity Card (Featured) -->
+<section class="mb-stack-lg">
+<div class="relative rounded-2xl overflow-hidden bg-primary p-6 md:p-8 shadow-xl group">
+<div class="absolute top-0 right-0 w-64 h-64 bg-tertiary-container opacity-20 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+<div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div class="space-y-4 max-w-2xl">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+                            Hot Opportunity
+                        </span>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-on-primary">Lead UX Designer untuk Fintech Unicorn</h2>
+<div class="flex flex-wrap gap-4 text-on-primary/80 font-body-md">
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">apartment</span> DanaTech Labs</span>
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">location_on</span> Remote (WIB)</span>
+</div>
+<p class="text-on-primary/90 font-body-md leading-relaxed">Pimpin revolusi keuangan masa depan dengan tim desain kelas dunia. Proyek jangka panjang dengan skema kerja fleksibel.</p>
+<div class="flex items-center gap-2 font-headline-md text-secondary-fixed">
+                            $120 - $180 /hr
+                        </div>
+</div>
+<button class="w-full md:w-auto px-8 py-4 bg-secondary-fixed text-on-secondary-fixed font-label-md rounded-xl shadow-lg hover:bg-secondary-fixed-dim transition-all active:scale-95">
+                        Apply Now
+                    </button>
+</div>
+</div>
+</section>
+<!-- Recommended Gigs Section -->
+<section class="mb-stack-lg">
+<div class="flex justify-between items-center mb-stack-md">
+<h3 class="font-headline-md text-on-surface">Direkomendasikan Untukmu</h3>
+<a class="text-primary font-label-md hover:underline" href="#">Lihat Semua</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Job Card 1 -->
+<div class="bg-white rounded-2xl border border-outline-variant p-6 hover:shadow-lg hover:border-primary transition-all group flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden">
+<img class="w-8 h-8 object-contain" data-alt="A minimalist tech company logo with a geometric abstract bird in mint green and indigo. Professional, clean branding style on a white background with a soft studio lighting feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDoGwCyNUhnmje2p4HIEzwJBJDlunC4C_EAaw0UtVegBK9lytvCsifB2jTK4hxbDMcqQTg03xAe3ZJ34cVqtT3fpGc7kt1QALCELwftM6dYQAXkXLPqWnX1tZtQZ_Q6afWEikzFfYMrTBq-XRyODq8voHR_329fNMcYJizEq0wg5IIh-tZ21fOAQpKFjvzZ61_VuwCun-B1Yi9cf4X0agf8jo-YhQ48s3z9_fyoLR7X0GQgl61kqQ4XA"/>
+</div>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+<h4 class="font-headline-md text-[20px] mb-1 group-hover:text-primary transition-colors">Full-stack React Developer</h4>
+<p class="text-on-surface-variant font-body-md mb-4">Vectra Solutions • Remote</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm">React</span>
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm">Node.js</span>
+<span class="px-3 py-1 rounded-full bg-secondary-container/30 text-on-secondary-container font-label-sm">Matched</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-surface-container">
+<span class="font-label-md text-on-surface">$85 - $120 /hr</span>
+<span class="text-outline font-label-sm">Full-time</span>
+</div>
+</div>
+<!-- Job Card 2 -->
+<div class="bg-white rounded-2xl border border-outline-variant p-6 hover:shadow-lg hover:border-primary transition-all group flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden">
+<img class="w-8 h-8 object-contain" data-alt="A sleek corporate logo featuring a modern sans-serif letter 'M' integrated with a digital pulse line in shades of deep indigo and slate gray. Modern corporate branding aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZTdLJb7pvUum9XS70oa8fXReJaUhKr3ZJc1bStM4GWJO0SFExNtQQusLrDcaYHjB6ngloAchj41COC99H-cYKbr8_iv0k3WqEszzAKVnUA55IdBFbjpCsY_rvYL8wq3P0GmfE7vpzqUtkVwzLKYxyqehsxoxn0UITi3nAGuGJFG3RwMDheD1dCItEz7ZSwe4ZZGZkgskEXpi4Nw1Zn9WkCga-JhgdlvSjUNq35HgbP0tMDU1FFk7dNw"/>
+</div>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+<h4 class="font-headline-md text-[20px] mb-1 group-hover:text-primary transition-colors">Content Strategist</h4>
+<p class="text-on-surface-variant font-body-md mb-4">MediaPulse Group • Jakarta</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm">SEO</span>
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm">Copywriting</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-surface-container">
+<span class="font-label-md text-on-surface">$45 - $70 /hr</span>
+<span class="text-outline font-label-sm">Project</span>
+</div>
+</div>
+<!-- Job Card 3 -->
+<div class="bg-white rounded-2xl border border-outline-variant p-6 hover:shadow-lg hover:border-primary transition-all group flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center overflow-hidden">
+<img class="w-8 h-8 object-contain" data-alt="Minimalist eco-tech logo with a stylized green leaf motif emerging from a circuit pattern. Clean white background, sophisticated corporate identity in mint and emerald tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGAzFFUV15Up6wlJnoBpp0zNa-WzXMXX8nOQtSIfkapbj166VfS20Z_6TfD9LTDfxkq8BoduxFVLR7wFHnlAlbsK1F1B10oYiD7RuxsHYOc4V9dZYOd6h0QicPWizaATGg885D5sVsI2YdhHQU7-0YK3Gre_hMdCh9WWLuQQBsQqnhNZWho8TE26x7UMqy7Q_Ig5JVARW6WmDcwkXTfUVo6QuNhsE0q3BUjvL5eZEkUJ4BC231PHMOBw"/>
+</div>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark</span>
+</button>
+</div>
+<h4 class="font-headline-md text-[20px] mb-1 group-hover:text-primary transition-colors">Motion Graphics Artist</h4>
+<p class="text-on-surface-variant font-body-md mb-4">EcoSphere Digital • Remote</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm">After Effects</span>
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm">3D Design</span>
+</div>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-surface-container">
+<span class="font-label-md text-on-surface">$60 - $95 /hr</span>
+<span class="text-outline font-label-sm">Contract</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Nearby Opportunities Section (Bento Style) -->
+<section class="mb-stack-lg">
+<h3 class="font-headline-md text-on-surface mb-stack-md">Eksplorasi Lainnya</h3>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="md:col-span-2 h-48 rounded-2xl relative overflow-hidden bg-on-surface-variant group cursor-pointer shadow-md">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" data-alt="A professional architectural photograph of a modern co-working space in Jakarta with floor-to-ceiling windows, sleek ergonomic furniture, and indoor plants. Warm sunset lighting filters through the city skyline. Photorealistic style, architectural magazine aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAEB9-efwzorSYpZ-JAJ9u_hoDhV9bWYCaeBQkdlz5qVJPw93udTW0hWRi3OZRYh0oy9qcTaNm9YrwpV1d57oacB-KlJkdsxdxe5EQf_orz2RUNdlurvDAdSpySeOImXUi6RD0WxgtvrRG77G59eDtQO2zqIooq77_bjUhgkEeUBA9fSHAla39ayYKeJGvk_eAW9VW596Sskqf1Rn9b-1oDmlYZ9787oagaQrYqjmVaFiNKK3b_utN7pw')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-4 left-4 text-white">
+<p class="font-label-sm opacity-80">Populer di Jakarta</p>
+<h4 class="font-headline-md">Startup Emerging Gigs</h4>
+</div>
+</div>
+<div class="md:col-span-1 h-48 rounded-2xl bg-secondary-fixed flex flex-col justify-center items-center text-center p-4 cursor-pointer hover:shadow-lg transition-all active:scale-95">
+<span class="material-symbols-outlined text-[32px] text-on-secondary-fixed mb-2">trending_up</span>
+<h4 class="font-label-md text-on-secondary-fixed">Gaji Tertinggi Pekan Ini</h4>
+</div>
+<div class="md:col-span-1 h-48 rounded-2xl bg-tertiary-fixed flex flex-col justify-center items-center text-center p-4 cursor-pointer hover:shadow-lg transition-all active:scale-95">
+<span class="material-symbols-outlined text-[32px] text-on-tertiary-fixed mb-2">bolt</span>
+<h4 class="font-label-md text-on-tertiary-fixed">Quick Apply (No Resume)</h4>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed right-6 bottom-24 w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-xl flex items-center justify-center hover:bg-primary-container transition-all active:scale-90 z-40 group">
+<span class="material-symbols-outlined text-[28px] group-hover:rotate-90 transition-transform duration-300">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface dark:bg-inverse-surface shadow-[0_-2px_10px_rgba(0,0,0,0.05)] h-20">
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary-fixed-dim text-on-secondary-container dark:text-on-secondary-fixed rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="font-label-sm text-label-sm">My Gigs</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for category selection
+        const categoryButtons = document.querySelectorAll('section:nth-of-type(2) button');
+        categoryButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                categoryButtons.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary', 'shadow-md');
+                    b.classList.add('bg-white', 'text-on-surface-variant', 'border', 'border-outline-variant');
+                });
+                btn.classList.add('bg-primary', 'text-on-primary', 'shadow-md');
+                btn.classList.remove('bg-white', 'text-on-surface-variant', 'border', 'border-outline-variant');
+            });
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.01]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.01]');
+        });
+    </script>
+</body></html>
