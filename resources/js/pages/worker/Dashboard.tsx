@@ -19,11 +19,21 @@ interface WorkerDashboardProps {
         tags: string[];
         logo: string;
     }[];
+    active_jobs?: {
+        id: number;
+        job_id: number;
+        title: string;
+        company: string;
+        rate: string;
+        status: string;
+        accepted_at: string;
+    }[];
 }
 
 export default function WorkerDashboard({
     stats,
-    recommended_gigs
+    recommended_gigs,
+    active_jobs = []
 }: WorkerDashboardProps) {
     return (
         <DashboardLayout title="Freelancer Dashboard" role="worker" userName="Sarah">
@@ -31,7 +41,11 @@ export default function WorkerDashboard({
             <section className="mb-8">
                 <div className="flex flex-col gap-1">
                     <h2 className="font-headline-lg text-headline-lg text-on-surface">Halo, Sarah!</h2>
-                    <p className="text-on-surface-variant font-body-md">You have 3 pending offers and 2 upcoming deadlines this week. Time to shine!</p>
+                    <p className="text-on-surface-variant font-body-md">
+                        {active_jobs.length > 0 
+                            ? `You have ${active_jobs.length} active gig(s) that need your attention.`
+                            : `You have 3 pending offers and 2 upcoming deadlines this week. Time to shine!`}
+                    </p>
                 </div>
             </section>
 
@@ -94,11 +108,63 @@ export default function WorkerDashboard({
                 </div>
             </section>
 
+            {/* Active Gigs Section */}
+            {active_jobs.length > 0 && (
+                <section className="mb-stack-lg">
+                    <div className="flex justify-between items-end mb-stack-md">
+                        <div>
+                            <h3 className="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+                                <Briefcase className="text-primary" /> My Active Jobs
+                            </h3>
+                            <p className="text-on-surface-variant font-body-md mt-1">Jobs you've been hired for. Check messages for instructions.</p>
+                        </div>
+                        <Link href="/messages" className="text-primary font-label-md hover:underline flex items-center gap-1">
+                            Go to Messages <ArrowRight size={16} />
+                        </Link>
+                    </div>
+
+                    <div className="flex flex-col gap-stack-md">
+                        {active_jobs.map((job) => (
+                            <div key={job.id} className="bg-primary/5 p-6 rounded-2xl border border-primary/20 shadow-sm transition-all relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-2 h-full bg-primary"></div>
+                                <div className="flex flex-col md:flex-row gap-6">
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div>
+                                                <h4 className="font-headline-md text-on-surface">{job.title}</h4>
+                                                <p className="text-on-surface-variant font-body-md">
+                                                    {job.company} • Hired {job.accepted_at}
+                                                </p>
+                                            </div>
+                                            <span className="bg-primary text-on-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                                                Active
+                                            </span>
+                                        </div>
+                                        
+                                        <div className="flex justify-between items-center pt-4 mt-4 border-t border-primary/10">
+                                            <span className="font-headline-md text-on-surface">{job.rate}</span>
+                                            <div className="flex gap-2">
+                                                <Link href="/messages" className="border border-outline-variant text-on-surface px-4 py-2.5 rounded-lg font-label-md hover:bg-surface-variant active:scale-95 transition-all shadow-sm">
+                                                    Chat
+                                                </Link>
+                                                <Link href={`/gigs/${job.job_id}/tracking`} className="bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-md hover:bg-primary-container hover:text-on-primary-container active:scale-95 transition-all shadow-sm">
+                                                    Live Tracker
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
             {/* Recommended Gigs Section */}
-            <section className="mb-12">
-                <div className="flex justify-between items-end mb-6">
+            <section className="mb-stack-lg">
+                <div className="flex justify-between items-end mb-stack-md">
                     <div>
-                        <h2 className="font-headline-md text-headline-md text-on-surface">Recommended for You</h2>
+                        <h3 className="font-headline-md text-headline-md text-on-surface flex items-center gap-2">Recommended for You</h3>
                         <p className="text-on-surface-variant font-body-md">Based on your skills in UI/UX & React</p>
                     </div>
                     <Link className="text-primary font-label-md hover:underline flex items-center gap-1 active:scale-95 transition-transform" href="#">

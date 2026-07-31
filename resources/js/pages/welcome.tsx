@@ -25,9 +25,25 @@ export default function Welcome({ auth }: any) {
                     <nav className="hidden md:flex gap-8 items-center text-label-md text-on-surface-variant">
                         <a href="#how-it-works" className="hover:text-primary transition-colors">How it works</a>
                         <a href="#employers" className="hover:text-primary transition-colors">For Employers</a>
-                        <a href="#workers" className="hover:text-primary transition-colors">For workers</a>
-                        <a href="#support" className="hover:text-primary transition-colors">Support</a>
+                        <a href="#workers" className="hover:text-primary transition-colors">For Workers</a>
                     </nav>
+
+                    <div className="hidden md:flex items-center gap-4">
+                        {auth.user ? (
+                            <Link href="/dashboard" className="px-5 py-2 bg-primary text-on-primary rounded-full font-label-md transition-colors shadow-sm hover:brightness-110">
+                                Dashboard
+                            </Link>
+                        ) : (
+                            <>
+                                <Link href="/login" className="px-4 py-2 text-on-surface-variant hover:text-primary font-label-md transition-colors">
+                                    Log in
+                                </Link>
+                                <Link href="/register" className="px-5 py-2 bg-primary text-on-primary rounded-full font-label-md transition-colors shadow-sm hover:brightness-110">
+                                    Sign up
+                                </Link>
+                            </>
+                        )}
+                    </div>
 
                     {/* Mobile Menu Icon (Placeholder) */}
                     <div className="md:hidden flex items-center">
@@ -45,11 +61,46 @@ export default function Welcome({ auth }: any) {
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-secondary/10 blur-[100px] rounded-full -z-10 pointer-events-none"></div>
 
                     <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 relative z-10">
-                        {/* Placeholder Left Block */}
-                        <div className="w-full md:w-1/2 aspect-[4/3] bg-primary-container/50 rounded-2xl border border-outline/20 shadow-2xl overflow-hidden flex items-center justify-center relative">
-                            {/* Graphic mockup placeholder */}
-                            <div className="absolute inset-0 bg-gradient-to-tr from-primary-container to-surface-tint opacity-50"></div>
-                            <Compass className="text-on-primary-container/30 w-32 h-32" />
+                        {/* Hero UI Component Preview */}
+                        <div className="w-full md:w-1/2 aspect-[4/3] bg-primary-container/30 rounded-3xl border border-outline/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col relative">
+                            <div className="absolute inset-0 bg-gradient-to-tr from-primary-container to-surface-tint opacity-30"></div>
+                            
+                            {/* Chat Header */}
+                            <div className="bg-surface/10 backdrop-blur-md border-b border-outline/10 p-4 flex items-center gap-3 relative z-10">
+                                <div className="w-10 h-10 rounded-full overflow-hidden bg-primary-container border-2 border-surface/20">
+                                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100&h=100" alt="Client" className="w-full h-full object-cover" />
+                                </div>
+                                <div>
+                                    <h3 className="text-on-primary font-bold text-sm">Sarah Jenkins</h3>
+                                    <p className="text-on-primary/70 text-xs flex items-center gap-1"><MapPin size={10} /> 1.2 km away</p>
+                                </div>
+                                <div className="ml-auto bg-secondary text-on-secondary text-xs px-2 py-1 rounded-full font-bold">
+                                    $25/hr
+                                </div>
+                            </div>
+                            
+                            {/* Chat Messages */}
+                            <div className="flex-1 p-4 flex flex-col gap-4 relative z-10 overflow-hidden">
+                                <div className="self-start max-w-[80%] bg-surface text-on-surface p-3 rounded-2xl rounded-tl-sm shadow-md text-sm">
+                                    <p>Hi! Are you available to cover a barista shift this afternoon? 2 PM to 6 PM.</p>
+                                </div>
+                                
+                                <div className="self-end max-w-[80%] bg-primary text-on-primary p-3 rounded-2xl rounded-tr-sm shadow-md text-sm border border-outline/20">
+                                    <p>Yes, absolutely! I can be there by 1:45 PM.</p>
+                                </div>
+                                
+                                <div className="self-start max-w-[80%] bg-surface text-on-surface p-3 rounded-2xl rounded-tl-sm shadow-md text-sm">
+                                    <p>Perfect. Just hired you through the app. See you soon!</p>
+                                </div>
+                            </div>
+                            
+                            {/* Action Bar */}
+                            <div className="bg-surface/10 backdrop-blur-md p-4 relative z-10">
+                                <div className="w-full bg-secondary text-on-secondary rounded-xl py-3 flex items-center justify-center gap-2 font-bold shadow-lg animate-pulse">
+                                    <Briefcase size={18} />
+                                    <span>Slide to Start Gig</span>
+                                </div>
+                            </div>
                         </div>
                         
                         {/* Content Right */}
@@ -71,93 +122,18 @@ export default function Welcome({ auth }: any) {
                             </div>
                             
                             <div className="flex flex-wrap items-center gap-3 mb-6">
-                                <button className="px-6 py-3 rounded-full bg-surface/10 hover:bg-surface/20 text-on-primary font-label-md transition-colors border border-outline/30 backdrop-blur-md">
-                                    I'm an Employer
-                                </button>
-                                <button className="px-6 py-3 rounded-full bg-secondary hover:bg-secondary-container hover:text-on-secondary-container text-on-secondary font-label-md transition-colors shadow-lg">
+                                <Link href={auth.user ? "/dashboard" : "/register"} className="px-6 py-3 rounded-full bg-secondary hover:bg-secondary-container hover:text-on-secondary-container text-on-secondary font-label-md transition-colors shadow-lg">
                                     See jobs near me
-                                </button>
+                                </Link>
+                                <Link href={auth.user ? "/dashboard" : "/register"} className="px-6 py-3 rounded-full bg-surface/10 hover:bg-surface/20 text-on-primary font-label-md transition-colors border border-outline/30 backdrop-blur-md">
+                                    I'm an Employer
+                                </Link>
                             </div>
                             
                             <div className="flex items-center gap-2">
-                                <span className="px-3 py-1 rounded-full bg-primary-container text-on-primary-container text-label-sm font-medium border border-outline/20">Hire me</span>
-                                <span className="px-3 py-1 rounded-full bg-primary-container text-on-primary-container text-label-sm font-medium border border-outline/20">Popular roles</span>
+                                <span className="px-3 py-1 rounded-full bg-primary-container text-on-primary-container text-label-sm font-medium border border-outline/20">Barista</span>
+                                <span className="px-3 py-1 rounded-full bg-primary-container text-on-primary-container text-label-sm font-medium border border-outline/20">Driver</span>
                                 <span className="px-3 py-1 rounded-full bg-tertiary-container text-on-tertiary-container text-label-sm font-medium border border-outline/20">Same-day</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Location Query Bar */}
-                <section className="py-20 bg-surface-container-lowest border-b border-outline-variant/30">
-                    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-12">
-                            <h2 className="text-headline-lg text-on-surface mb-2 tracking-tight">Location query bar (minimal friction)</h2>
-                            <p className="text-on-surface-variant text-body-md max-w-2xl mx-auto">Interactive search that drives the core preview section immediately. Default is auto-detect location + smart radius. Users can change radius and role without searching persona.</p>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 bg-surface p-6 rounded-3xl border border-outline-variant/50 shadow-sm">
-                            {/* Input Group 1 */}
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-label-md text-on-surface">Location</label>
-                                <input type="text" placeholder="Gathering..." className="border border-outline-variant rounded-xl px-4 py-2.5 text-body-md bg-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow" />
-                                <p className="text-[11px] text-on-surface-variant/70 leading-tight mt-1">Smart logic: auto-detect location, fallback to State/Area.</p>
-                            </div>
-                            
-                            {/* Input Group 2 */}
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-label-md text-on-surface">Role search</label>
-                                <input type="text" placeholder="Try: Barista, Cleaner..." className="border border-outline-variant rounded-xl px-4 py-2.5 text-body-md bg-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow" />
-                                <p className="text-[11px] text-on-surface-variant/70 leading-tight mt-1">Populates local demand suggestions dynamically.</p>
-                            </div>
-                            
-                            {/* Input Group 3 */}
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-label-md text-on-surface">Radius</label>
-                                <select className="border border-outline-variant rounded-xl px-4 py-2.5 text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-surface">
-                                    <option>Up to 5 km</option>
-                                    <option>Up to 10 km</option>
-                                    <option>Up to 25 km</option>
-                                </select>
-                                <p className="text-[11px] text-on-surface-variant/70 leading-tight mt-1">Microcopy: 'Widen to see more jobs nearby'.</p>
-                            </div>
-                            
-                            {/* Input Group 4 */}
-                            <div className="flex flex-col gap-1.5">
-                                <label className="text-label-md text-on-surface">Time preference <span className="font-normal text-on-surface-variant">(Optional)</span></label>
-                                <select className="border border-outline-variant rounded-xl px-4 py-2.5 text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-surface">
-                                    <option>Today / This week</option>
-                                    <option>Anytime</option>
-                                </select>
-                                <p className="text-[11px] text-on-surface-variant/70 leading-tight mt-1">Prioritizes Same-day / Urgent tags.</p>
-                            </div>
-                        </div>
-                        
-                        <div className="flex justify-center gap-4">
-                            <button className="px-6 py-3 border-2 border-outline-variant rounded-full text-label-md hover:bg-surface-variant transition-colors text-on-surface">
-                                Use a different location
-                            </button>
-                            <button className="px-6 py-3 bg-primary text-on-primary rounded-full text-label-md hover:bg-primary/90 transition-colors shadow-md">
-                                Update jobs
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Map Section */}
-                <section className="py-12 bg-surface-container-lowest">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="w-full h-[300px] md:h-[400px] bg-surface-container-highest rounded-3xl flex items-center justify-center relative overflow-hidden border border-outline-variant/40 shadow-inner">
-                            {/* Crosshatch background pattern simulation using branding colors */}
-                            <div className="absolute inset-0 opacity-10" style={{
-                                backgroundImage: `linear-gradient(45deg, var(--color-on-surface) 25%, transparent 25%, transparent 75%, var(--color-on-surface) 75%, var(--color-on-surface)), linear-gradient(45deg, var(--color-on-surface) 25%, transparent 25%, transparent 75%, var(--color-on-surface) 75%, var(--color-on-surface))`,
-                                backgroundSize: `40px 40px`,
-                                backgroundPosition: `0 0, 20px 20px`
-                            }}></div>
-                            
-                            <div className="relative z-10 flex flex-col items-center gap-3 bg-surface/90 px-6 py-4 rounded-2xl backdrop-blur-md shadow-lg border border-outline-variant/50">
-                                <MapPin className="text-secondary" size={32} />
-                                <span className="text-label-md text-on-surface">Jobs Near You [Core Hook: dynamic live preview]</span>
                             </div>
                         </div>
                     </div>
@@ -167,8 +143,8 @@ export default function Welcome({ auth }: any) {
                 <section className="py-24 bg-surface-container-lowest border-b border-outline-variant/30">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-16">
-                            <h2 className="text-headline-lg text-on-surface mb-4 tracking-tight">Real utility preview</h2>
-                            <p className="text-on-surface-variant text-body-lg max-w-2xl mx-auto">Replace generic feature boxes with a "preview of outcomes". Each item is framed as a direct benefit, triggered by the live search.</p>
+                            <h2 className="text-headline-lg text-on-surface mb-4 tracking-tight">Why choose Goodgigs?</h2>
+                            <p className="text-on-surface-variant text-body-lg max-w-2xl mx-auto">We streamline the hiring process so you can focus on getting the job done. No resumes, no cover letters, just verified skills.</p>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

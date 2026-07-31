@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import { 
     Search, PlusCircle, Rocket, Users, CreditCard, 
     Clock, Terminal, Brush, Video, ArrowRight, MoreVertical,
-    Star
+    Star, RefreshCw
 } from 'lucide-react';
 import BottomNavLayout from '@/layouts/BottomNavLayout';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -30,7 +30,7 @@ export default function EmployerDashboard({
             <Head title="Goodgigs | Employer Dashboard" />
 
             {/* Top App Bar */}
-            <header className="bg-surface shadow-sm sticky top-0 z-40">
+            {/* <header className="bg-surface shadow-sm sticky top-0 z-40">
                 <div className="flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop w-full h-16 max-w-7xl mx-auto">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
@@ -55,7 +55,7 @@ export default function EmployerDashboard({
                         )}
                     </div>
                 </div>
-            </header>
+            </header> */}
 
             <main className="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop mt-stack-lg space-y-stack-lg">
                 {/* Welcome Hero Section */}
@@ -172,7 +172,9 @@ export default function EmployerDashboard({
                                     <p className="text-on-surface-variant text-[10px] uppercase font-bold tracking-wider">{in_progress_gig.progress}% Milestones Completed</p>
                                 </div>
                                 <div className="md:text-right shrink-0 border-t md:border-t-0 md:border-l border-outline-variant pt-stack-md md:pt-0 md:pl-stack-md flex md:flex-col gap-2 items-center justify-center">
-                                    <Button variant="outline" className="grow w-full border-outline-variant bg-surface-container-highest text-on-surface hover:bg-surface-bright">Manage</Button>
+                                    <Link href={`/gigs/${in_progress_gig.id}/tracking/employer`} className="grow w-full">
+                                        <Button variant="outline" className="w-full border-outline-variant bg-surface-container-highest text-on-surface hover:bg-surface-bright">Manage</Button>
+                                    </Link>
                                     <button className="shrink-0 p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg">
                                         <MoreVertical size={20} />
                                     </button>

@@ -45,7 +45,7 @@ export default function MapBrowse({ categories = ['All', 'Handyman', 'Cleaning',
             <Head title="Goodgigs | Browse Gigs Map" />
 
             {/* Top AppBar */}
-            <header className="bg-surface shadow-sm sticky top-0 z-50 flex justify-between items-center px-container-padding-mobile w-full h-16 shrink-0">
+            {/* <header className="bg-surface shadow-sm sticky top-0 z-50 flex justify-between items-center px-container-padding-mobile w-full h-16 shrink-0">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
                         <img 
@@ -61,7 +61,7 @@ export default function MapBrowse({ categories = ['All', 'Handyman', 'Cleaning',
                         <Search size={24} />
                     </button>
                 </div>
-            </header>
+            </header> */}
 
             <main className="relative w-full h-[calc(100vh-64px)] flex-grow overflow-hidden">
                 {/* Floating Filter Bar & Search */}

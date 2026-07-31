@@ -34,7 +34,7 @@ export default function BottomNavLayout({ children }: BottomNavLayoutProps) {
 
     const NavigationLinks = ({ isDesktopMode = false }: { isDesktopMode?: boolean }) => {
         const linkClassFn = isDesktopMode ? getDesktopLinkClass : getMobileLinkClass;
-        
+
         return (
             <>
                 <Link className={linkClassFn(isHome)} href={homeUrl}>
@@ -69,21 +69,17 @@ export default function BottomNavLayout({ children }: BottomNavLayoutProps) {
                         <span className="text-xl font-bold text-primary tracking-tight">Goodgigs</span>
                     </Link>
                 </div>
-                
+
                 <nav className="flex-1 px-4 py-6 space-y-2">
                     <NavigationLinks isDesktopMode={true} />
                 </nav>
-                
+
                 <div className="p-6 border-t border-outline-variant">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container shrink-0">
-                            <img className="w-full h-full object-cover" alt="Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6y4e4430TxP-HS8Mdh8pnwuIRrh3t7oOgYvenAHaDAQ1Wod-4rS4vPoHCZnhWNo_y4PKkuBIg6I-10L6IvhswSBdnyczlq_62Hw1EfCGKptRTsODGLbTcqZFRyxv20eRkEWoYqL5XHLVhWLISYulTZQdToW-VRCu6RFfOWQM3jnridGKE7l7VVvtJUdWe1HdH8FHAtl5chCyyDiJWokwXZpln7LTG_vMTdLyVA7kWxb7qVB4nVipN8w" />
-                        </div>
-                        <div className="overflow-hidden">
-                            <p className="font-label-md text-on-surface truncate">Alex Rivera</p>
-                            <p className="text-label-sm text-on-surface-variant truncate">alex@example.com</p>
-                        </div>
-                    </div>
+                    <form action="/logout" method="POST">
+                        <button>
+                            <span>Logout</span>
+                        </button>
+                    </form>
                 </div>
             </aside>
 

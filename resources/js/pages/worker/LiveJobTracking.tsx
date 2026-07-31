@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Navigation, MapPin, Gauge, MessageSquare, Phone, MoreHorizontal, Play, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface LiveJobTrackingProps {
     job: {
         id: number;
+        status: string;
         type: string;
         number: string;
         eta_mins: number;
@@ -24,7 +28,13 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
     // Slider state
     const [sliderX, setSliderX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
-    const [isCompleted, setIsCompleted] = useState(false);
+    
+    // Status derivatives
+    const isInProgress = job.status === 'in_progress';
+    const isReviewing = job.status === 'reviewing';
+    const isCompleted = job.status === 'completed';
+    const hasFinishedAction = isReviewing || isCompleted;
+
     const [isLoading, setIsLoading] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -36,7 +46,7 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
         : 300;
 
     const handleStart = (clientX: number) => {
-        if (isCompleted || isLoading) return;
+        if (hasFinishedAction || isLoading) return;
         setIsDragging(true);
     };
 
@@ -92,11 +102,22 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
 
     const completeAction = () => {
         setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-            setIsCompleted(true);
-            toast.success('Job Started Successfully!');
-        }, 1000);
+        if (job.status === 'assigned') {
+            router.post(`/gigs/${job.id}/start`, {}, {
+                onSuccess: () => {
+                    setIsLoading(false);
+                    setSliderX(0); // reset slider for the next phase
+                    toast.success('Job Started Successfully!');
+                }
+            });
+        } else if (job.status === 'in_progress') {
+            router.post(`/gigs/${job.id}/complete`, {}, {
+                onSuccess: () => {
+                    setIsLoading(false);
+                    toast.success('Job marked as complete!');
+                }
+            });
+        }
     };
 
     return (
@@ -106,7 +127,7 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
             {/* Header Section */}
             <header className="bg-surface shadow-sm fixed top-0 w-full z-50 flex justify-between items-center px-container-padding-mobile h-16">
                 <div className="flex items-center gap-stack-md">
-                    <Link href="/worker/dashboard" className="active:scale-95 transition-transform p-2">
+                    <Link href="/dashboard" className="active:scale-95 transition-transform p-2">
                         <ArrowLeft className="text-primary" size={24} />
                     </Link>
                     <div>
@@ -124,32 +145,58 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
             </header>
 
             {/* Main Tracking Canvas */}
-            <main className="flex-grow relative bg-surface-dim pt-16">
-                {/* Map Placeholder */}
-                <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuACZr95Vn4r83n3mcWhxuU3QMmsTUwJGKLYdzuZ8tA328tQeDNMO8sihKZRfJWtjQmWt5XKF9MIMJt0JbkWg_eBROY6XHI3bTX5kyUIeVrZY9fNF3YJgDAzuQXpeqBo0koRYr3WgXFBqF2RDHvff5Ybr_XMVil3_hn9DhyVZCRVOVKYwV2yUmNoJ8IRVcU0adNHszRUtgzWVLArjQfZ94xePz1fZftGCygZDxoheM0_gH50MhsWmfRa-g')" }}>
+            <main className="flex-grow relative bg-surface-dim pt-16 h-full w-full overflow-hidden">
+                <MapContainer 
+                    center={job.coordinates.worker as [number, number]} 
+                    zoom={14} 
+                    zoomControl={false}
+                    className="absolute inset-0 z-0 h-full w-full"
+                >
+                    <TileLayer
+                        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                    />
                     
-                    {/* Live Worker Marker */}
-                    <div className="absolute top-1/2 left-1/3 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
-                        <div className="w-8 h-8 bg-primary rounded-full border-4 border-on-primary shadow-lg flex items-center justify-center relative">
-                            <Navigation className="text-white" size={14} />
-                            {/* Pulse Animation Ring */}
-                            <div className="absolute inset-0 border-4 border-primary rounded-full animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-50"></div>
-                        </div>
-                        <div className="mt-2 bg-primary px-3 py-1 rounded-full shadow-sm">
-                            <span className="text-on-primary font-label-md text-[11px] whitespace-nowrap">You</span>
-                        </div>
-                    </div>
+                    {/* Worker Marker */}
+                    <Marker 
+                        position={job.coordinates.worker as [number, number]}
+                        icon={L.divIcon({
+                            className: 'custom-marker',
+                            html: `
+                                <div class="flex flex-col items-center">
+                                    <div class="w-8 h-8 bg-primary rounded-full border-4 border-white shadow-lg flex items-center justify-center relative">
+                                        <div class="absolute inset-0 border-4 border-primary rounded-full animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite] opacity-50"></div>
+                                    </div>
+                                    <div class="mt-2 bg-primary px-3 py-1 rounded-full shadow-sm">
+                                        <span class="text-white font-label-md text-[11px] whitespace-nowrap">You</span>
+                                    </div>
+                                </div>
+                            `,
+                            iconSize: [40, 60],
+                            iconAnchor: [20, 30]
+                        })} 
+                    />
 
-                    {/* Destination Marker */}
-                    <div className="absolute top-1/4 right-1/4 transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
-                        <div className="w-10 h-10 bg-error rounded-full border-4 border-on-primary shadow-lg flex items-center justify-center">
-                            <MapPin className="text-white fill-error" size={20} />
-                        </div>
-                        <div className="mt-2 bg-on-surface px-3 py-1 rounded-full shadow-sm">
-                            <span className="text-on-primary font-label-md text-[11px] whitespace-nowrap">{job.client.location}</span>
-                        </div>
-                    </div>
-                </div>
+                    {/* Job Destination Marker */}
+                    <Marker 
+                        position={job.coordinates.job as [number, number]}
+                        icon={L.divIcon({
+                            className: 'custom-marker',
+                            html: `
+                                <div class="flex flex-col items-center">
+                                    <div class="w-10 h-10 bg-error rounded-full border-4 border-white shadow-lg flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+                                    </div>
+                                    <div class="mt-2 bg-gray-900 px-3 py-1 rounded-full shadow-sm">
+                                        <span class="text-white font-label-md text-[11px] whitespace-nowrap">${job.client.location}</span>
+                                    </div>
+                                </div>
+                            `,
+                            iconSize: [100, 70],
+                            iconAnchor: [50, 35]
+                        })} 
+                    />
+                </MapContainer>
 
                 {/* Floating ETA Badge */}
                 <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20">
@@ -183,10 +230,6 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
                             <MessageSquare className="text-primary" size={24} />
                             <span className="font-label-md text-on-surface">Message</span>
                         </button>
-                        <button className="flex-1 bg-surface-container-high py-4 rounded-2xl flex flex-col items-center gap-1 active:scale-95 transition-all hover:bg-surface-dim">
-                            <Phone className="text-secondary fill-secondary" size={24} />
-                            <span className="font-label-md text-on-surface">Call</span>
-                        </button>
                     </div>
                     <button className="w-16 h-16 shrink-0 bg-surface-container-high rounded-2xl flex items-center justify-center active:scale-95 transition-all hover:bg-surface-dim">
                         <MoreHorizontal className="text-on-surface-variant" size={28} />
@@ -199,8 +242,8 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
                     className="relative w-full h-[72px] bg-surface-variant rounded-full p-2 flex items-center border-2 border-outline-variant/50 group overflow-hidden touch-none select-none"
                 >
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span className={`font-label-md uppercase tracking-widest text-[13px] ${isCompleted ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:animate-pulse'}`}>
-                            {isCompleted ? 'Job Started' : 'Slide to start job'}
+                        <span className={`font-label-md uppercase tracking-widest text-[13px] ${hasFinishedAction ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:animate-pulse'}`}>
+                            {isReviewing ? 'Waiting for Approval...' : isCompleted ? 'Job Completed' : isInProgress ? 'Slide to Complete Job' : 'Slide to start job'}
                         </span>
                     </div>
 
@@ -216,15 +259,15 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
                         onMouseDown={(e) => handleStart(e.clientX)}
                         onTouchStart={(e) => handleStart(e.touches[0].clientX)}
                         className={`absolute left-2 h-[56px] w-[56px] text-on-primary rounded-full flex items-center justify-center shadow-md z-10 transition-transform ${
-                            !isDragging && !isCompleted ? 'duration-300 ease-out' : 'duration-75 ease-linear'
+                            !isDragging && !hasFinishedAction ? 'duration-300 ease-out' : 'duration-75 ease-linear'
                         } ${
-                            isCompleted || sliderX >= maxSlide * 0.95 ? 'bg-primary cursor-default' : 'bg-primary cursor-grab active:cursor-grabbing'
+                            hasFinishedAction || sliderX >= maxSlide * 0.95 ? 'bg-primary cursor-default' : 'bg-primary cursor-grab active:cursor-grabbing'
                         }`}
                         style={{ transform: `translateX(${sliderX}px)` }}
                     >
                         {isLoading ? (
                             <Loader2 className="animate-spin text-white" size={28} />
-                        ) : isCompleted ? (
+                        ) : hasFinishedAction ? (
                             <Check className="text-white" size={28} strokeWidth={3} />
                         ) : (
                             <Play className="text-white fill-white ml-1" size={24} />

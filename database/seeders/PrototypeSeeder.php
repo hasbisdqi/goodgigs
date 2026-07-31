@@ -11,6 +11,19 @@ class PrototypeSeeder extends Seeder
 {
     public function run(): void
     {
+        // 0. Create Admin User
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@goodgigs.com'],
+            [
+                'name' => 'System Administrator',
+                'username' => 'admin',
+                'password' => bcrypt('password'),
+                'role' => 'admin',
+                'active_mode' => 'worker',
+            ]
+        );
+        $admin->assignRole('Admin');
+
         // 1. Create Employer (Alex Rivera)
         $employer = User::updateOrCreate(
             ['email' => 'alex@example.com'],

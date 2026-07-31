@@ -24,8 +24,8 @@ export default function DashboardLayout({
                 <Head title={title} />
             
             {/* TopAppBar */}
-            <header className="bg-surface shadow-sm fixed top-0 w-full z-50 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop h-16">
-                <div className="flex items-center gap-stack-md">
+            <header className="bg-surface shadow-sm fixed top-0 w-full md:w-[calc(100%-16rem)] md:left-[16rem] z-50 flex justify-between md:justify-end items-center px-container-padding-mobile md:px-container-padding-desktop h-16">
+                <div className="flex items-center gap-stack-md md:hidden">
                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container/20">
                         <img className="w-full h-full object-cover" alt={userName} src={userAvatar} />
                     </div>

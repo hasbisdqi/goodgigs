@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { 
     Search, Edit, RefreshCw, User, CreditCard, 
-    Bell, HelpCircle, ShieldCheck, LogOut, Home, Briefcase, MessageSquare
+    Bell, HelpCircle, ShieldCheck, LogOut, Home, Briefcase, MessageSquare, AlertTriangle
 } from 'lucide-react';
 
 interface UserProfileProps {
@@ -40,7 +40,7 @@ export default function UserProfile({ user }: UserProfileProps) {
             <Head title="Goodgigs | Profile" />
 
             {/* Top App Bar */}
-            <header className="bg-surface shadow-sm sticky top-0 z-40">
+            {/* <header className="bg-surface shadow-sm sticky top-0 z-40">
                 <div className="flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop w-full h-16 max-w-7xl mx-auto">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/10">
@@ -54,7 +54,7 @@ export default function UserProfile({ user }: UserProfileProps) {
                         </button>
                     </div>
                 </div>
-            </header>
+            </header> */}
 
             <main className="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop mt-stack-lg space-y-stack-lg">
                 {/* Profile Header Bento Grid */}
@@ -77,19 +77,20 @@ export default function UserProfile({ user }: UserProfileProps) {
                                     <div className="flex items-center gap-2">
                                         <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg">{user.name}</h2>
                                         {user.computed_badge && (
-                                            <span className={`px-3 py-1 rounded-full text-label-sm font-bold uppercase tracking-wide border shadow-sm ${
+                                            <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-label-sm font-bold uppercase tracking-wide border shadow-sm ${
                                                 user.computed_badge === 'GG' 
-                                                    ? 'bg-secondary text-white border-secondary' 
-                                                    : 'bg-error text-white border-error'
+                                                    ? 'bg-primary-container text-on-primary-container border-primary/20' 
+                                                    : 'bg-error-container text-on-error-container border-error/20'
                                             }`}>
+                                                {user.computed_badge === 'GG' ? <ShieldCheck size={14} /> : <AlertTriangle size={14} />}
                                                 {user.computed_badge}
-                                            </span>
+                                            </div>
                                         )}
                                     </div>
-                                    <button className="text-primary font-label-md flex items-center gap-1 hover:underline">
+                                    <Link href="/profile/edit" className="text-primary font-label-md flex items-center gap-1 hover:underline">
                                         <Edit size={16} />
                                         Edit Profile
-                                    </button>
+                                    </Link>
                                 </div>
                                 <p className="text-on-surface-variant max-w-lg font-body-md leading-relaxed">
                                     {user.description}
@@ -152,7 +153,7 @@ export default function UserProfile({ user }: UserProfileProps) {
                     <div className="md:col-span-6 space-y-stack-md">
                         <h4 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest pl-2">General Settings</h4>
                         <div className="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30 shadow-sm">
-                            <a href="#" className="flex items-center gap-4 px-6 py-5 hover:bg-surface-container transition-colors group">
+                            <Link href="/profile/edit" className="flex items-center gap-4 px-6 py-5 hover:bg-surface-container transition-colors group">
                                 <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                                     <User size={20} />
                                 </div>
@@ -161,31 +162,7 @@ export default function UserProfile({ user }: UserProfileProps) {
                                     <p className="text-label-sm text-on-surface-variant">Profile info, email, security</p>
                                 </div>
                                 <span className="text-on-surface-variant group-hover:translate-x-1 transition-transform">›</span>
-                            </a>
-                            <div className="h-px bg-outline-variant/20 mx-6"></div>
-                            
-                            <a href="#" className="flex items-center gap-4 px-6 py-5 hover:bg-surface-container transition-colors group">
-                                <div className="w-10 h-10 rounded-full bg-secondary/10 text-secondary flex items-center justify-center">
-                                    <CreditCard size={20} />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="font-label-md text-label-md text-on-surface">Payment Methods</p>
-                                    <p className="text-label-sm text-on-surface-variant">Manage cards and bank accounts</p>
-                                </div>
-                                <span className="text-on-surface-variant group-hover:translate-x-1 transition-transform">›</span>
-                            </a>
-                            <div className="h-px bg-outline-variant/20 mx-6"></div>
-
-                            <a href="#" className="flex items-center gap-4 px-6 py-5 hover:bg-surface-container transition-colors group">
-                                <div className="w-10 h-10 rounded-full bg-tertiary/10 text-tertiary flex items-center justify-center">
-                                    <Bell size={20} />
-                                </div>
-                                <div className="flex-1">
-                                    <p className="font-label-md text-label-md text-on-surface">Notifications</p>
-                                    <p className="text-label-sm text-on-surface-variant">Push, email, and gig alerts</p>
-                                </div>
-                                <span className="text-on-surface-variant group-hover:translate-x-1 transition-transform">›</span>
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
@@ -193,7 +170,7 @@ export default function UserProfile({ user }: UserProfileProps) {
                     <div className="md:col-span-6 space-y-stack-md">
                         <h4 className="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest pl-2">Help & Support</h4>
                         <div className="bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30 shadow-sm">
-                            <a href="#" className="flex items-center gap-4 px-6 py-5 hover:bg-surface-container transition-colors group">
+                            <button onClick={() => alert('Help Center feature coming soon!')} className="w-full text-left flex items-center gap-4 px-6 py-5 hover:bg-surface-container transition-colors group">
                                 <div className="w-10 h-10 rounded-full bg-on-surface-variant/10 text-on-surface-variant flex items-center justify-center">
                                     <HelpCircle size={20} />
                                 </div>
@@ -202,26 +179,31 @@ export default function UserProfile({ user }: UserProfileProps) {
                                     <p className="text-label-sm text-on-surface-variant">FAQs, tutorials, and support chat</p>
                                 </div>
                                 <span className="text-on-surface-variant group-hover:translate-x-1 transition-transform">›</span>
-                            </a>
+                            </button>
                             <div className="h-px bg-outline-variant/20 mx-6"></div>
 
-                            <a href="#" className="flex items-center gap-4 px-6 py-5 hover:bg-surface-container transition-colors group">
+                            <Link href="/profile/kyc" className="flex items-center gap-4 px-6 py-5 hover:bg-surface-container transition-colors group">
                                 <div className="w-10 h-10 rounded-full bg-on-surface-variant/10 text-on-surface-variant flex items-center justify-center">
                                     <ShieldCheck size={20} />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="font-label-md text-label-md text-on-surface">Privacy & Safety</p>
+                                    <p className="font-label-md text-label-md text-on-surface">Privacy & Safety (KYC)</p>
                                     <p className="text-label-sm text-on-surface-variant">Data usage and identity verification</p>
                                 </div>
                                 <span className="text-on-surface-variant group-hover:translate-x-1 transition-transform">›</span>
-                            </a>
+                            </Link>
                         </div>
 
                         <div className="pt-4 px-2">
-                            <button className="w-full text-error border border-error/20 bg-error/5 py-4 rounded-xl font-label-md hover:bg-error hover:text-white transition-colors flex items-center justify-center gap-2">
+                            <Link 
+                                href="/logout" 
+                                method="post" 
+                                as="button" 
+                                className="w-full text-error border border-error/20 bg-error/5 py-4 rounded-xl font-label-md hover:bg-error hover:text-white transition-colors flex items-center justify-center gap-2"
+                            >
                                 <LogOut size={18} />
                                 Log Out
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </section>

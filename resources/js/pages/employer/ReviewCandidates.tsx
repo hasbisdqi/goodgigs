@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
-import { Search, Bell, ChevronRight, ChevronDown, Filter, Star as StarIcon, ArrowRight, UsersRound } from 'lucide-react';
+import { Search, Bell, ChevronRight, ChevronDown, Filter, Star as StarIcon, ArrowRight, UsersRound, ShieldCheck, AlertTriangle } from 'lucide-react';
 import BottomNavLayout from '@/layouts/BottomNavLayout';
 import CandidateProfileSheet from '@/components/CandidateProfileSheet';
 
@@ -90,7 +90,19 @@ export default function ReviewCandidates({ gig, candidates }: ReviewCandidatesPr
                                         <div className="grow">
                                             <div className="flex justify-between items-start">
                                                 <div>
-                                                    <h3 className="font-headline-md text-[18px] text-on-background">{candidate.name}</h3>
+                                                    <div className="flex items-center gap-2">
+                                                        <h3 className="font-headline-md text-[18px] text-on-background">{candidate.name}</h3>
+                                                        {candidate.computed_badge && (
+                                                            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border shadow-sm ${
+                                                                candidate.computed_badge === 'GG' 
+                                                                    ? 'bg-primary-container text-on-primary-container border-primary/20' 
+                                                                    : 'bg-error-container text-on-error-container border-error/20'
+                                                            }`}>
+                                                                {candidate.computed_badge === 'GG' ? <ShieldCheck size={12} /> : <AlertTriangle size={12} />}
+                                                                {candidate.computed_badge}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                     <p className="font-label-md text-label-md text-on-surface-variant">{candidate.role}</p>
                                                 </div>
                                                 <div className="bg-secondary-container/20 text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1 border border-secondary-container/30">

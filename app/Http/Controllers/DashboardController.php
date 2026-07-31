@@ -23,7 +23,7 @@ class DashboardController extends Controller
 
     public function applyToGigSubmit($id)
     {
-        $user = auth()->user() ?? \App\Models\User::where('email', 'sarah@example.com')->first();
+        $user = auth()->user();
         
         \App\Models\JobApplication::create([
             'job_posting_id' => $id,
@@ -66,7 +66,7 @@ class DashboardController extends Controller
 
     public function dashboard()
     {
-        $user = auth()->user() ?? \App\Models\User::first();
+        $user = auth()->user();
         
         if ($user && $user->active_mode === 'employer') {
             return $this->employerDashboard($user);
@@ -77,7 +77,7 @@ class DashboardController extends Controller
 
     protected function employerDashboard($user)
     {
-        $user = auth()->user() ?? \App\Models\User::where('email', 'alex@example.com')->first();
+        $user = auth()->user();
         
         $activeGigs = \App\Models\JobPosting::where('user_id', $user->id)
             ->where('status', 'published')
@@ -114,7 +114,7 @@ class DashboardController extends Controller
 
         $inProgressApp = \App\Models\JobApplication::whereHas('jobPosting', function ($q) use ($user) {
             $q->where('user_id', $user->id);
-        })->where('status', 'accepted')->with('user', 'jobPosting')->first();
+        })->where('status', 'hired')->with('user', 'jobPosting')->first();
 
         $inProgressGig = null;
         if ($inProgressApp) {
@@ -150,7 +150,7 @@ class DashboardController extends Controller
 
     protected function workerDashboard($user)
     {
-        $user = auth()->user() ?? \App\Models\User::where('email', 'sarah@example.com')->first();
+        $user = auth()->user();
 
         // Find gigs not posted by the worker and that are published
         $recommendedGigs = \App\Models\JobPosting::where('user_id', '!=', $user->id)
@@ -159,8 +159,10 @@ class DashboardController extends Controller
             ->get();
 
         $stats = [
-            'total_earnings' => (float) $user->total_earnings,
-            'active_gigs' => \App\Models\JobApplication::where('user_id', $user->id)->count(),
+            'total_earnings' => (float) \App\Models\Transaction::whereHas('wallet', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })->where('type', 'credit')->sum('amount'),
+            'active_gigs' => \App\Models\JobApplication::where('user_id', $user->id)->where('status', 'hired')->count(),
             'rating' => (float) $user->rating,
         ];
 
@@ -179,9 +181,26 @@ class DashboardController extends Controller
             ];
         });
 
+        $activeJobs = \App\Models\JobApplication::with('jobPosting')
+            ->where('user_id', $user->id)
+            ->where('status', 'hired')
+            ->get()
+            ->map(function ($app) {
+                return [
+                    'id' => $app->id,
+                    'job_id' => $app->jobPosting->id,
+                    'title' => $app->jobPosting->title,
+                    'company' => $app->jobPosting->company,
+                    'rate' => $app->jobPosting->salary,
+                    'status' => $app->status,
+                    'accepted_at' => $app->updated_at->diffForHumans(),
+                ];
+            });
+
         $data = [
             'stats' => $stats,
             'recommended_gigs' => $formattedGigs,
+            'active_jobs' => $activeJobs,
         ];
 
         return Inertia::render('worker/Dashboard', $data);
@@ -222,7 +241,7 @@ class DashboardController extends Controller
 
     public function messagesList()
     {
-        $user = auth()->user() ?? \App\Models\User::first();
+        $user = auth()->user();
         
         // Fetch latest message per conversation
         // In a real app we would use complex joins or window functions, but for SQLite prototype:
@@ -267,7 +286,7 @@ class DashboardController extends Controller
 
     public function directChat($id)
     {
-        $user = auth()->user() ?? \App\Models\User::first();
+        $user = auth()->user();
         $contact = \App\Models\User::findOrFail($id);
 
         $messages = \App\Models\ChatMessage::where(function ($q) use ($user, $contact) {
@@ -313,7 +332,7 @@ class DashboardController extends Controller
             'message' => 'required|string',
         ]);
 
-        $user = auth()->user() ?? \App\Models\User::first();
+        $user = auth()->user();
         $contact = \App\Models\User::findOrFail($id);
 
         $jobPosting = \App\Models\JobPosting::first();
@@ -332,7 +351,7 @@ class DashboardController extends Controller
 
     public function userProfile()
     {
-        $user = auth()->user() ?? \App\Models\User::where('email', 'sarah@example.com')->first();
+        $user = auth()->user();
         
         $data = [
             'user' => [
@@ -341,14 +360,57 @@ class DashboardController extends Controller
                 'description' => $user->bio ?? 'No description provided.',
                 'rating' => (float) $user->rating,
                 'avatar' => $user->avatar,
-                'skills' => $user->tags ?? ['UX Design', 'Brand Identity', 'Figma', 'Prototyping'],
-                'extra_skills_count' => count($user->tags ?? []) > 4 ? count($user->tags) - 4 : 0,
+                'skills' => $user->skills ?? [],
+                'extra_skills_count' => count($user->skills ?? []) > 4 ? count($user->skills) - 4 : 0,
                 'computed_badge' => $user->computed_badge,
                 'active_mode' => $user->active_mode ?? 'worker',
             ]
         ];
 
         return Inertia::render('UserProfile', $data);
+    }
+
+    public function editProfile()
+    {
+        $user = auth()->user();
+        
+        $data = [
+            'user' => [
+                'name' => $user->name,
+                'title' => $user->title ?? '',
+                'description' => $user->bio ?? '',
+                'location' => $user->address ?? '',
+                'avatar' => $user->avatar,
+            ]
+        ];
+
+        return Inertia::render('profile/Edit', $data);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'location' => 'nullable|string|max:255',
+            'avatar' => 'nullable|image|max:5120',
+        ]);
+
+        $user = auth()->user();
+        $user->name = $validated['name'];
+        $user->title = $validated['title'];
+        $user->bio = $validated['description'];
+        $user->address = $validated['location'];
+
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = '/storage/' . $path;
+        }
+
+        $user->save();
+
+        return redirect()->route('profile.view')->with('success', 'Profile updated successfully.');
     }
 
     public function proposalSuccess()
@@ -360,20 +422,50 @@ class DashboardController extends Controller
     {
         $job = \App\Models\JobPosting::with('user')->findOrFail($id);
         
+        $worker = auth()->user();
+        
+        // Calculate real distance using Haversine if both have coords
+        $distanceKm = 4.2; // fallback
+        $etaMins = 15;
+        
+        if ($worker && $worker->latitude && $job->latitude) {
+            $earthRadius = 6371; // km
+            $latFrom = deg2rad($worker->latitude);
+            $lonFrom = deg2rad($worker->longitude);
+            $latTo = deg2rad($job->latitude);
+            $lonTo = deg2rad($job->longitude);
+            
+            $latDelta = $latTo - $latFrom;
+            $lonDelta = $lonTo - $lonFrom;
+            
+            $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+                cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+            
+            $distanceKm = round($angle * $earthRadius, 1);
+            $etaMins = max(1, round(($distanceKm / 40) * 60)); // assuming 40km/h speed
+        }
+
+        $etaTime = \Carbon\Carbon::now()->addMinutes($etaMins)->format('H:i A');
+
         $data = [
             'job' => [
                 'id' => $job->id,
+                'status' => $job->status,
                 'type' => $job->category ?? 'Service',
                 'number' => 'JB-' . str_pad($job->id, 4, '0', STR_PAD_LEFT),
-                'eta_mins' => 15,
-                'eta_time' => '14:30 PM',
-                'distance_remaining' => '4.2 km',
+                'eta_mins' => $etaMins,
+                'eta_time' => $etaTime,
+                'distance_remaining' => $distanceKm . ' km',
                 'traffic_status' => 'Moderate Traffic',
                 'client' => [
                     'name' => $job->user ? $job->user->name : $job->company,
                     'avatar' => $job->user ? $job->user->avatar : 'https://ui-avatars.com/api/?name=' . urlencode($job->company),
                     'location' => $job->location,
                 ],
+                'coordinates' => [
+                    'job' => [$job->latitude ?? -6.200000, $job->longitude ?? 106.816666],
+                    'worker' => [$worker ? $worker->latitude ?? -6.210000 : -6.210000, $worker ? $worker->longitude ?? 106.820000 : 106.820000],
+                ]
             ]
         ];
 
@@ -405,7 +497,7 @@ class DashboardController extends Controller
             'longitude' => 'required|numeric',
         ]);
 
-        $user = auth()->user() ?? \App\Models\User::factory()->create();
+        $user = auth()->user();
 
         \App\Models\JobPosting::create([
             'user_id' => $user->id,
@@ -432,20 +524,38 @@ class DashboardController extends Controller
             ->where('job_posting_id', $job->id)
             ->get();
 
-        $candidates = $applications->map(function ($app) {
+        $candidates = $applications->map(function ($app) use ($job) {
+            // Calculate a simple match score based on job title/type vs user tags
+            $jobKeywords = array_map('strtolower', array_merge(explode(' ', $job->title ?? ''), explode(' ', $job->type ?? '')));
+            $userTags = array_map('strtolower', $app->user->tags ?? []);
+            
+            $matchScore = 50; // base score
+            foreach ($userTags as $tag) {
+                foreach ($jobKeywords as $keyword) {
+                    if (strlen($keyword) > 3 && str_contains($keyword, $tag)) {
+                        $matchScore += 15;
+                    }
+                }
+            }
+            $matchScore = min($matchScore, 99); // max 99%
+            if (empty($userTags)) {
+                $matchScore = 75; // default fallback if no tags
+            }
+
             return [
                 'id' => $app->user->id,
                 'application_id' => $app->id,
                 'name' => $app->user->name,
                 'role' => $app->user->title ?? 'Professional',
                 'avatar' => $app->user->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($app->user->name).'&background=random',
-                'rating' => $app->user->rating ?? 4.8,
-                'reviews' => $app->user->reviews_count ?? 15,
+                'rating' => (float) ($app->user->rating ?? 0),
+                'reviews' => (int) ($app->user->reviews_count ?? 0),
                 'message' => $app->message,
                 'status' => $app->status,
-                'match' => rand(85, 99),
-                'skills' => $app->user->tags ?? ['Hardworking', 'Punctual', 'Skilled'],
+                'match' => $matchScore,
+                'skills' => $app->user->tags ?? [],
                 'bio' => $app->user->bio ?? 'I am highly motivated and ready to deliver the best results for your project.',
+                'computed_badge' => $app->user->computed_badge,
             ];
         });
 
@@ -497,6 +607,29 @@ class DashboardController extends Controller
             return redirect()->back()->with('error', 'No worker assigned to this gig.');
         }
 
+        // Calculate real distance using Haversine if both have coords
+        $distanceKm = 4.2; // fallback
+        $etaMins = 15;
+        
+        if ($worker && $worker->latitude && $job->latitude) {
+            $earthRadius = 6371; // km
+            $latFrom = deg2rad($worker->latitude);
+            $lonFrom = deg2rad($worker->longitude);
+            $latTo = deg2rad($job->latitude);
+            $lonTo = deg2rad($job->longitude);
+            
+            $latDelta = $latTo - $latFrom;
+            $lonDelta = $lonTo - $lonFrom;
+            
+            $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+                cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+            
+            $distanceKm = round($angle * $earthRadius, 1);
+            $etaMins = max(1, round(($distanceKm / 40) * 60)); // assuming 40km/h speed
+        }
+
+        $etaTime = \Carbon\Carbon::now()->addMinutes($etaMins)->format('H:i A');
+
         $data = [
             'gig' => [
                 'id' => $job->id,
@@ -505,16 +638,165 @@ class DashboardController extends Controller
                 'company' => $job->company,
                 'location' => $job->location,
                 'salary' => $job->salary,
+                'eta_mins' => $etaMins,
+                'eta_time' => $etaTime,
+                'distance_remaining' => $distanceKm . ' km',
+                'coordinates' => [
+                    'job' => [$job->latitude ?? -6.200000, $job->longitude ?? 106.816666],
+                    'worker' => [$worker ? $worker->latitude ?? -6.210000 : -6.210000, $worker ? $worker->longitude ?? 106.820000 : 106.820000],
+                ]
             ],
             'worker' => [
                 'id' => $worker->id,
                 'name' => $worker->name,
                 'role' => $worker->title ?? 'Professional',
                 'avatar' => $worker->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($worker->name).'&background=random',
-                'phone' => '+62 812-3456-7890', // Prototype data
+                'phone' => $worker->phone ?? '+62 812-3456-7890', // fallback if empty
             ]
         ];
 
         return Inertia::render('employer/MissionControl', $data);
+    }
+
+    public function startGig(Request $request, $id)
+    {
+        $job = \App\Models\JobPosting::findOrFail($id);
+        $job->status = 'in_progress';
+        $job->save();
+
+        return redirect()->back()->with('success', 'Gig started!');
+    }
+
+    public function completeGig(Request $request, $id)
+    {
+        $job = \App\Models\JobPosting::findOrFail($id);
+        $job->status = 'reviewing';
+        $job->save();
+
+        return redirect()->back()->with('success', 'Gig marked as complete, pending employer review!');
+    }
+
+    public function approveGig(Request $request, $id)
+    {
+        $job = \App\Models\JobPosting::findOrFail($id);
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($job) {
+            $job->status = 'paid';
+            $job->save();
+
+            $salary = (float) $job->salary;
+            $employerWallet = \App\Models\Wallet::firstOrCreate(['user_id' => $job->user_id]);
+            $workerWallet = \App\Models\Wallet::firstOrCreate(['user_id' => $job->worker_id]);
+
+            // Deduct from employer
+            $employerWallet->balance -= $salary;
+            $employerWallet->save();
+
+            \App\Models\Transaction::create([
+                'wallet_id' => $employerWallet->id,
+                'amount' => $salary,
+                'type' => 'debit',
+                'description' => 'Payment for gig ' . $job->title,
+                'job_posting_id' => $job->id,
+            ]);
+
+            // Add to worker
+            $workerWallet->balance += $salary;
+            $workerWallet->save();
+
+            \App\Models\Transaction::create([
+                'wallet_id' => $workerWallet->id,
+                'amount' => $salary,
+                'type' => 'credit',
+                'description' => 'Earnings from gig ' . $job->title,
+                'job_posting_id' => $job->id,
+            ]);
+        });
+
+        return redirect()->back()->with('success', 'Gig approved and payment released!');
+    }
+
+    public function confirmPayment(Request $request, $id)
+    {
+        $job = \App\Models\JobPosting::findOrFail($id);
+        
+        if ($job->status === 'paid' && $job->worker_id === auth()->id()) {
+            $job->status = 'completed';
+            $job->save();
+            return redirect()->back()->with('success', 'Payment confirmed!');
+        }
+
+        return redirect()->back()->with('error', 'Unauthorized action.');
+    }
+
+    public function reviewGig(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string',
+        ]);
+
+        $job = \App\Models\JobPosting::findOrFail($id);
+        $workerId = $job->worker_id;
+
+        \App\Models\Review::create([
+            'reviewer_id' => auth()->id(),
+            'reviewee_id' => $workerId,
+            'job_posting_id' => $job->id,
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'],
+        ]);
+
+        $worker = \App\Models\User::find($workerId);
+        if ($worker) {
+            $totalReviews = $worker->reviews_count + 1;
+            $newRating = (($worker->rating * $worker->reviews_count) + $validated['rating']) / $totalReviews;
+            
+            $worker->reviews_count = $totalReviews;
+            $worker->rating = round($newRating, 1);
+            $worker->save();
+        }
+
+        return redirect()->route('dashboard')->with('success', 'Review submitted successfully!');
+    }
+
+    public function kycForm()
+    {
+        $user = auth()->user();
+        return Inertia::render('profile/KYC', [
+            'user' => [
+                'kyc_status' => $user->kyc_status ?? 'unverified',
+                'name' => $user->name,
+            ]
+        ]);
+    }
+
+    public function submitKyc(Request $request)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'nik' => 'required|string|min:16|max:16',
+            'address' => 'required|string',
+            'id_card' => 'required|image|max:5120',
+            'selfie' => 'required|image|max:5120',
+        ]);
+        
+        $user = auth()->user();
+        $user->kyc_status = 'pending';
+        // In a real app we would save full_name, nik, address here too
+        
+        if ($request->hasFile('id_card')) {
+            $idPath = $request->file('id_card')->store('kyc', 'local');
+            $user->kyc_id_path = $idPath;
+        }
+        
+        if ($request->hasFile('selfie')) {
+            $selfiePath = $request->file('selfie')->store('kyc', 'local');
+            $user->kyc_selfie_path = $selfiePath;
+        }
+
+        $user->save();
+
+        return redirect()->route('profile.kyc')->with('success', 'KYC application submitted. Please wait for verification.');
     }
 }
