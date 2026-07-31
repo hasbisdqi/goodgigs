@@ -144,7 +144,7 @@ export default function EmployerDashboard({
                                 <div className="md:text-right shrink-0 border-t md:border-t-0 md:border-l border-outline-variant pt-stack-md md:pt-0 md:pl-stack-md flex flex-col justify-center">
                                     <p className={`${gig.text_class} font-headline-md text-headline-md`}>{gig.new_applicants}</p>
                                     <p className="text-on-surface-variant text-label-sm font-label-sm mb-3">New Applicants</p>
-                                    <Link href={`/employer/gigs/${gig.id}/candidates`}>
+                                    <Link href={`/gigs/${gig.id}/candidates`}>
                                         <Button className={`w-full md:w-auto ${gig.color_class.replace('-fixed', '')} text-white`}>Review Candidates</Button>
                                     </Link>
                                 </div>

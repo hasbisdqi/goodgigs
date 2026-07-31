@@ -10,11 +10,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['user_id', 'title', 'company', 'description', 'location', 'salary', 'type', 'status', 'latitude', 'longitude', 'job_category_id'])]
+#[Fillable(['user_id', 'title', 'company', 'description', 'location', 'salary', 'type', 'status', 'latitude', 'longitude', 'job_category_id', 'tags', 'duration', 'icon', 'color_class', 'text_class', 'new_applicants', 'logo'])]
 class JobPosting extends Model
 {
     /** @use HasFactory<JobPostingFactory> */
     use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'tags' => 'array',
+        ];
+    }
 
     /**
      * Get the user (employer) that created this job posting.

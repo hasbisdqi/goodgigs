@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
-import { Search, Bell, ChevronRight, ChevronDown, Filter, Star as StarIcon, ArrowRight } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { Search, Bell, ChevronRight, ChevronDown, Filter, Star as StarIcon, ArrowRight, UsersRound } from 'lucide-react';
 import BottomNavLayout from '@/layouts/BottomNavLayout';
 import CandidateProfileSheet from '@/components/CandidateProfileSheet';
 
@@ -76,66 +76,90 @@ export default function ReviewCandidates({ gig, candidates }: ReviewCandidatesPr
                 </section>
 
                 {/* Candidates Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
-                    {candidates.map((candidate) => (
-                        <article key={candidate.id} className="bg-white/80 backdrop-blur-md rounded-[16px] p-stack-md shadow-sm hover:shadow-md border border-outline-variant/50 transition-all duration-300 relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-container/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
-                            
-                            <div className="flex items-start gap-stack-md relative z-10">
-                                <div className="w-16 h-16 rounded-xl overflow-hidden shadow-md shrink-0">
-                                    <img className="w-full h-full object-cover" alt={candidate.name} src={candidate.avatar} />
-                                </div>
-                                <div className="grow">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <h3 className="font-headline-md text-[18px] text-on-background">{candidate.name}</h3>
-                                            <p className="font-label-md text-label-md text-on-surface-variant">{candidate.role}</p>
+                {candidates.length > 0 ? (
+                    <>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+                            {candidates.map((candidate) => (
+                                <article key={candidate.id} className="bg-white/80 backdrop-blur-md rounded-[16px] p-stack-md shadow-sm hover:shadow-md border border-outline-variant/50 transition-all duration-300 relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-container/10 rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110"></div>
+                                    
+                                    <div className="flex items-start gap-stack-md relative z-10">
+                                        <div className="w-16 h-16 rounded-xl overflow-hidden shadow-md shrink-0">
+                                            <img className="w-full h-full object-cover" alt={candidate.name} src={candidate.avatar} />
                                         </div>
-                                        <div className="bg-secondary-container/20 text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1 border border-secondary-container/30">
-                                            <StarIcon className="fill-current" size={14} />
-                                            {candidate.match}% Match
+                                        <div className="grow">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <h3 className="font-headline-md text-[18px] text-on-background">{candidate.name}</h3>
+                                                    <p className="font-label-md text-label-md text-on-surface-variant">{candidate.role}</p>
+                                                </div>
+                                                <div className="bg-secondary-container/20 text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1 border border-secondary-container/30">
+                                                    <StarIcon className="fill-current" size={14} />
+                                                    {candidate.match}% Match
+                                                </div>
+                                            </div>
+                                            <div className="mt-stack-sm flex flex-wrap gap-2">
+                                                {candidate.skills.map((skill: string, index: number) => (
+                                                    <span key={index} className={`px-3 py-1 rounded-full text-label-sm font-label-sm ${index === 2 ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-high text-on-surface-variant'}`}>
+                                                        {skill}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <p className="mt-stack-md font-body-md text-body-md text-on-surface-variant line-clamp-2">
+                                                {candidate.bio}
+                                            </p>
                                         </div>
                                     </div>
-                                    <div className="mt-stack-sm flex flex-wrap gap-2">
-                                        {candidate.skills.map((skill: string, index: number) => (
-                                            <span key={index} className={`px-3 py-1 rounded-full text-label-sm font-label-sm ${index === 2 ? 'bg-secondary-container text-on-secondary-container' : 'bg-surface-container-high text-on-surface-variant'}`}>
-                                                {skill}
-                                            </span>
-                                        ))}
+                                    
+                                    <div className="mt-stack-lg pt-stack-md border-t border-outline-variant/30 flex justify-between items-center relative z-10">
+                                        <div className="flex gap-2">
+                                            <button 
+                                                onClick={() => {
+                                                    if (candidate.status !== 'shortlisted') {
+                                                        router.post(`/applications/${candidate.application_id}/shortlist`, {}, { preserveScroll: true });
+                                                    }
+                                                }}
+                                                disabled={candidate.status === 'shortlisted'}
+                                                className={`px-4 py-2 rounded-xl font-label-md text-label-md shadow-sm transition-all ${candidate.status === 'shortlisted' ? 'bg-secondary-container text-on-secondary-container opacity-80 cursor-default' : 'bg-primary text-on-primary hover:brightness-110 active:scale-95'}`}
+                                            >
+                                                {candidate.status === 'shortlisted' ? 'Shortlisted' : 'Shortlist'}
+                                            </button>
+                                            <Link href="/messages">
+                                                <button className="bg-surface-container-low text-primary px-4 py-2 rounded-xl font-label-md text-label-md hover:bg-surface-container transition-all active:scale-95 border border-primary/10">
+                                                    Message
+                                                </button>
+                                            </Link>
+                                        </div>
+                                        <button 
+                                            onClick={() => setSelectedCandidate(candidate)}
+                                            className="text-on-surface-variant hover:text-primary font-label-md text-label-md flex items-center gap-1 transition-colors group/btn"
+                                        >
+                                            View Profile 
+                                            <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                                        </button>
                                     </div>
-                                    <p className="mt-stack-md font-body-md text-body-md text-on-surface-variant line-clamp-2">
-                                        {candidate.bio}
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div className="mt-stack-lg pt-stack-md border-t border-outline-variant/30 flex justify-between items-center relative z-10">
-                                <div className="flex gap-2">
-                                    <button className="bg-primary text-on-primary px-4 py-2 rounded-xl font-label-md text-label-md shadow-sm hover:brightness-110 active:scale-95 transition-all">
-                                        Shortlist
-                                    </button>
-                                    <button className="bg-surface-container-low text-primary px-4 py-2 rounded-xl font-label-md text-label-md hover:bg-surface-container transition-all active:scale-95 border border-primary/10">
-                                        Message
-                                    </button>
-                                </div>
-                                <button 
-                                    onClick={() => setSelectedCandidate(candidate)}
-                                    className="text-on-surface-variant hover:text-primary font-label-md text-label-md flex items-center gap-1 transition-colors group/btn"
-                                >
-                                    View Profile 
-                                    <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
-                                </button>
-                            </div>
-                        </article>
-                    ))}
-                </div>
+                                </article>
+                            ))}
+                        </div>
 
-                {/* Load More Section */}
-                <div className="mt-stack-lg flex justify-center">
-                    <button className="flex items-center gap-2 px-8 py-3 rounded-full border-2 border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-all active:scale-95">
-                        Load More Applicants
-                    </button>
-                </div>
+                        {/* Load More Section */}
+                        <div className="mt-stack-lg flex justify-center">
+                            <button className="flex items-center gap-2 px-8 py-3 rounded-full border-2 border-primary text-primary font-label-md text-label-md hover:bg-primary/5 transition-all active:scale-95">
+                                Load More Applicants
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <div className="py-20 flex flex-col items-center justify-center text-center px-4 bg-surface-container-lowest border border-dashed border-outline-variant rounded-[16px]">
+                        <div className="w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mb-4">
+                            <UsersRound size={32} className="text-on-surface-variant opacity-70" />
+                        </div>
+                        <h3 className="font-headline-sm text-headline-sm text-on-surface mb-2">No Candidates Yet</h3>
+                        <p className="font-body-md text-on-surface-variant max-w-md">
+                            Your gig is live, but no one has applied yet. Candidates will appear here as soon as they submit their application. Check back soon!
+                        </p>
+                    </div>
+                )}
             </main>
 
             {/* Candidate Profile Sheet */}

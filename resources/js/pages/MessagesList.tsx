@@ -19,7 +19,7 @@ interface MessagesListProps {
 
 import BottomNavLayout from '@/layouts/BottomNavLayout';
 
-export default function MessagesList({ filters, conversations }: MessagesListProps) {
+export default function MessagesList({ filters = ['All Chats', 'Unread', 'Archived'], conversations }: MessagesListProps) {
     const [activeFilter, setActiveFilter] = useState(filters[0]);
     const [isScrolled, setIsScrolled] = useState(false);
 

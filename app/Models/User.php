@@ -30,7 +30,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'username', 'email', 'password', 'active_mode', 'bio', 'address', 'skills', 'latitude', 'longitude', 'is_identity_verified', 'verified_skills', 'is_worker_active', 'is_employer_active'])]
+#[Fillable(['name', 'username', 'email', 'password', 'active_mode', 'bio', 'address', 'skills', 'latitude', 'longitude', 'is_identity_verified', 'verified_skills', 'is_worker_active', 'is_employer_active', 'role', 'avatar', 'title', 'rating', 'reviews_count', 'total_earnings', 'badge_status'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
@@ -86,6 +86,8 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'verified_skills' => 'array',
             'is_worker_active' => 'boolean',
             'is_employer_active' => 'boolean',
+            'rating' => 'decimal:1',
+            'total_earnings' => 'decimal:2',
         ];
     }
 
@@ -138,4 +140,26 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     {
         return $this->hasMany(AttendanceSession::class, 'employer_id');
     }
+
+    /**
+     * Get the user's computed badge status based on rating.
+     */
+    public function getComputedBadgeAttribute()
+    {
+        if ($this->badge_status) {
+            return $this->badge_status; // Explicit override
+        }
+
+        if ($this->reviews_count > 0) {
+            if ($this->rating >= 4.5) {
+                return 'GG'; // Good Gig / Great Job
+            } elseif ($this->rating < 3.0) {
+                return 'BAD GIGS'; // Poor Performance / Ghosting
+            }
+        }
+
+        return null;
+    }
+
+    protected $appends = ['computed_badge'];
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { 
     Search, Edit, RefreshCw, User, CreditCard, 
     Bell, HelpCircle, ShieldCheck, LogOut, Home, Briefcase, MessageSquare
@@ -14,13 +14,25 @@ interface UserProfileProps {
         avatar: string;
         skills: string[];
         extra_skills_count: number;
+        computed_badge?: string;
+        active_mode?: string;
     }
 }
 
 import BottomNavLayout from '@/layouts/BottomNavLayout';
 
 export default function UserProfile({ user }: UserProfileProps) {
-    const [isEmployerMode, setIsEmployerMode] = useState(false);
+    const isEmployerMode = user.active_mode === 'employer';
+    const [isSwitching, setIsSwitching] = useState(false);
+
+    const handleSwitchMode = () => {
+        setIsSwitching(true);
+        const newMode = isEmployerMode ? 'worker' : 'employer';
+        router.post('/profile/switch-mode', { mode: newMode }, {
+            onFinish: () => setIsSwitching(false),
+            preserveScroll: true
+        });
+    };
 
     return (
         <BottomNavLayout>
@@ -62,7 +74,18 @@ export default function UserProfile({ user }: UserProfileProps) {
                             </div>
                             <div className="flex-1 space-y-stack-sm">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg">{user.name}</h2>
+                                    <div className="flex items-center gap-2">
+                                        <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg">{user.name}</h2>
+                                        {user.computed_badge && (
+                                            <span className={`px-3 py-1 rounded-full text-label-sm font-bold uppercase tracking-wide border shadow-sm ${
+                                                user.computed_badge === 'GG' 
+                                                    ? 'bg-secondary text-white border-secondary' 
+                                                    : 'bg-error text-white border-error'
+                                            }`}>
+                                                {user.computed_badge}
+                                            </span>
+                                        )}
+                                    </div>
                                     <button className="text-primary font-label-md flex items-center gap-1 hover:underline">
                                         <Edit size={16} />
                                         Edit Profile
@@ -105,8 +128,9 @@ export default function UserProfile({ user }: UserProfileProps) {
                         </div>
                         <div className="relative z-10">
                             <button 
-                                onClick={() => setIsEmployerMode(!isEmployerMode)}
-                                className="w-full bg-surface text-primary font-bold py-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-transform shadow-md group"
+                                onClick={handleSwitchMode}
+                                disabled={isSwitching}
+                                className={`w-full bg-surface text-primary font-bold py-4 rounded-xl flex items-center justify-center gap-3 transition-transform shadow-md group ${isSwitching ? 'opacity-70 cursor-not-allowed' : 'active:scale-95'}`}
                             >
                                 {isEmployerMode ? (
                                     <User className="group-hover:scale-110 transition-transform duration-300" size={24} />

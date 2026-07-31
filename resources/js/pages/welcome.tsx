@@ -29,7 +29,7 @@ export default function Welcome({ auth }: any) {
 
                     <div className="flex items-center gap-3">
                         {auth?.user ? (
-                            <Link href="/worker/dashboard">
+                            <Link href="/dashboard">
                                 <Button className="rounded-full px-6">Dashboard</Button>
                             </Link>
                         ) : (
@@ -75,13 +75,13 @@ export default function Welcome({ auth }: any) {
                         </p>
                         
                         <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-                            <Link href="/worker/dashboard" className="w-full sm:w-auto">
+                            <Link href="/dashboard" className="w-full sm:w-auto">
                                 <Button size="lg" className="w-full sm:w-auto rounded-full h-14 px-8 text-lg flex items-center gap-2 group">
                                     Find Work
                                     <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
                                 </Button>
                             </Link>
-                            <Link href="/employer/dashboard" className="w-full sm:w-auto">
+                            <Link href="/dashboard" className="w-full sm:w-auto">
                                 <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full h-14 px-8 text-lg text-on-surface border-outline">
                                     Hire Talent
                                 </Button>
@@ -162,12 +162,12 @@ export default function Welcome({ auth }: any) {
                             Join thousands of freelancers and employers connecting every day on GigConnect.
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
-                            <Link href="/worker/dashboard">
+                            <Link href="/dashboard">
                                 <Button size="lg" variant="secondary" className="rounded-full h-14 px-8 text-lg text-primary w-full sm:w-auto">
                                     Explore as Freelancer
                                 </Button>
                             </Link>
-                            <Link href="/employer/dashboard">
+                            <Link href="/dashboard">
                                 <Button size="lg" className="rounded-full h-14 px-8 text-lg bg-primary-fixed text-on-primary-fixed hover:bg-primary-fixed-dim w-full sm:w-auto">
                                     Post a Gig
                                 </Button>

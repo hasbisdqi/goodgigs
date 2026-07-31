@@ -37,7 +37,7 @@ export default function QuickApply({ gig }: any) {
             
             <header className="bg-surface shadow-sm sticky top-0 z-40">
                 <div className="flex justify-between items-center px-4 md:px-8 w-full h-16 max-w-7xl mx-auto">
-                    <Link href={`/worker/gigs/${gig?.id || 1}/tracking`} className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
+                    <Link href={`/gigs/${gig?.id || 1}/tracking`} className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
                         <ChevronLeft size={24} />
                         <span className="font-label-md hidden md:inline">Back to Gig</span>
                     </Link>

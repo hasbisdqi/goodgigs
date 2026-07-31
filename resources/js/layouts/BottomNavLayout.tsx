@@ -11,13 +11,12 @@ export default function BottomNavLayout({ children }: BottomNavLayoutProps) {
     const { url } = usePage();
     const isDesktop = useMediaQuery('(min-width: 768px)');
 
-    const isHome = url === '/worker/dashboard' || url === '/employer/dashboard';
-    const isGigs = url === '/worker/gigs/map' || url.startsWith('/gigs');
+    const isHome = url === '/dashboard';
+    const isGigs = url === '/gigs' || url.startsWith('/gigs') && !url.includes('/create');
     const isMessages = url.startsWith('/messages');
     const isProfile = url.startsWith('/profile');
 
-    // Determine default home route based on typical role
-    const homeUrl = url.includes('/employer/') ? '/employer/dashboard' : '/worker/dashboard';
+    const homeUrl = '/dashboard';
 
     const getMobileLinkClass = (isActive: boolean) => {
         if (isActive) {
@@ -42,7 +41,7 @@ export default function BottomNavLayout({ children }: BottomNavLayoutProps) {
                     {isDesktopMode ? <LayoutDashboard size={24} /> : <Home size={24} className={`mb-1 ${isHome ? 'fill-current' : ''}`} />}
                     <span className={isDesktopMode ? "font-label-lg" : "font-label-sm text-label-sm"}>Home</span>
                 </Link>
-                <Link className={linkClassFn(isGigs)} href="/worker/gigs/map">
+                <Link className={linkClassFn(isGigs)} href="/gigs">
                     {isDesktopMode ? <Map size={24} /> : <Search size={24} className={`mb-1 ${isGigs ? 'fill-current text-on-secondary-container' : ''}`} />}
                     <span className={isDesktopMode ? "font-label-lg" : "font-label-sm text-label-sm"}>Explore</span>
                 </Link>
