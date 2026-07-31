@@ -100,6 +100,12 @@ export default function KYC({ users }: any) {
                                 <div className="font-semibold text-on-surface-variant">Full Name</div>
                                 <div className="col-span-2">{selectedUser.name}</div>
                                 
+                                <div className="font-semibold text-on-surface-variant">Legal Name</div>
+                                <div className="col-span-2">{selectedUser.legal_name || 'N/A'}</div>
+
+                                <div className="font-semibold text-on-surface-variant">NIK (KTP)</div>
+                                <div className="col-span-2">{selectedUser.nik || 'N/A'}</div>
+
                                 <div className="font-semibold text-on-surface-variant">Email</div>
                                 <div className="col-span-2">{selectedUser.email}</div>
                                 

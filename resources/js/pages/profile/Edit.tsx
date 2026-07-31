@@ -25,6 +25,7 @@ export default function EditProfile({ user }: any) {
         title: user.title || '',
         description: user.description || '',
         location: user.location || '',
+        skills: user.skills ? user.skills.join(', ') : '',
         avatar: null as File | null,
     });
     const [avatarPreview, setAvatarPreview] = React.useState<string | null>(null);
@@ -133,6 +134,18 @@ export default function EditProfile({ user }: any) {
                                 onChange={e => setData('description', e.target.value)} 
                                 placeholder="Tell us about yourself..."
                                 className="w-full border border-outline-variant rounded-xl px-4 py-3 bg-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface resize-y"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label htmlFor="skills" className="text-sm font-medium text-on-surface">Skills (comma separated)</label>
+                            <input 
+                                id="skills" 
+                                type="text" 
+                                value={data.skills} 
+                                onChange={e => setData('skills', e.target.value)} 
+                                placeholder="e.g. UX Design, React, Figma"
+                                className="w-full border border-outline-variant rounded-xl px-4 py-3 bg-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface"
                             />
                         </div>
                     </div>

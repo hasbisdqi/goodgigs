@@ -32,6 +32,7 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
     // Status derivatives
     const isInProgress = job.status === 'in_progress';
     const isReviewing = job.status === 'reviewing';
+    const isPaid = job.status === 'paid';
     const isCompleted = job.status === 'completed';
     const hasFinishedAction = isReviewing || isCompleted;
 
@@ -53,12 +54,10 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
     const handleMove = (clientX: number) => {
         if (!isDragging) return;
         
-        if (containerRef.current) {
-            const containerRect = containerRef.current.getBoundingClientRect();
-            let newX = clientX - containerRect.left - (knobRef.current?.offsetWidth || 56) / 2;
-            
-            // Constrain
-            newX = Math.max(0, Math.min(newX, maxSlide));
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+            const x = clientX - rect.left - 28; // 28 is half of knob width (56/2)
+            const newX = Math.max(0, Math.min(x, maxSlide));
             setSliderX(newX);
         }
     };
@@ -243,7 +242,7 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
                 >
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <span className={`font-label-md uppercase tracking-widest text-[13px] ${hasFinishedAction ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:animate-pulse'}`}>
-                            {isReviewing ? 'Waiting for Approval...' : isCompleted ? 'Job Completed' : isInProgress ? 'Slide to Complete Job' : 'Slide to start job'}
+                            {isReviewing ? 'Waiting for Approval...' : isCompleted ? 'Job Completed' : isPaid ? 'Slide to Confirm Payment' : isInProgress ? 'Slide to Complete Job' : 'Slide to start job'}
                         </span>
                     </div>
 

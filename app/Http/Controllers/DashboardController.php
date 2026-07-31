@@ -394,6 +394,7 @@ class DashboardController extends Controller
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:255',
+            'skills' => 'nullable|string',
             'avatar' => 'nullable|image|max:5120',
         ]);
 
@@ -402,6 +403,14 @@ class DashboardController extends Controller
         $user->title = $validated['title'];
         $user->bio = $validated['description'];
         $user->address = $validated['location'];
+        
+        if (isset($validated['skills'])) {
+            $skillsArray = array_map('trim', explode(',', $validated['skills']));
+            $skillsArray = array_filter($skillsArray);
+            $user->skills = array_values($skillsArray);
+        } else {
+            $user->skills = [];
+        }
 
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
@@ -783,7 +792,9 @@ class DashboardController extends Controller
         
         $user = auth()->user();
         $user->kyc_status = 'pending';
-        // In a real app we would save full_name, nik, address here too
+        $user->legal_name = $request->full_name;
+        $user->nik = $request->nik;
+        $user->address = $request->address;
         
         if ($request->hasFile('id_card')) {
             $idPath = $request->file('id_card')->store('kyc', 'local');
@@ -794,9 +805,9 @@ class DashboardController extends Controller
             $selfiePath = $request->file('selfie')->store('kyc', 'local');
             $user->kyc_selfie_path = $selfiePath;
         }
-
+        
         $user->save();
-
-        return redirect()->route('profile.kyc')->with('success', 'KYC application submitted. Please wait for verification.');
+        
+        return redirect()->back()->with('success', 'KYC documents submitted successfully. Please wait for verification.');
     }
 }

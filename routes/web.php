@@ -45,6 +45,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/gigs/{id}/start', [DashboardController::class, 'startGig'])->name('gigs.start');
     Route::post('/gigs/{id}/complete', [DashboardController::class, 'completeGig'])->name('gigs.complete');
     Route::post('/gigs/{id}/approve', [DashboardController::class, 'approveGig'])->name('gigs.approve');
+    Route::post('/gigs/{id}/confirm_payment', [DashboardController::class, 'confirmPayment'])->name('gigs.confirm_payment');
     Route::post('/gigs/{id}/review', [DashboardController::class, 'reviewGig'])->name('gigs.review');
 
     Route::middleware(['verified'])->group(function () {
