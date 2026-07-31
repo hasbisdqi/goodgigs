@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { ChevronLeft, MoreVertical, Phone, Video, Send, Paperclip, Smile } from 'lucide-react';
+import { useEcho } from '@laravel/echo-react';
 
 interface Contact {
     id: number;
@@ -40,22 +41,11 @@ export default function DirectChat({ contact, messages }: DirectChatProps) {
         setChatMessages(messages);
     }, [messages]);
 
-    useEffect(() => {
-        if (!auth?.user?.id || !(window as any).Echo) return;
-
-        const channelName = `chat.${auth.user.id}`;
-        const channel = (window as any).Echo.private(channelName);
-
-        channel.listen('.ChatMessageSent', (e: any) => {
-            if (e.messageData && e.messageData.sender_id === contact.id) {
-                setChatMessages((prev) => [...prev, e.messageData]);
-            }
-        });
-
-        return () => {
-            (window as any).Echo.leave(channelName);
-        };
-    }, [auth?.user?.id, contact.id]);
+    const { channel } = useEcho(`chat.${auth?.user?.id}`, '.ChatMessageSent', (e: any) => {
+        if (e.messageData && e.messageData.sender_id === contact.id) {
+            setChatMessages((prev) => [...prev, e.messageData]);
+        }
+    }, [contact.id]);
 
     useEffect(() => {
         scrollToBottom();
