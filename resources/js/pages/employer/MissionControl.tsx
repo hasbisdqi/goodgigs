@@ -216,37 +216,44 @@ export default function MissionControl({ gig, worker }: MissionControlProps) {
                                         <span className="font-title-md font-bold">Gig Approved & Paid</span>
                                     </div>
                                     
-                                    <form onSubmit={handleReview} className="bg-surface-container-low p-5 rounded-2xl border border-outline-variant/50">
-                                        <h4 className="font-title-md font-bold text-on-surface mb-3">Leave a Review</h4>
-                                        <div className="flex gap-2 mb-4">
-                                            {[1, 2, 3, 4, 5].map((star) => (
-                                                <button
-                                                    key={star}
-                                                    type="button"
-                                                    onClick={() => setRating(star)}
-                                                    className="focus:outline-none"
-                                                >
-                                                    <Star 
-                                                        size={28} 
-                                                        className={`${star <= rating ? 'text-[#FFB800] fill-[#FFB800]' : 'text-outline-variant'} transition-colors`} 
-                                                    />
-                                                </button>
-                                            ))}
+                                    {!gig.has_reviewed ? (
+                                        <form onSubmit={handleReview} className="bg-surface-container-low p-5 rounded-2xl border border-outline-variant/50">
+                                            <h4 className="font-title-md font-bold text-on-surface mb-3">Leave a Review</h4>
+                                            <div className="flex gap-2 mb-4">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        key={star}
+                                                        type="button"
+                                                        onClick={() => setRating(star)}
+                                                        className="focus:outline-none"
+                                                    >
+                                                        <Star 
+                                                            size={28} 
+                                                            className={`${star <= rating ? 'text-[#FFB800] fill-[#FFB800]' : 'text-outline-variant'} transition-colors`} 
+                                                        />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <textarea 
+                                                value={comment}
+                                                onChange={(e) => setComment(e.target.value)}
+                                                placeholder="How was the worker's performance?"
+                                                className="w-full bg-surface border border-outline-variant/50 rounded-xl p-3 font-body-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none h-24 mb-4"
+                                            ></textarea>
+                                            <button 
+                                                type="submit"
+                                                disabled={isSubmitting}
+                                                className="w-full bg-secondary text-on-secondary font-label-md py-3 rounded-xl font-bold shadow-sm active:scale-95 transition-all disabled:opacity-70"
+                                            >
+                                                {isSubmitting ? 'Submitting...' : 'Submit Review'}
+                                            </button>
+                                        </form>
+                                    ) : (
+                                        <div className="bg-surface-container-low p-5 rounded-2xl border border-outline-variant/50 text-center">
+                                            <h4 className="font-title-md font-bold text-on-surface mb-2">Review Submitted</h4>
+                                            <p className="font-body-sm text-on-surface-variant">Thank you for leaving a review!</p>
                                         </div>
-                                        <textarea 
-                                            value={comment}
-                                            onChange={(e) => setComment(e.target.value)}
-                                            placeholder="How was the worker's performance?"
-                                            className="w-full bg-surface border border-outline-variant/50 rounded-xl p-3 font-body-md text-on-surface placeholder:text-outline focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none h-24 mb-4"
-                                        ></textarea>
-                                        <button 
-                                            type="submit"
-                                            disabled={isSubmitting}
-                                            className="w-full bg-secondary text-on-secondary font-label-md py-3 rounded-xl font-bold shadow-sm active:scale-95 transition-all disabled:opacity-70"
-                                        >
-                                            {isSubmitting ? 'Submitting...' : 'Submit Review'}
-                                        </button>
-                                    </form>
+                                    )}
                                 </div>
                             )}
                         </div>

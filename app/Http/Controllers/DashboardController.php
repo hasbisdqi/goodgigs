@@ -113,7 +113,7 @@ class DashboardController extends Controller
         });
 
         $inProgressApp = \App\Models\JobApplication::whereHas('jobPosting', function ($q) use ($user) {
-            $q->where('user_id', $user->id);
+            $q->where('user_id', $user->id)->where('status', '!=', 'completed');
         })->where('status', 'hired')->with('user', 'jobPosting')->first();
 
         $inProgressGig = null;
@@ -162,7 +162,11 @@ class DashboardController extends Controller
             'total_earnings' => (float) \App\Models\Transaction::whereHas('wallet', function($q) use ($user) {
                 $q->where('user_id', $user->id);
             })->where('type', 'credit')->sum('amount'),
-            'active_gigs' => \App\Models\JobApplication::where('user_id', $user->id)->where('status', 'hired')->count(),
+            'active_gigs' => \App\Models\JobApplication::where('user_id', $user->id)
+                ->where('status', 'hired')
+                ->whereHas('jobPosting', function($query) {
+                    $query->where('status', '!=', 'completed');
+                })->count(),
             'rating' => (float) $user->rating,
         ];
 
@@ -184,6 +188,9 @@ class DashboardController extends Controller
         $activeJobs = \App\Models\JobApplication::with('jobPosting')
             ->where('user_id', $user->id)
             ->where('status', 'hired')
+            ->whereHas('jobPosting', function($query) {
+                $query->where('status', '!=', 'completed');
+            })
             ->get()
             ->map(function ($app) {
                 return [
@@ -639,6 +646,10 @@ class DashboardController extends Controller
 
         $etaTime = \Carbon\Carbon::now()->addMinutes($etaMins)->format('H:i A');
 
+        $hasReviewed = \App\Models\Review::where('job_posting_id', $job->id)
+            ->where('reviewer_id', auth()->id())
+            ->exists();
+
         $data = [
             'gig' => [
                 'id' => $job->id,
@@ -650,6 +661,7 @@ class DashboardController extends Controller
                 'eta_mins' => $etaMins,
                 'eta_time' => $etaTime,
                 'distance_remaining' => $distanceKm . ' km',
+                'has_reviewed' => $hasReviewed,
                 'coordinates' => [
                     'job' => [$job->latitude ?? -6.200000, $job->longitude ?? 106.816666],
                     'worker' => [$worker ? $worker->latitude ?? -6.210000 : -6.210000, $worker ? $worker->longitude ?? 106.820000 : 106.820000],
