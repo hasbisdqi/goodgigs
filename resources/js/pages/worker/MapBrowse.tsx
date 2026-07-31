@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Search, SlidersHorizontal, MapPin, Navigation, Wrench, Hammer, CheckCircle2 } from 'lucide-react';
+import Map, { Marker, NavigationControl } from 'react-map-gl/maplibre';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface GigMarker {
     id: number;
-    top: string;
-    left: string;
+    latitude: number;
+    longitude: number;
     color_class: string;
     text_class: string;
     icon: string;
-    selected?: boolean;
     preview?: {
         title: string;
         price: number;
@@ -20,8 +21,6 @@ interface GigMarker {
 
 interface MapBrowseProps {
     categories: string[];
-    map_image: string;
-    markers: GigMarker[];
 }
 
 const getIcon = (name: string, className?: string) => {
@@ -32,10 +31,60 @@ const getIcon = (name: string, className?: string) => {
     }
 };
 
-export default function MapBrowse({ categories, map_image, markers }: MapBrowseProps) {
+import BottomNavLayout from '@/layouts/BottomNavLayout';
+
+// Mock some markers near Jogja
+const MOCK_MARKERS: GigMarker[] = [
+    {
+        id: 1,
+        latitude: -7.7956,
+        longitude: 110.3695, // Center Jogja
+        color_class: 'bg-primary-container',
+        text_class: 'text-on-primary-container',
+        icon: 'Wrench',
+        preview: {
+            title: 'Emergency Pipe Repair',
+            price: 80,
+            distance: '1.2 km away',
+            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAEB9-efwzorSYpZ-JAJ9u_hoDhV9bWYCaeBQkdlz5qVJPw93udTW0hWRi3OZRYh0oy9qcTaNm9YrwpV1d57oacB-KlJkdsxdxe5EQf_orz2RUNdlurvDAdSpySeOImXUi6RD0WxgtvrRG77G59eDtQO2zqIooq77_bjUhgkEeUBA9fSHAla39ayYKeJGvk_eAW9VW596Sskqf1Rn9b-1oDmlYZ9787oagaQrYqjmVaFiNKK3b_utN7pw'
+        }
+    },
+    {
+        id: 2,
+        latitude: -7.8000,
+        longitude: 110.3800,
+        color_class: 'bg-secondary-container',
+        text_class: 'text-on-secondary-container',
+        icon: 'Hammer',
+        preview: {
+            title: 'Wooden Fence Setup',
+            price: 55,
+            distance: '2.5 km away',
+            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCDoGwCyNUhnmje2p4HIEzwJBJDlunC4C_EAaw0UtVegBK9lytvCsifB2jTK4hxbDMcqQTg03xAe3ZJ34cVqtT3fpGc7kt1QALCELwftM6dYQAXkXLPqWnX1tZtQZ_Q6afWEikzFfYMrTBq-XRyODq8voHR_329fNMcYJizEq0wg5IIh-tZ21fOAQpKFjvzZ61_VuwCun-B1Yi9cf4X0agf8jo-YhQ48s3z9_fyoLR7X0GQgl61kqQ4XA'
+        }
+    },
+    {
+        id: 3,
+        latitude: -7.7850,
+        longitude: 110.3600,
+        color_class: 'bg-tertiary-container',
+        text_class: 'text-on-tertiary-container',
+        icon: 'MapPin',
+        preview: {
+            title: 'House Cleaning',
+            price: 40,
+            distance: '3.1 km away',
+            image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAZTdLJb7pvUum9XS70oa8fXReJaUhKr3ZJc1bStM4GWJO0SFExNtQQusLrDcaYHjB6ngloAchj41COC99H-cYKbr8_iv0k3WqEszzAKVnUA55IdBFbjpCsY_rvYL8wq3P0GmfE7vpzqUtkVwzLKYxyqehsxoxn0UITi3nAGuGJFG3RwMDheD1dCItEz7ZSwe4ZZGZkgskEXpi4Nw1Zn9WkCga-JhgdlvSjUNq35HgbP0tMDU1FFk7dNw'
+        }
+    }
+];
+
+export default function MapBrowse({ categories = ['All', 'Handyman', 'Cleaning', 'Moving'] }: MapBrowseProps) {
     const [activeCategory, setActiveCategory] = useState(categories[0]);
+    const [selectedMarkerId, setSelectedMarkerId] = useState<number | null>(null);
 
     return (
+        <BottomNavLayout>
         <div className="bg-background text-on-background min-h-screen overflow-hidden flex flex-col">
             <Head title="GigConnect | Browse Gigs Map" />
 
@@ -102,84 +151,90 @@ export default function MapBrowse({ categories, map_image, markers }: MapBrowseP
                     </div>
                 </div>
 
-                {/* Map Layer (Simulated) */}
+                {/* Map Layer */}
                 <div className="relative w-full h-full bg-surface-dim">
-                    <div className="absolute inset-0 grayscale-[20%] opacity-90">
-                        <img className="w-full h-full object-cover" alt="Map background" src={map_image} />
-                    </div>
+                    <Map
+                        initialViewState={{
+                            longitude: 110.3695,
+                            latitude: -7.7956,
+                            zoom: 13
+                        }}
+                        mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+                        style={{ width: '100%', height: '100%' }}
+                        onClick={() => setSelectedMarkerId(null)}
+                    >
+                        <NavigationControl position="bottom-right" style={{ marginBottom: '100px' }} />
 
-                    {/* Markers */}
-                    {markers.map(marker => (
-                        <div 
-                            key={marker.id} 
-                            className={`absolute -translate-x-1/2 -translate-y-1/2 ${marker.selected ? 'z-30' : 'cursor-pointer group'}`}
-                            style={{ top: marker.top, left: marker.left }}
-                        >
-                            {marker.selected ? (
-                                <div className="flex flex-col items-center">
-                                    {/* Preview Card */}
-                                    <div className="bg-white rounded-xl shadow-2xl p-3 mb-3 w-64 border border-outline-variant/30 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                                        <div className="flex gap-3 items-start mb-2">
-                                            <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0">
-                                                <img className="w-full h-full object-cover" alt={marker.preview?.title} src={marker.preview?.image} />
-                                            </div>
-                                            <div className="grow">
-                                                <h3 className="font-label-md text-on-surface line-clamp-1">{marker.preview?.title}</h3>
-                                                <div className="flex items-center gap-1 text-secondary">
-                                                    <span className="font-label-md">${marker.preview?.price.toFixed(2)}</span>
-                                                    <span className="text-[10px] text-outline">/ hr</span>
+                        {/* Markers */}
+                        {MOCK_MARKERS.map(marker => {
+                            const isSelected = selectedMarkerId === marker.id;
+                            
+                            return (
+                                <Marker 
+                                    key={marker.id}
+                                    longitude={marker.longitude}
+                                    latitude={marker.latitude}
+                                    anchor="bottom"
+                                    onClick={e => {
+                                        e.originalEvent.stopPropagation();
+                                        setSelectedMarkerId(marker.id);
+                                    }}
+                                >
+                                    <div className={`${isSelected ? 'z-30 relative' : 'cursor-pointer group relative'}`}>
+                                        {isSelected ? (
+                                            <div className="flex flex-col items-center">
+                                                {/* Preview Card */}
+                                                <div className="bg-white rounded-xl shadow-2xl p-3 mb-2 w-64 border border-outline-variant/30 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                                                    <div className="flex gap-3 items-start mb-2">
+                                                        <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0">
+                                                            <img className="w-full h-full object-cover" alt={marker.preview?.title} src={marker.preview?.image} />
+                                                        </div>
+                                                        <div className="grow">
+                                                            <h3 className="font-label-md text-on-surface line-clamp-1">{marker.preview?.title}</h3>
+                                                            <div className="flex items-center gap-1 text-secondary">
+                                                                <span className="font-label-md">${marker.preview?.price.toFixed(2)}</span>
+                                                                <span className="text-[10px] text-outline">/ hr</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-[12px] text-on-surface-variant flex items-center gap-1">
+                                                            <Navigation size={14} /> {marker.preview?.distance}
+                                                        </span>
+                                                        <Link href={`/gigs/${marker.id}/apply`}>
+                                                            <button className="bg-primary text-on-primary px-3 py-1 rounded-full font-label-sm shadow-sm active:scale-95 transition-transform">
+                                                                View Gig
+                                                            </button>
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                                {/* Selected Pin */}
+                                                <div className="w-10 h-10 bg-primary rounded-full rounded-bl-none rotate-45 flex items-center justify-center shadow-2xl animate-bounce border-2 border-on-primary">
+                                                    <div className="-rotate-45 text-on-primary">
+                                                        {getIcon(marker.icon, 'text-on-primary')}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <CheckCircle2 className="text-secondary shrink-0" size={18} />
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-[12px] text-on-surface-variant flex items-center gap-1">
-                                                <Navigation size={14} /> {marker.preview?.distance}
-                                            </span>
-                                            <button className="bg-primary text-on-primary px-3 py-1 rounded-full font-label-sm shadow-sm active:scale-95 transition-transform">
-                                                View Gig
-                                            </button>
-                                        </div>
+                                        ) : (
+                                            <div className={`w-8 h-8 ${marker.color_class} rounded-full rounded-bl-none rotate-45 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+                                                <div className={`-rotate-45 ${marker.text_class}`}>
+                                                    {getIcon(marker.icon, marker.text_class)}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                    {/* Selected Pin */}
-                                    <div className="w-10 h-10 bg-primary rounded-full rounded-bl-none rotate-45 flex items-center justify-center shadow-2xl animate-bounce border-2 border-on-primary">
-                                        <div className="-rotate-45">
-                                            {getIcon(marker.icon, marker.text_class)}
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className={`w-8 h-8 ${marker.color_class} rounded-full rounded-bl-none rotate-45 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-                                    <div className="-rotate-45">
-                                        {getIcon(marker.icon, marker.text_class)}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                                </Marker>
+                            );
+                        })}
+                    </Map>
 
                     {/* Location Button */}
-                    <button className="absolute bottom-24 right-4 bg-white p-3 rounded-full shadow-lg border border-outline-variant/20 hover:bg-surface-container transition-colors active:scale-90 duration-200 z-10 flex items-center justify-center text-primary">
+                    <button className="absolute bottom-28 right-4 bg-white p-3 rounded-full shadow-lg border border-outline-variant/20 hover:bg-surface-container transition-colors active:scale-90 duration-200 z-10 flex items-center justify-center text-primary">
                         <Navigation size={24} />
                     </button>
                 </div>
             </main>
-
-            {/* Bottom Navigation (Simplified for this view) */}
-            <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface shadow-[0_-2px_10px_rgba(0,0,0,0.05)] h-16 md:hidden">
-                 <Link className="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="/worker/dashboard">
-                    <MapPin size={24} className="fill-current" />
-                    <span className="font-label-sm text-label-sm">Explore</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform duration-200" href="#">
-                    <Wrench size={24} />
-                    <span className="font-label-sm text-label-sm">My Gigs</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform duration-200" href="/messages">
-                    <Search size={24} />
-                    <span className="font-label-sm text-label-sm">Messages</span>
-                </Link>
-            </nav>
         </div>
+        </BottomNavLayout>
     );
 }

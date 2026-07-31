@@ -6,6 +6,19 @@ use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
+    public function quickApply($id)
+    {
+        $gig = [
+            'id' => $id,
+            'title' => 'Emergency Pipe Repair',
+            'rate' => '$80/hr',
+            'client' => [
+                'name' => 'Mrs. Diana'
+            ]
+        ];
+        return Inertia::render('worker/QuickApply', ['gig' => $gig]);
+    }
+
     public function employer()
     {
         // Mock data matching the employer_dashboard screen requirements
@@ -279,5 +292,37 @@ class DashboardController extends Controller
         ];
 
         return Inertia::render('UserProfile', $data);
+    }
+
+    public function applyToGig($id)
+    {
+        $gig = [
+            'id' => $id,
+            'title' => 'Senior React Developer - Fintech App',
+            'company' => 'Nebula Systems',
+            'rate' => '$80 - $100/hr',
+            'location' => 'Remote',
+        ];
+        return Inertia::render('worker/ApplyToGig', ['gig' => $gig]);
+    }
+
+    public function applyToGigSubmit($id)
+    {
+        return redirect()->route('gigs.apply.success');
+    }
+
+    public function proposalSuccess()
+    {
+        return Inertia::render('worker/ProposalSuccess');
+    }
+
+    public function liveJobTracking($id)
+    {
+        return Inertia::render('worker/LiveJobTracking');
+    }
+
+    public function reviewCandidates($id)
+    {
+        return Inertia::render('employer/ReviewCandidates');
     }
 }

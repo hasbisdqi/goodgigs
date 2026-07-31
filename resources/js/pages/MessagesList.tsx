@@ -17,6 +17,8 @@ interface MessagesListProps {
     conversations: Conversation[];
 }
 
+import BottomNavLayout from '@/layouts/BottomNavLayout';
+
 export default function MessagesList({ filters, conversations }: MessagesListProps) {
     const [activeFilter, setActiveFilter] = useState(filters[0]);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -30,6 +32,7 @@ export default function MessagesList({ filters, conversations }: MessagesListPro
     }, []);
 
     return (
+        <BottomNavLayout>
         <div className="bg-background text-on-background font-body-md min-h-screen flex flex-col">
             <Head title="GigConnect | Messages" />
 
@@ -104,30 +107,11 @@ export default function MessagesList({ filters, conversations }: MessagesListPro
                 </section>
             </main>
 
-            {/* BottomNavBar */}
-            <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center h-20 px-2 pb-safe bg-surface shadow-lg border-t border-outline-variant/20 md:hidden">
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-low transition-colors active:scale-90" href="/worker/gigs/map">
-                    <Search className="mb-1" size={24} />
-                    <span className="font-label-sm text-label-sm">Explore</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-3 py-1 active:scale-90 transition-transform" href="/messages">
-                    <MessageSquare className="mb-1 fill-current" size={24} />
-                    <span className="font-label-sm text-label-sm">Messages</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-low transition-colors active:scale-90" href="/worker/dashboard">
-                    <Briefcase className="mb-1" size={24} />
-                    <span className="font-label-sm text-label-sm">My Gigs</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-container-low transition-colors active:scale-90" href="#">
-                    <User className="mb-1" size={24} />
-                    <span className="font-label-sm text-label-sm">Profile</span>
-                </Link>
-            </nav>
-
             {/* FAB Contextual (New Message) */}
             <button className="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-[0px_8px_24px_rgba(79,70,229,0.2)] flex items-center justify-center active:scale-95 transition-transform z-40">
                 <MessageSquarePlus size={28} />
             </button>
         </div>
+        </BottomNavLayout>
     );
 }

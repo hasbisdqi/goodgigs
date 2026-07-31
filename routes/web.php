@@ -22,52 +22,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages', [DashboardController::class, 'messagesList'])->name('messages.list');
     Route::get('/messages/{id}', [DashboardController::class, 'directChat'])->name('messages.direct');
     Route::get('/profile', [DashboardController::class, 'userProfile'])->name('profile.view');
+    Route::get('/gigs/apply/success', [DashboardController::class, 'proposalSuccess'])->name('gigs.apply.success');
+    Route::get('/gigs/{id}/apply', [DashboardController::class, 'applyToGig'])->name('gigs.apply');
+    Route::post('/gigs/{id}/apply', [DashboardController::class, 'applyToGigSubmit'])->name('gigs.apply.submit');
+    Route::get('/gigs/{id}/quick-apply', [DashboardController::class, 'quickApply'])->name('gigs.quick-apply');
+    Route::get('/employer/gigs/{id}/candidates', [DashboardController::class, 'reviewCandidates'])->name('employer.gigs.candidates');
+    Route::get('/worker/gigs/{id}/tracking', [DashboardController::class, 'liveJobTracking'])->name('worker.gigs.tracking');
 
     Route::middleware(['verified'])->group(function () {
-
-        // Navigation modules
-        Route::get('jobs', [JobPostingController::class, 'index'])->name('jobs.index');
-        Route::get('jobs/{jobPosting}', [JobPostingController::class, 'show'])->name('jobs.show');
-        Route::post('jobs/{jobPosting}/apply', [JobApplicationController::class, 'store'])->name('jobs.apply');
-
-        Route::get('user/{user}', [ProfileController::class, 'show'])->name('profile.show');
-        Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
-        Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
-
-        Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
-        Route::post('jobs/{jobPosting}/attendance/check-in', [AttendanceController::class, 'store'])->name('jobs.attendance.checkin');
-        Route::get('attendance/{attendanceSession}', [AttendanceController::class, 'show'])->name('attendance.show');
-
-        // Views for Verification
-        Route::get('attendance/{attendanceSession}/qr-verification', function (AttendanceSession $attendanceSession) {
-            return Inertia::render('attendance/qr-verification', ['session' => $attendanceSession]);
-        })->name('attendance.qr.view');
-
-        Route::get('attendance/{attendanceSession}/pin-verification', function (AttendanceSession $attendanceSession) {
-            return Inertia::render('attendance/pin-verification', ['session' => $attendanceSession]);
-        })->name('attendance.pin.view');
-
-        Route::get('attendance/{attendanceSession}/evidence', function (AttendanceSession $attendanceSession) {
-            $attendanceSession->load('evidences');
-
-            return Inertia::render('attendance/evidence-upload', ['session' => $attendanceSession]);
-        })->name('attendance.evidence.view');
-
-        Route::get('attendance/{attendanceSession}/no-show', function (AttendanceSession $attendanceSession) {
-            $attendanceSession->load('disputes');
-
-            return Inertia::render('attendance/no-show-report', ['session' => $attendanceSession]);
-        })->name('attendance.dispute.view');
-
-        // Actions for Verification
-        Route::post('attendance/{attendanceSession}/qr/generate', [VerificationController::class, 'generateQr'])->name('attendance.qr.generate');
-        Route::post('attendance/{attendanceSession}/qr/verify', [VerificationController::class, 'verifyQr'])->name('attendance.qr.verify');
-
-        Route::post('attendance/{attendanceSession}/pin/generate', [VerificationController::class, 'generatePin'])->name('attendance.pin.generate');
-        Route::post('attendance/{attendanceSession}/pin/verify', [VerificationController::class, 'verifyPin'])->name('attendance.pin.verify');
-
-        Route::post('attendance/{attendanceSession}/no-show', [DisputeController::class, 'reportNoShow'])->name('attendance.dispute.noshow');
-        Route::post('attendance/{attendanceSession}/evidence', [EvidenceController::class, 'upload'])->name('attendance.evidence.upload');
-
+        // Any verified routes if needed in the future
     });
 });

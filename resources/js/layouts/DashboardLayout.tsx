@@ -9,6 +9,7 @@ interface DashboardLayoutProps {
     userAvatar?: string;
     role?: 'employer' | 'worker';
 }
+import BottomNavLayout from '@/layouts/BottomNavLayout';
 
 export default function DashboardLayout({
     children,
@@ -18,8 +19,9 @@ export default function DashboardLayout({
     role = 'employer',
 }: DashboardLayoutProps) {
     return (
-        <div className="bg-surface font-body-md text-on-surface min-h-screen pb-24">
-            <Head title={title} />
+        <BottomNavLayout>
+            <div className="bg-surface font-body-md text-on-surface min-h-screen">
+                <Head title={title} />
             
             {/* TopAppBar */}
             <header className="bg-surface shadow-sm fixed top-0 w-full z-50 flex justify-between items-center px-container-padding-mobile md:px-container-padding-desktop h-16">
@@ -55,26 +57,7 @@ export default function DashboardLayout({
                 {children}
             </main>
 
-            {/* BottomNavBar (Visible on Mobile) */}
-            <nav className="fixed bottom-0 left-0 w-full z-50 bg-surface shadow-[0_-2px_10px_rgba(0,0,0,0.05)] md:hidden flex justify-around items-center px-4 py-2">
-                <Link className="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href={role === 'employer' ? '/employer/dashboard' : '/worker/dashboard'}>
-                    <Home size={24} className="fill-current" />
-                    <span className="font-label-sm text-label-sm">Home</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform duration-200" href="#">
-                    <Briefcase size={24} />
-                    <span className="font-label-sm text-label-sm">My Gigs</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform duration-200 relative" href="#">
-                    <MessageSquare size={24} />
-                    <span className="font-label-sm text-label-sm">Messages</span>
-                    {role === 'worker' && <span className="absolute top-0 right-1 w-2 h-2 bg-error rounded-full"></span>}
-                </Link>
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform duration-200" href="#">
-                    <User size={24} />
-                    <span className="font-label-sm text-label-sm">Profile</span>
-                </Link>
-            </nav>
-        </div>
+            </div>
+        </BottomNavLayout>
     );
 }

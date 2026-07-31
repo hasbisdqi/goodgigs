@@ -17,10 +17,13 @@ interface UserProfileProps {
     }
 }
 
+import BottomNavLayout from '@/layouts/BottomNavLayout';
+
 export default function UserProfile({ user }: UserProfileProps) {
     const [isEmployerMode, setIsEmployerMode] = useState(false);
 
     return (
+        <BottomNavLayout>
         <div className="bg-background text-on-background font-body-md min-h-screen pb-24 overflow-x-hidden">
             <Head title="GigConnect | Profile" />
 
@@ -199,26 +202,7 @@ export default function UserProfile({ user }: UserProfileProps) {
                     </div>
                 </section>
             </main>
-
-            {/* Bottom Navigation Bar (Mobile) */}
-            <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 bg-surface shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center px-4 py-2 border-none">
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform duration-200" href={isEmployerMode ? '/employer/dashboard' : '/worker/dashboard'}>
-                    <Home size={24} />
-                    <span className="font-label-sm text-label-sm mt-1">Home</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform duration-200" href="#">
-                    <Briefcase size={24} />
-                    <span className="font-label-sm text-label-sm mt-1">My Gigs</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 transition-transform duration-200" href="/messages">
-                    <MessageSquare size={24} />
-                    <span className="font-label-sm text-label-sm mt-1">Messages</span>
-                </Link>
-                <Link className="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 active:scale-90 transition-transform duration-200" href="/profile">
-                    <User size={24} className="fill-current" />
-                    <span className="font-label-sm text-label-sm">Profile</span>
-                </Link>
-            </nav>
         </div>
+        </BottomNavLayout>
     );
 }
