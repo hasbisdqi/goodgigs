@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -41,7 +42,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
      */
     public function getRouteKey()
     {
-        return $this->username ?: 'u-' . $this->id;
+        return $this->username ?: 'u-'.$this->id;
     }
 
     /**
@@ -49,7 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
      *
      * @param  mixed  $value
      * @param  string|null  $field
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return Model|null
      */
     public function resolveRouteBinding($value, $field = null)
     {
@@ -97,30 +98,6 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     }
 
     /**
-     * Get the job applications submitted by this user.
-     */
-    public function jobApplications(): HasMany
-    {
-        return $this->hasMany(JobApplication::class);
-    }
-
-    /**
-     * Get the chat messages sent by this user.
-     */
-    public function sentChatMessages(): HasMany
-    {
-        return $this->hasMany(ChatMessage::class, 'sender_id');
-    }
-
-    /**
-     * Get the chat messages received by this user.
-     */
-    public function receivedChatMessages(): HasMany
-    {
-        return $this->hasMany(ChatMessage::class, 'receiver_id');
-    }
-
-    /**
      * Check if the user is in employer mode.
      */
     public function isEmployer(): bool
@@ -152,59 +129,13 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         return $this->is_worker_active;
     }
 
-    /**
-     * Get the reviews given by this user.
-     */
-    public function reviewsGiven(): HasMany
+    public function workerAttendanceSessions(): HasMany
     {
-        return $this->hasMany(Review::class, 'reviewer_id');
+        return $this->hasMany(AttendanceSession::class, 'worker_id');
     }
 
-    /**
-     * Get the reviews received by this user.
-     */
-    public function reviewsReceived(): HasMany
+    public function employerAttendanceSessions(): HasMany
     {
-        return $this->hasMany(Review::class, 'reviewee_id');
-    }
-
-    /**
-     * Get the endorsements given by this user.
-     */
-    public function endorsementsGiven(): HasMany
-    {
-        return $this->hasMany(Endorsement::class, 'endorser_id');
-    }
-
-    /**
-     * Get the endorsements received by this user.
-     */
-    public function endorsementsReceived(): HasMany
-    {
-        return $this->hasMany(Endorsement::class, 'endorsee_id');
-    }
-
-    /**
-     * Get the portfolios created by this user.
-     */
-    public function portfolios(): HasMany
-    {
-        return $this->hasMany(Portfolio::class);
-    }
-
-    /**
-     * Get the verification requests submitted by this user.
-     */
-    public function verificationRequests(): HasMany
-    {
-        return $this->hasMany(VerificationRequest::class);
-    }
-
-    /**
-     * Get the reports submitted by this user.
-     */
-    public function reportsSubmitted(): HasMany
-    {
-        return $this->hasMany(Report::class, 'reporter_id');
+        return $this->hasMany(AttendanceSession::class, 'employer_id');
     }
 }

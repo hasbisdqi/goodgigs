@@ -2,120 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\JobApplication;
 use App\Models\JobPosting;
-use App\Models\User;
-use App\Notifications\ApplicationStatusUpdated;
-use App\Notifications\JobApplicationReceived;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class JobApplicationController extends Controller
 {
-    /**
-     * Display a listing of candidates for a specific job posting.
-     */
-    public function index(Request $request, JobPosting $jobPosting): \Inertia\Response
-    {
-        // Ensure current user is the owner of the gig
-        if ($jobPosting->user_id !== $request->user()->id && ! $request->user()->hasRole('Super Admin') && ! $request->user()->hasRole('Admin')) {
-            abort(403);
-        }
-
-        $applications = $jobPosting->applications()->with(['user.reviewsReceived'])->latest()->get();
-
-        return Inertia::render('jobs/manage-candidates', [
-            'job' => $jobPosting,
-            'applications' => $applications,
-        ]);
-    }
-
-    /**
-     * Store a newly created job application in storage.
-     */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, JobPosting $jobPosting)
     {
         $validated = $request->validate([
-            'job_posting_id' => ['required', 'exists:job_postings,id'],
-            'message' => ['required', 'string', 'max:1000'],
-            'hourly_rate' => ['nullable', 'numeric', 'min:0'],
-            'duration' => ['nullable', 'string', 'max:255'],
-            'availability' => ['nullable', 'string', 'max:255'],
-            'attachment' => ['nullable', 'file', 'max:10240'], // 10MB max
+            'message' => 'required|string|max:1000',
         ]);
 
-        $job = JobPosting::findOrFail($validated['job_posting_id']);
+        $user = $request->user();
 
-        // Check if user is the creator of the gig
-        if ($job->user_id === $request->user()->id) {
-            return back()->withErrors(['message' => __('Anda tidak bisa melamar ke tugas yang Anda buat sendiri.')]);
+        // Prevent employer from applying to their own job
+        if ($jobPosting->user_id === $user->id) {
+            return back()->withErrors(['message' => 'You cannot apply to your own job.']);
         }
 
-        // Check if user already applied
-        $exists = JobApplication::where('job_posting_id', $job->id)
-            ->where('user_id', $request->user()->id)
-            ->exists();
-
-        if ($exists) {
-            return back()->withErrors(['message' => __('Anda sudah melamar ke tugas ini.')]);
+        // Check if already applied
+        if ($jobPosting->jobApplications()->where('user_id', $user->id)->exists()) {
+            return back()->withErrors(['message' => 'You have already applied to this job.']);
         }
 
-        $attachmentPath = null;
-        if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('job-applications', 'public');
-        }
-
-        $application = JobApplication::create([
-            'job_posting_id' => $job->id,
-            'user_id' => $request->user()->id,
+        $jobPosting->jobApplications()->create([
+            'user_id' => $user->id,
             'message' => $validated['message'],
-            'hourly_rate' => $validated['hourly_rate'] ?? null,
-            'duration' => $validated['duration'] ?? null,
-            'availability' => $validated['availability'] ?? null,
-            'attachment_path' => $attachmentPath,
+            'status' => 'pending',
         ]);
 
-        // Notify the job poster about the new application
-        $job->user->notify(new JobApplicationReceived($application, $job, $request->user()));
-
-        Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => __('Lamaran tugas berhasil dikirim.'),
-        ]);
-
-        return redirect()->back();
-    }
-
-    /**
-     * Update the status of the job application.
-     */
-    public function update(Request $request, JobApplication $application): RedirectResponse
-    {
-        $job = $application->jobPosting;
-
-        // Ensure current user is the owner of the gig or an admin
-        if ($job->user_id !== $request->user()->id && ! $request->user()->hasRole('Super Admin') && ! $request->user()->hasRole('Admin')) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            'status' => ['required', 'string', 'in:accepted,rejected,pending'],
-        ]);
-
-        $application->update(['status' => $validated['status']]);
-
-        // Notify the applicant about status change
-        $applicant = User::find($application->user_id);
-        if ($applicant) {
-            $applicant->notify(new ApplicationStatusUpdated($application, $job));
-        }
-
-        Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => __('Status lamaran berhasil diperbarui.'),
-        ]);
-
-        return redirect()->back();
+        return back()->with('success', 'Your application has been submitted successfully.');
     }
 }

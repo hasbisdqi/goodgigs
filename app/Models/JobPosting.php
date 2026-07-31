@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['user_id', 'title', 'company', 'description', 'location', 'salary', 'type', 'status', 'latitude', 'longitude', 'job_category_id'])]
 class JobPosting extends Model
@@ -24,14 +25,6 @@ class JobPosting extends Model
     }
 
     /**
-     * Get the category of this job posting.
-     */
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(JobCategory::class, 'job_category_id');
-    }
-
-    /**
      * Get the applications received for this job posting.
      */
     public function jobApplications(): HasMany
@@ -39,27 +32,8 @@ class JobPosting extends Model
         return $this->hasMany(JobApplication::class);
     }
 
-    /**
-     * Get the chat messages for this job posting.
-     */
-    public function chatMessages(): HasMany
+    public function attendanceSession(): HasOne
     {
-        return $this->hasMany(ChatMessage::class);
-    }
-
-    /**
-     * Get the reviews for this job posting.
-     */
-    public function reviews(): HasMany
-    {
-        return $this->hasMany(Review::class);
-    }
-
-    /**
-     * Get the progress updates for this job posting.
-     */
-    public function progressUpdates(): HasMany
-    {
-        return $this->hasMany(JobProgressUpdate::class);
+        return $this->hasOne(AttendanceSession::class);
     }
 }
