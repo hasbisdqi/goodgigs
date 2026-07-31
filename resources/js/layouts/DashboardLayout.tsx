@@ -30,7 +30,7 @@ export default function DashboardLayout({
                         <img className="w-full h-full object-cover" alt={userName} src={userAvatar} />
                     </div>
                     <span className="font-headline-md text-headline-md font-bold text-primary">
-                        GigConnect
+                        Goodgigs
                     </span>
                 </div>
                 <div className="flex items-center gap-4 md:gap-stack-md">

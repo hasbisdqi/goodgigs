@@ -20,7 +20,7 @@ export default function Login({ status }: { status?: string }) {
 
     return (
         <div className="min-h-screen bg-surface-container-lowest flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <Head title="Sign In | GigConnect" />
+            <Head title="Sign In | Goodgigs" />
 
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <Link href="/" className="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors mb-6">
@@ -31,7 +31,7 @@ export default function Login({ status }: { status?: string }) {
                     <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
                         <span className="text-on-primary font-bold text-xl">G</span>
                     </div>
-                    <span className="text-2xl font-bold text-primary tracking-tight">GigConnect</span>
+                    <span className="text-2xl font-bold text-primary tracking-tight">Goodgigs</span>
                 </div>
             </div>
 

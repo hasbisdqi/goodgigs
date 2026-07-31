@@ -26,7 +26,7 @@ export default function ApplyToGig({ gig }: ApplyToGigProps) {
     return (
         <BottomNavLayout>
         <div className="bg-background text-on-background font-body-md min-h-screen">
-            <Head title="GigConnect | Submit Proposal" />
+            <Head title="Goodgigs | Submit Proposal" />
 
             {/* Top AppBar */}
             <header className="fixed top-0 left-0 w-full h-16 bg-surface shadow-sm flex justify-between items-center px-container-padding-mobile z-50">

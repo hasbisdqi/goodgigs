@@ -33,7 +33,7 @@ export default function QuickApply({ gig }: any) {
 
     return (
         <div className="bg-background text-on-background font-body-md min-h-screen pb-24">
-            <Head title="GigConnect | Quick Apply" />
+            <Head title="Goodgigs | Quick Apply" />
             
             <header className="bg-surface shadow-sm sticky top-0 z-40">
                 <div className="flex justify-between items-center px-4 md:px-8 w-full h-16 max-w-7xl mx-auto">

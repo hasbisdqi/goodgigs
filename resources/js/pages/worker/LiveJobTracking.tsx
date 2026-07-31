@@ -101,7 +101,7 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
 
     return (
         <div className="bg-surface-bright text-on-surface font-body-md selection:bg-primary-fixed-dim overflow-hidden h-screen flex flex-col">
-            <Head title="Live Job Tracking | GigConnect" />
+            <Head title="Live Job Tracking | Goodgigs" />
 
             {/* Header Section */}
             <header className="bg-surface shadow-sm fixed top-0 w-full z-50 flex justify-between items-center px-container-padding-mobile h-16">

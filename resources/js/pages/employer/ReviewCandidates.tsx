@@ -20,7 +20,7 @@ export default function ReviewCandidates({ gig, candidates }: ReviewCandidatesPr
     return (
         <BottomNavLayout>
         <div className="bg-background text-on-background font-body-md min-h-screen md:pt-16 pb-24 md:pb-0">
-            <Head title="GigConnect | Review Candidates" />
+            <Head title="Goodgigs | Review Candidates" />
 
             {/* TopAppBar Shell */}
             <header className="bg-surface shadow-sm fixed top-0 w-full z-40 flex justify-between items-center px-container-padding-mobile h-16">
@@ -28,7 +28,7 @@ export default function ReviewCandidates({ gig, candidates }: ReviewCandidatesPr
                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
                         <img className="w-full h-full object-cover" alt="Employer Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFlOAQ-s3JFVwMhMLxSYQZi4270H4P_SKFhoH0xgQvFKtVGwoI5OLkG9Go8_PkhOccmIXtpae8Hj3-2aRg2TZ0a2tPl0uIWj93T3TvnQWJ4jtmx6f47wpE6Zv9xSpYZHoIsVrzqtflqkuGHg-z8iYiuwm5gu4i5_YgjykngDG8t2QuKhcR3rfmtfdh7OgT9MzhQ9doRIXK-s5DcTSnHhLXEzNe7ptUFtMh-qT-WU3YuVY-FoNhYBocNQ" />
                     </div>
-                    <h1 className="font-headline-md text-headline-md font-bold text-primary">GigConnect</h1>
+                    <h1 className="font-headline-md text-headline-md font-bold text-primary">Goodgigs</h1>
                 </div>
                 <div className="flex items-center gap-4">
                     <button className="text-on-surface-variant hover:bg-surface-container transition-colors p-2 rounded-full active:scale-95 transition-transform">
@@ -112,24 +112,6 @@ export default function ReviewCandidates({ gig, candidates }: ReviewCandidatesPr
                                     </div>
                                     
                                     <div className="mt-stack-lg pt-stack-md border-t border-outline-variant/30 flex justify-between items-center relative z-10">
-                                        <div className="flex gap-2">
-                                            <button 
-                                                onClick={() => {
-                                                    if (candidate.status !== 'shortlisted') {
-                                                        router.post(`/applications/${candidate.application_id}/shortlist`, {}, { preserveScroll: true });
-                                                    }
-                                                }}
-                                                disabled={candidate.status === 'shortlisted'}
-                                                className={`px-4 py-2 rounded-xl font-label-md text-label-md shadow-sm transition-all ${candidate.status === 'shortlisted' ? 'bg-secondary-container text-on-secondary-container opacity-80 cursor-default' : 'bg-primary text-on-primary hover:brightness-110 active:scale-95'}`}
-                                            >
-                                                {candidate.status === 'shortlisted' ? 'Shortlisted' : 'Shortlist'}
-                                            </button>
-                                            <Link href="/messages">
-                                                <button className="bg-surface-container-low text-primary px-4 py-2 rounded-xl font-label-md text-label-md hover:bg-surface-container transition-all active:scale-95 border border-primary/10">
-                                                    Message
-                                                </button>
-                                            </Link>
-                                        </div>
                                         <button 
                                             onClick={() => setSelectedCandidate(candidate)}
                                             className="text-on-surface-variant hover:text-primary font-label-md text-label-md flex items-center gap-1 transition-colors group/btn"
@@ -137,6 +119,40 @@ export default function ReviewCandidates({ gig, candidates }: ReviewCandidatesPr
                                             View Profile 
                                             <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
                                         </button>
+
+                                        <div className="flex gap-3">
+                                            {candidate.status === 'shortlisted' ? (
+                                                <button 
+                                                    onClick={() => {
+                                                        router.post(`/applications/${candidate.application_id}/hire`, {}, { preserveScroll: true });
+                                                    }}
+                                                    className="px-4 py-2 rounded-xl font-label-md text-label-md shadow-sm transition-all bg-primary text-on-primary hover:brightness-110 active:scale-95"
+                                                >
+                                                    Hire
+                                                </button>
+                                            ) : candidate.status === 'hired' ? (
+                                                <button 
+                                                    disabled
+                                                    className="px-4 py-2 rounded-xl font-label-md text-label-md shadow-sm transition-all bg-secondary-container text-on-secondary-container opacity-80 cursor-default"
+                                                >
+                                                    Hired
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => {
+                                                        router.post(`/applications/${candidate.application_id}/shortlist`, {}, { preserveScroll: true });
+                                                    }}
+                                                    className="px-4 py-2 rounded-xl font-label-md text-label-md shadow-sm transition-all bg-surface-container-highest text-on-surface hover:brightness-90 active:scale-95"
+                                                >
+                                                    Shortlist
+                                                </button>
+                                            )}
+                                            <Link href={`/messages/${candidate.id}`}>
+                                                <button className="bg-surface-container-low text-primary px-4 py-2 rounded-xl font-label-md text-label-md hover:bg-surface-container transition-all active:scale-95 border border-primary/10">
+                                                    Message
+                                                </button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </article>
                             ))}

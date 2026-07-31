@@ -1,6 +1,24 @@
 import { createInertiaApp } from '@inertiajs/react';
+import './echo';
+import { configureEcho } from '@laravel/echo-react';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+configureEcho({
+    broadcaster: 'reverb',
+});
+
+configureEcho({
+    broadcaster: 'reverb',
+});
+
+configureEcho({
+    broadcaster: 'reverb',
+});
+
+configureEcho({
+    broadcaster: 'reverb',
+});
+
+const appName = import.meta.env.VITE_APP_NAME || 'Goodgigs';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),

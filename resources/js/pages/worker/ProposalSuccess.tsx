@@ -17,12 +17,12 @@ export default function ProposalSuccess({ proposal }: ProposalSuccessProps) {
     return (
         <BottomNavLayout>
         <div className="bg-background text-on-background font-body-md min-h-screen overflow-x-hidden">
-            <Head title="GigConnect | Proposal Submitted" />
+            <Head title="Goodgigs | Proposal Submitted" />
 
             {/* Top Navigation Bar */}
             <header className="bg-surface shadow-sm fixed top-0 w-full z-50 flex justify-between items-center px-container-padding-mobile h-16">
                 <div className="flex items-center gap-stack-sm">
-                    <span className="font-headline-md text-headline-md font-bold text-primary">GigConnect</span>
+                    <span className="font-headline-md text-headline-md font-bold text-primary">Goodgigs</span>
                 </div>
                 <div className="flex items-center gap-4">
                     <button className="text-primary hover:bg-surface-container transition-colors p-2 rounded-full active:scale-95 transition-transform">

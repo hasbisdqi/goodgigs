@@ -1,32 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Head, Link } from '@inertiajs/react';
-import { 
-    ArrowLeft, Video, MoreVertical, CheckCheck, 
-    Paperclip, Camera, Smile, Send, FileText 
-} from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { ChevronLeft, MoreVertical, Phone, Video, Send, Paperclip, Smile } from 'lucide-react';
 
 interface Contact {
     id: number;
     name: string;
-    title: string;
+    role: string;
     status: string;
     avatar: string;
-    is_online: boolean;
-}
-
-interface Attachment {
-    name: string;
-    size: string;
-    type: string;
 }
 
 interface Message {
     id: number;
+    type: 'sent' | 'received';
     text: string;
     time: string;
-    is_sent: boolean;
-    is_read?: boolean;
-    attachment?: Attachment | null;
+    date: string;
+    status: 'read' | 'delivered';
 }
 
 interface DirectChatProps {
@@ -34,204 +24,163 @@ interface DirectChatProps {
     messages: Message[];
 }
 
-export default function DirectChat({ contact, messages: initialMessages }: DirectChatProps) {
-    const [messages, setMessages] = useState<Message[]>(initialMessages);
-    const [newMessage, setNewMessage] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
-    const mainRef = useRef<HTMLElement>(null);
-    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+export default function DirectChat({ contact, messages }: DirectChatProps) {
+    const { auth } = usePage().props as any;
+    const [chatMessages, setChatMessages] = useState<Message[]>(messages);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const { data, setData, post, processing, reset } = useForm({
+        message: '',
+    });
 
-    // Auto-scroll to bottom
-    useEffect(() => {
-        if (mainRef.current) {
-            mainRef.current.scrollTop = mainRef.current.scrollHeight;
-        }
-    }, [messages, isTyping]);
-
-    const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewMessage(e.target.value);
-        setIsTyping(true);
-
-        if (typingTimeoutRef.current) {
-            clearTimeout(typingTimeoutRef.current);
-        }
-
-        typingTimeoutRef.current = setTimeout(() => {
-            setIsTyping(false);
-        }, 2000);
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const handleSend = (e?: React.FormEvent) => {
-        if (e) e.preventDefault();
-        
-        if (newMessage.trim() === '') return;
+    useEffect(() => {
+        setChatMessages(messages);
+    }, [messages]);
 
-        const newMsg: Message = {
-            id: Date.now(),
-            text: newMessage,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            is_sent: true,
-            is_read: false
+    useEffect(() => {
+        if (!auth?.user?.id || !(window as any).Echo) return;
+
+        const channelName = `chat.${auth.user.id}`;
+        const channel = (window as any).Echo.private(channelName);
+
+        channel.listen('.ChatMessageSent', (e: any) => {
+            if (e.messageData && e.messageData.sender_id === contact.id) {
+                setChatMessages((prev) => [...prev, e.messageData]);
+            }
+        });
+
+        return () => {
+            (window as any).Echo.leave(channelName);
         };
+    }, [auth?.user?.id, contact.id]);
 
-        setMessages([...messages, newMsg]);
-        setNewMessage('');
-        setIsTyping(false);
+    useEffect(() => {
+        scrollToBottom();
+    }, [chatMessages]);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!data.message.trim()) return;
+
+        post(`/messages/${contact.id}`, {
+            preserveScroll: true,
+            onSuccess: () => reset('message'),
+        });
     };
 
     return (
-        <div className="flex flex-col h-screen max-w-screen-xl mx-auto bg-background selection:bg-primary/20">
-            <Head title={`GigConnect | Chat with ${contact.name}`} />
+        <div className="bg-background text-on-background font-body-md h-screen flex flex-col">
+            <Head title={`Chat with ${contact.name}`} />
 
-            {/* Header */}
-            <header className="sticky top-0 z-50 bg-surface shadow-sm h-20 flex items-center px-4 md:px-8 border-b border-outline-variant/10">
-                <div className="flex items-center gap-4 w-full">
-                    {/* Back Button */}
-                    <button 
-                        onClick={() => window.history.back()}
-                        className="p-2 hover:bg-surface-container-high rounded-full transition-colors active:scale-95 text-on-surface"
-                    >
-                        <ArrowLeft size={28} />
-                    </button>
-                    
-                    {/* User Info */}
-                    <div className="flex items-center gap-3 flex-1">
-                        <div className="relative w-11 h-11">
-                            <img 
-                                className="w-full h-full rounded-full object-cover" 
-                                alt={contact.name} 
-                                src={contact.avatar}
-                            />
-                            {contact.is_online && (
-                                <div className="absolute bottom-0 right-0 w-3 h-3 bg-secondary-fixed border-2 border-white rounded-full"></div>
+            {/* TopAppBar */}
+            <header className="bg-surface flex items-center justify-between px-4 h-16 shadow-sm z-50 shrink-0">
+                <div className="flex items-center gap-3">
+                    <Link href="/messages" className="p-2 -ml-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface">
+                        <ChevronLeft size={24} />
+                    </Link>
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <div className="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/30">
+                                <img className="w-full h-full object-cover" src={contact.avatar} alt={contact.name} />
+                            </div>
+                            {contact.status === 'Online' && (
+                                <div className="absolute bottom-0 right-0 w-3 h-3 bg-secondary border-2 border-surface rounded-full"></div>
                             )}
                         </div>
                         <div>
-                            <h1 className="font-headline-md text-headline-md text-on-surface leading-tight">{contact.name}</h1>
-                            <p className="font-label-sm text-label-sm text-on-surface-variant">
-                                {contact.title} • {contact.status}
-                            </p>
+                            <h1 className="font-label-lg text-label-lg font-bold text-on-surface leading-tight">{contact.name}</h1>
+                            <p className="font-label-sm text-label-sm text-on-surface-variant leading-tight">{contact.role}</p>
                         </div>
                     </div>
-
-                    {/* Trailing Action */}
-                    <div className="flex items-center gap-2">
-                        <button className="hidden md:flex p-2 hover:bg-surface-container-high rounded-full transition-colors text-primary">
-                            <Video size={24} />
-                        </button>
-                        <button className="p-2 hover:bg-surface-container-high rounded-full transition-colors text-on-surface">
-                            <MoreVertical size={24} />
-                        </button>
-                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button className="p-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-primary">
+                        <Phone size={20} />
+                    </button>
+                    <button className="p-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-primary">
+                        <Video size={20} />
+                    </button>
+                    <button className="p-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant">
+                        <MoreVertical size={20} />
+                    </button>
                 </div>
             </header>
 
-            {/* Main Chat Area */}
-            <main 
-                ref={mainRef}
-                className="flex-1 overflow-y-auto px-4 md:px-8 py-6 space-y-6 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-outline-variant [&::-webkit-scrollbar-thumb]:rounded-full"
-            >
-                {/* Date Divider */}
-                <div className="flex justify-center">
-                    <span className="bg-surface-container-high px-4 py-1 rounded-full text-[11px] font-label-md text-on-surface-variant uppercase tracking-wider">
-                        Today
-                    </span>
-                </div>
-
-                {/* Messages */}
-                {messages.map((msg) => (
-                    <div 
-                        key={msg.id} 
-                        className={`flex flex-col gap-1 max-w-[85%] md:max-w-[70%] ${msg.is_sent ? 'items-end ml-auto' : 'items-start'}`}
-                    >
-                        <div 
-                            className={`px-4 py-3 rounded-2xl shadow-sm border border-outline-variant/20 ${
-                                msg.is_sent 
-                                    ? 'bg-primary text-on-primary rounded-tr-none' 
-                                    : 'bg-surface-container text-on-surface rounded-tl-none'
-                            }`}
-                        >
-                            <p className="font-body-md text-body-md whitespace-pre-wrap">{msg.text}</p>
-                            
-                            {/* Attachment Mock */}
-                            {msg.attachment && (
-                                <div className="mt-3 bg-surface-container-lowest p-3 rounded-xl border border-outline-variant/30 flex items-center gap-3 cursor-pointer hover:bg-surface-bright transition-colors">
-                                    <div className="w-10 h-10 rounded-lg bg-error-container flex items-center justify-center text-error">
-                                        <FileText size={20} />
+            {/* Chat Canvas */}
+            <main className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-surface-container-lowest">
+                {chatMessages.length === 0 ? (
+                    <div className="flex-1 flex flex-col items-center justify-center opacity-50">
+                        <p className="text-on-surface-variant mb-2">No messages yet.</p>
+                        <p className="text-label-sm text-on-surface-variant">Send a message to start the conversation.</p>
+                    </div>
+                ) : (
+                    chatMessages.map((msg, index) => {
+                        const showDate = index === 0 || chatMessages[index - 1].date !== msg.date;
+                        return (
+                            <React.Fragment key={msg.id}>
+                                {showDate && (
+                                    <div className="flex justify-center my-4">
+                                        <span className="bg-surface-container-low px-3 py-1 rounded-full text-label-sm text-on-surface-variant shadow-sm border border-outline-variant/20">
+                                            {msg.date}
+                                        </span>
                                     </div>
-                                    <div className="flex-1 overflow-hidden">
-                                        <p className="font-label-md text-label-md text-on-surface truncate">{msg.attachment.name}</p>
-                                        <p className="text-[10px] text-on-surface-variant uppercase">{msg.attachment.size} • {msg.attachment.type}</p>
+                                )}
+                                <div className={`flex flex-col ${msg.type === 'sent' ? 'items-end' : 'items-start'}`}>
+                                    <div 
+                                        className={`max-w-[80%] px-4 py-2.5 rounded-2xl shadow-sm ${
+                                            msg.type === 'sent' 
+                                            ? 'bg-primary text-on-primary rounded-tr-sm' 
+                                            : 'bg-surface-container text-on-surface rounded-tl-sm'
+                                        }`}
+                                    >
+                                        <p className="whitespace-pre-wrap word-break">{msg.text}</p>
+                                    </div>
+                                    <div className="flex items-center gap-1 mt-1 px-1 opacity-70">
+                                        <span className="text-[11px] font-label-sm text-on-surface-variant">{msg.time}</span>
+                                        {msg.type === 'sent' && (
+                                            <span className="text-[11px] font-label-sm text-on-surface-variant ml-1">
+                                                {msg.status === 'read' ? '✓✓' : '✓'}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
-                            )}
-                        </div>
-                        
-                        <div className="flex items-center gap-1 px-1">
-                            <span className="text-[11px] font-label-sm text-outline">{msg.time}</span>
-                            {msg.is_sent && msg.is_read && (
-                                <CheckCheck size={14} className="text-primary" />
-                            )}
-                            {msg.is_sent && !msg.is_read && (
-                                <CheckCheck size={14} className="text-outline" />
-                            )}
-                        </div>
-                    </div>
-                ))}
-
-                {/* Typing Indicator */}
-                <div 
-                    className={`flex items-center gap-2 px-1 text-on-surface-variant transition-opacity duration-300 ${isTyping ? 'opacity-100' : 'opacity-0'}`}
-                >
-                    <div className="flex gap-1">
-                        <span className="w-1.5 h-1.5 bg-outline-variant rounded-full animate-bounce"></span>
-                        <span className="w-1.5 h-1.5 bg-outline-variant rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                        <span className="w-1.5 h-1.5 bg-outline-variant rounded-full animate-bounce [animation-delay:0.4s]"></span>
-                    </div>
-                    <span className="font-label-sm text-label-sm">{contact.name} is typing...</span>
-                </div>
+                            </React.Fragment>
+                        );
+                    })
+                )}
+                <div ref={messagesEndRef} />
             </main>
 
-            {/* Bottom Message Input Bar */}
-            <footer className="p-4 md:px-8 md:pb-8 bg-surface/80 backdrop-blur-md">
-                <div className="max-w-4xl mx-auto">
-                    <form 
-                        onSubmit={handleSend}
-                        className="relative flex items-center gap-3 bg-surface-container-lowest border border-outline-variant/40 rounded-full px-2 py-2 shadow-lg focus-within:ring-2 focus-within:ring-primary/20 transition-all"
-                    >
-                        {/* Attachments */}
-                        <div className="flex items-center">
-                            <button type="button" className="p-2 hover:bg-surface-container-high rounded-full transition-colors text-on-surface-variant active:scale-90" title="Attach File">
-                                <Paperclip size={20} />
-                            </button>
-                            <button type="button" className="hidden sm:flex p-2 hover:bg-surface-container-high rounded-full transition-colors text-on-surface-variant active:scale-90" title="Take Photo">
-                                <Camera size={20} />
-                            </button>
-                        </div>
-                        
-                        {/* Input Field */}
-                        <input 
-                            value={newMessage}
-                            onChange={handleInput}
-                            className="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-on-surface placeholder:text-outline-variant px-2 py-1 outline-none" 
-                            placeholder="Type a message..." 
+            {/* Message Input Area */}
+            <footer className="bg-surface border-t border-outline-variant/30 px-4 py-3 shrink-0">
+                <form onSubmit={handleSubmit} className="flex items-end gap-2">
+                    <button type="button" className="p-2.5 rounded-full text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors shrink-0">
+                        <Paperclip size={24} />
+                    </button>
+                    <div className="flex-1 bg-surface-container-low rounded-3xl flex items-center px-4 min-h-[48px] border border-outline-variant/50 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+                        <input
                             type="text"
+                            value={data.message}
+                            onChange={(e) => setData('message', e.target.value)}
+                            placeholder="Type a message..."
+                            className="flex-1 bg-transparent border-none outline-none py-3 text-on-surface placeholder:text-on-surface-variant/70 focus:ring-0"
+                            autoComplete="off"
                         />
-                        
-                        {/* Emoji (Desktop) */}
-                        <button type="button" className="hidden sm:flex p-2 hover:bg-surface-container-high rounded-full transition-colors text-on-surface-variant active:scale-90">
+                        <button type="button" className="p-2 -mr-2 text-on-surface-variant hover:text-primary transition-colors shrink-0">
                             <Smile size={20} />
                         </button>
-                        
-                        {/* Send Button */}
-                        <button 
-                            type="submit"
-                            className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-md active:scale-95 transition-transform hover:brightness-110 group flex-shrink-0"
-                        >
-                            <Send size={18} className="group-hover:translate-x-0.5 transition-transform" />
-                        </button>
-                    </form>
-                </div>
+                    </div>
+                    <button 
+                        type="submit" 
+                        disabled={processing || !data.message.trim()}
+                        className="w-12 h-12 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-sm active:scale-95 transition-transform disabled:opacity-50 disabled:active:scale-100 hover:brightness-110"
+                    >
+                        <Send size={20} className="ml-1" />
+                    </button>
+                </form>
             </footer>
         </div>
     );

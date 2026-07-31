@@ -307,6 +307,29 @@ class DashboardController extends Controller
         return Inertia::render('DirectChat', $data);
     }
 
+    public function sendMessage(Request $request, $id)
+    {
+        $request->validate([
+            'message' => 'required|string',
+        ]);
+
+        $user = auth()->user() ?? \App\Models\User::first();
+        $contact = \App\Models\User::findOrFail($id);
+
+        $jobPosting = \App\Models\JobPosting::first();
+
+        $chatMsg = \App\Models\ChatMessage::create([
+            'sender_id' => $user->id,
+            'receiver_id' => $contact->id,
+            'job_posting_id' => $jobPosting ? $jobPosting->id : 1,
+            'message' => $request->message,
+        ]);
+
+        broadcast(new \App\Events\ChatMessageSent($chatMsg));
+
+        return back();
+    }
+
     public function userProfile()
     {
         $user = auth()->user() ?? \App\Models\User::where('email', 'sarah@example.com')->first();
@@ -446,5 +469,52 @@ class DashboardController extends Controller
         $application->save();
 
         return back()->with('success', 'Candidate shortlisted successfully!');
+    }
+    public function hireCandidate(Request $request, $id)
+    {
+        $application = \App\Models\JobApplication::findOrFail($id);
+        $application->status = 'hired';
+        $application->save();
+
+        $job = $application->jobPosting;
+        if ($job) {
+            $job->status = 'assigned';
+            $job->worker_id = $application->user_id;
+            $job->save();
+        }
+
+        return redirect()->route('gigs.tracking.employer', ['id' => $job->id])
+            ->with('success', 'Candidate hired successfully!');
+    }
+
+    public function employerLiveTracking($id)
+    {
+        $job = \App\Models\JobPosting::findOrFail($id);
+        
+        $worker = \App\Models\User::find($job->worker_id);
+        
+        if (!$worker) {
+            return redirect()->back()->with('error', 'No worker assigned to this gig.');
+        }
+
+        $data = [
+            'gig' => [
+                'id' => $job->id,
+                'title' => $job->title,
+                'status' => $job->status,
+                'company' => $job->company,
+                'location' => $job->location,
+                'salary' => $job->salary,
+            ],
+            'worker' => [
+                'id' => $worker->id,
+                'name' => $worker->name,
+                'role' => $worker->title ?? 'Professional',
+                'avatar' => $worker->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode($worker->name).'&background=random',
+                'phone' => '+62 812-3456-7890', // Prototype data
+            ]
+        ];
+
+        return Inertia::render('employer/MissionControl', $data);
     }
 }

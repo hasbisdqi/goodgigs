@@ -34,7 +34,7 @@ export default function MessagesList({ filters = ['All Chats', 'Unread', 'Archiv
     return (
         <BottomNavLayout>
         <div className="bg-background text-on-background font-body-md min-h-screen flex flex-col">
-            <Head title="GigConnect | Messages" />
+            <Head title="Goodgigs | Messages" />
 
             {/* TopAppBar */}
             <header className={`bg-surface flex items-center justify-between px-gutter w-full h-16 fixed top-0 z-50 transition-shadow ${isScrolled ? 'shadow-md' : 'shadow-sm'}`}>
@@ -75,7 +75,8 @@ export default function MessagesList({ filters = ['All Chats', 'Unread', 'Archiv
                 {/* Conversations List */}
                 <section className="flex flex-col">
                     {conversations.map(chat => (
-                        <div key={chat.id} className="px-gutter py-4 flex items-center gap-stack-md hover:bg-surface-container-low transition-colors cursor-pointer group active:bg-surface-container-high">
+                        <Link href={`/messages/${chat.id}`} key={chat.id} className="block">
+                            <div className="px-gutter py-4 flex items-center gap-stack-md hover:bg-surface-container-low transition-colors cursor-pointer group active:bg-surface-container-high">
                             <div className="relative shrink-0">
                                 <div className="w-14 h-14 rounded-full overflow-hidden border border-outline-variant/20 shadow-sm group-active:scale-95 transition-transform">
                                     <img className="w-full h-full object-cover" alt={chat.name} src={chat.avatar} />
@@ -103,6 +104,7 @@ export default function MessagesList({ filters = ['All Chats', 'Unread', 'Archiv
                                 </div>
                             </div>
                         </div>
+                        </Link>
                     ))}
                 </section>
             </main>

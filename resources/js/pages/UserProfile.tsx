@@ -37,7 +37,7 @@ export default function UserProfile({ user }: UserProfileProps) {
     return (
         <BottomNavLayout>
         <div className="bg-background text-on-background font-body-md min-h-screen pb-24 overflow-x-hidden">
-            <Head title="GigConnect | Profile" />
+            <Head title="Goodgigs | Profile" />
 
             {/* Top App Bar */}
             <header className="bg-surface shadow-sm sticky top-0 z-40">
@@ -46,7 +46,7 @@ export default function UserProfile({ user }: UserProfileProps) {
                         <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/10">
                             <img className="w-full h-full object-cover" alt={user.name} src={user.avatar} />
                         </div>
-                        <h1 className="font-headline-md text-headline-md font-bold text-primary">GigConnect</h1>
+                        <h1 className="font-headline-md text-headline-md font-bold text-primary">Goodgigs</h1>
                     </div>
                     <div className="flex gap-2">
                         <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-on-surface-variant">

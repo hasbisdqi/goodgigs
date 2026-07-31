@@ -27,7 +27,7 @@ export default function EmployerDashboard({
     return (
         <BottomNavLayout>
         <div className="bg-background text-on-background font-body-md min-h-screen pb-24 overflow-x-hidden">
-            <Head title="GigConnect | Employer Dashboard" />
+            <Head title="Goodgigs | Employer Dashboard" />
 
             {/* Top App Bar */}
             <header className="bg-surface shadow-sm sticky top-0 z-40">
@@ -36,7 +36,7 @@ export default function EmployerDashboard({
                         <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
                             <img className="w-full h-full object-cover" alt="Profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6y4e4430TxP-HS8Mdh8pnwuIRrh3t7oOgYvenAHaDAQ1Wod-4rS4vPoHCZnhWNo_y4PKkuBIg6I-10L6IvhswSBdnyczlq_62Hw1EfCGKptRTsODGLbTcqZFRyxv20eRkEWoYqL5XHLVhWLISYulTZQdToW-VRCu6RFfOWQM3jnridGKE7l7VVvtJUdWe1HdH8FHAtl5chCyyDiJWokwXZpln7LTG_vMTdLyVA7kWxb7qVB4nVipN8w" />
                         </div>
-                        <h1 className="font-headline-md text-headline-md font-bold text-primary">GigConnect</h1>
+                        <h1 className="font-headline-md text-headline-md font-bold text-primary">Goodgigs</h1>
                     </div>
                     <div className="flex items-center gap-3">
                         <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors active:scale-95 text-on-surface-variant">

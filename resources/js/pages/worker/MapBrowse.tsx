@@ -42,7 +42,7 @@ export default function MapBrowse({ categories = ['All', 'Handyman', 'Cleaning',
     return (
         <BottomNavLayout>
         <div className="bg-background text-on-background min-h-screen overflow-hidden flex flex-col">
-            <Head title="GigConnect | Browse Gigs Map" />
+            <Head title="Goodgigs | Browse Gigs Map" />
 
             {/* Top AppBar */}
             <header className="bg-surface shadow-sm sticky top-0 z-50 flex justify-between items-center px-container-padding-mobile w-full h-16 shrink-0">
@@ -54,7 +54,7 @@ export default function MapBrowse({ categories = ['All', 'Handyman', 'Cleaning',
                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6y4e4430TxP-HS8Mdh8pnwuIRrh3t7oOgYvenAHaDAQ1Wod-4rS4vPoHCZnhWNo_y4PKkuBIg6I-10L6IvhswSBdnyczlq_62Hw1EfCGKptRTsODGLbTcqZFRyxv20eRkEWoYqL5XHLVhWLISYulTZQdToW-VRCu6RFfOWQM3jnridGKE7l7VVvtJUdWe1HdH8FHAtl5chCyyDiJWokwXZpln7LTG_vMTdLyVA7kWxb7qVB4nVipN8w" 
                         />
                     </div>
-                    <h1 className="font-headline-md text-headline-md font-bold text-primary">GigConnect</h1>
+                    <h1 className="font-headline-md text-headline-md font-bold text-primary">Goodgigs</h1>
                 </div>
                 <div className="flex items-center gap-4">
                     <button className="text-primary hover:bg-surface-container transition-colors p-2 rounded-full active:scale-95 transition-transform">
