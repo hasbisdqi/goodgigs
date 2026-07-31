@@ -33,6 +33,13 @@ class AdminController extends Controller
         ]);
         
         $user->kyc_status = $request->status;
+        
+        if ($request->status === 'verified') {
+            $user->is_identity_verified = true;
+        } elseif ($request->status === 'rejected') {
+            $user->is_identity_verified = false;
+        }
+
         $user->save();
 
         return back()->with('success', 'User KYC status updated to ' . $request->status);

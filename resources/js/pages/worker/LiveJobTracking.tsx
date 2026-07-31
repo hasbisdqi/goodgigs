@@ -36,6 +36,20 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
     const isCompleted = job.status === 'completed';
     const hasFinishedAction = isReviewing || isCompleted;
 
+    const theme = isPaid || isCompleted ? {
+        fill: 'bg-secondary/30',
+        knob: 'bg-secondary',
+        text: 'text-secondary',
+    } : isInProgress ? {
+        fill: 'bg-tertiary/30',
+        knob: 'bg-tertiary',
+        text: 'text-tertiary',
+    } : {
+        fill: 'bg-primary/30',
+        knob: 'bg-primary',
+        text: 'text-primary',
+    };
+
     const [isLoading, setIsLoading] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -104,18 +118,27 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
         if (job.status === 'assigned') {
             router.post(`/gigs/${job.id}/start`, {}, {
                 onSuccess: () => {
-                    setIsLoading(false);
                     setSliderX(0); // reset slider for the next phase
                     toast.success('Job Started Successfully!');
-                }
+                },
+                onFinish: () => setIsLoading(false)
             });
         } else if (job.status === 'in_progress') {
             router.post(`/gigs/${job.id}/complete`, {}, {
                 onSuccess: () => {
-                    setIsLoading(false);
                     toast.success('Job marked as complete!');
-                }
+                },
+                onFinish: () => setIsLoading(false)
             });
+        } else if (job.status === 'paid') {
+            router.post(`/gigs/${job.id}/confirm_payment`, {}, {
+                onSuccess: () => {
+                    toast.success('Payment confirmed successfully!');
+                },
+                onFinish: () => setIsLoading(false)
+            });
+        } else {
+            setIsLoading(false);
         }
     };
 
@@ -197,27 +220,6 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
                     />
                 </MapContainer>
 
-                {/* Floating ETA Badge */}
-                <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20">
-                    <div className="bg-white/85 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-white/50 flex items-center gap-3">
-                        <div className="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
-                        <div className="flex flex-col">
-                            <span className="font-headline-md text-[16px] md:text-[18px] text-on-surface leading-tight whitespace-nowrap">Arriving in {job.eta_mins} mins</span>
-                            <span className="font-label-sm text-[12px] text-on-surface-variant whitespace-nowrap">Estimated arrival: {job.eta_time}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Floating Traffic Info */}
-                <div className="absolute right-4 bottom-32 z-20 md:right-8">
-                    <div className="bg-surface-container-lowest p-3 rounded-xl shadow-md border border-outline-variant flex flex-col gap-1 items-end">
-                        <div className="flex items-center gap-2 text-secondary">
-                            <Gauge size={18} />
-                            <span className="font-label-md">{job.traffic_status}</span>
-                        </div>
-                        <span className="font-label-sm text-on-surface-variant">{job.distance_remaining} remaining</span>
-                    </div>
-                </div>
             </main>
 
             {/* Interaction & Status Layer */}
@@ -240,15 +242,15 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
                     ref={containerRef}
                     className="relative w-full h-[72px] bg-surface-variant rounded-full p-2 flex items-center border-2 border-outline-variant/50 group overflow-hidden touch-none select-none"
                 >
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span className={`font-label-md uppercase tracking-widest text-[13px] ${hasFinishedAction ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:animate-pulse'}`}>
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                        <span className={`font-label-md uppercase tracking-widest text-[13px] ${hasFinishedAction ? theme.text + ' font-bold' : 'text-on-surface-variant group-hover:animate-pulse z-20 drop-shadow-sm'}`}>
                             {isReviewing ? 'Waiting for Approval...' : isCompleted ? 'Job Completed' : isPaid ? 'Slide to Confirm Payment' : isInProgress ? 'Slide to Complete Job' : 'Slide to start job'}
                         </span>
                     </div>
 
                     {/* Fill background */}
                     <div 
-                        className="absolute left-0 top-0 bottom-0 bg-primary/10 rounded-full transition-all duration-75 pointer-events-none" 
+                        className={`absolute left-0 top-0 bottom-0 ${theme.fill} rounded-full transition-all duration-75 pointer-events-none z-0`} 
                         style={{ width: `${sliderX + 56}px` }}
                     ></div>
 
@@ -257,10 +259,10 @@ export default function LiveJobTracking({ job }: LiveJobTrackingProps) {
                         ref={knobRef}
                         onMouseDown={(e) => handleStart(e.clientX)}
                         onTouchStart={(e) => handleStart(e.touches[0].clientX)}
-                        className={`absolute left-2 h-[56px] w-[56px] text-on-primary rounded-full flex items-center justify-center shadow-md z-10 transition-transform ${
+                        className={`absolute left-2 h-[56px] w-[56px] text-on-primary rounded-full flex items-center justify-center shadow-md z-20 transition-transform ${
                             !isDragging && !hasFinishedAction ? 'duration-300 ease-out' : 'duration-75 ease-linear'
                         } ${
-                            hasFinishedAction || sliderX >= maxSlide * 0.95 ? 'bg-primary cursor-default' : 'bg-primary cursor-grab active:cursor-grabbing'
+                            hasFinishedAction || sliderX >= maxSlide * 0.95 ? `${theme.knob} cursor-default` : `${theme.knob} cursor-grab active:cursor-grabbing`
                         }`}
                         style={{ transform: `translateX(${sliderX}px)` }}
                     >

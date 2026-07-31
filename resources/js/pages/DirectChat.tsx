@@ -97,12 +97,7 @@ export default function DirectChat({ contact, messages }: DirectChatProps) {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="p-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-primary">
-                        <Phone size={20} />
-                    </button>
-                    <button className="p-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-primary">
-                        <Video size={20} />
-                    </button>
+
                     <button className="p-2 rounded-full hover:bg-surface-container active:scale-95 transition-all text-on-surface-variant">
                         <MoreVertical size={20} />
                     </button>
